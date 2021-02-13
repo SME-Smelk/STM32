@@ -9,8 +9,8 @@ In the process of learning and generating a personal repository as well as frien
 - Support  STM32 and Cortex Mx architecture
 - Focus in FreeRTOS
 - Memory Management with processor Cortex-M4 and assembly.
-- Multiples projects code to use in basic electronic, avance, robotics and rtos projects.
-- Own Drivers SME for perypherals
+- Multiples projects code to use in basic electronic, advance, robotics and rtos projects.
+- Own Drivers SME for pherypherals
 
 #
 
