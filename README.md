@@ -10,11 +10,18 @@ In the process of learning and generating a personal repository as well as frien
 - Focus in FreeRTOS
 - Memory Management with processor Cortex-M4 and assembly.
 - Multiples projects code to use in basic electronic, avance, robotics and rtos projects.
----
+
+#
+
+
+
 
 ![](https://i.postimg.cc/SsDPs73D/Sin-t-tulo-2.png)
 
----
+
+
+
+#
 
 # DISCOVERY-DISC1 STM32F407VG
 
