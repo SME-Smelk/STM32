@@ -12,15 +12,15 @@ In the process of learning and generating a personal repository as well as frien
 - Multiples projects code to use in basic electronic, avance, robotics and rtos projects.
 ---
 
-![](https://i.ibb.co/SmH8YWk/SME-trans.png)
+![](https://i.postimg.cc/SsDPs73D/Sin-t-tulo-2.png)
 
 ---
 
-###DISCOVERY-DISC1 STM32F407VG
+# DISCOVERY-DISC1 STM32F407VG
 
 The DISCOVERY-DISC1 F407VG board has the following code repository the following plan, at the moment. This list could change**
 
-#### Basics
+## Basics
 
 - [ ] UART2
     - [ ] 01-TX
@@ -53,7 +53,7 @@ The DISCOVERY-DISC1 F407VG board has the following code repository the following
     - [ ] CAN
     - [ ] I2S
 
-#### Sensors
+### Sensors
 
 - [ ] RTC
     - [ ] DS1307
@@ -63,7 +63,7 @@ The DISCOVERY-DISC1 F407VG board has the following code repository the following
 - [ ] IMU
 	- [ ] MPU6050
 
-#### Aplications
+### Aplications
 
 - [ ] With Interfaces
     - [ ] ADC-FFT
@@ -73,7 +73,7 @@ The DISCOVERY-DISC1 F407VG board has the following code repository the following
 	- [ ] DSP
 	- [ ] Filters
 	
-#### RTOS
+### RTOS
 
 - [ ] RTOS FreeRTOS
     - [ ] FreeRTOS Code Base
@@ -93,7 +93,7 @@ The DISCOVERY-DISC1 F407VG board has the following code repository the following
     - [ ] Mutex-BinSema
     - [ ] MutexAPI
 
-#### Bootloaders
+### Bootloaders
 
 - [ ] Bootloader
     - [ ] Bootloader Base Code
@@ -102,7 +102,7 @@ The DISCOVERY-DISC1 F407VG board has the following code repository the following
     - [ ] UserCode
     - [ ] Bootloader-Code
 
-#### Cortex M4 Programming
+### Cortex M4 Programming
 
 - [ ] Cortex-M4
     - [ ] --
