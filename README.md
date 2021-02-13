@@ -15,11 +15,6 @@ In the process of learning and generating a personal repository as well as frien
 ![](https://i.ibb.co/SmH8YWk/SME-trans.png)
 
 ---
-**Table of Contents**
-
-[TOCM]
-
-[TOC]
 
 ###DISCOVERY-DISC1 STM32F407VG
 
