@@ -29,34 +29,34 @@ endif
 
 -include ../makefile.defs
 
-BUILD_ARTIFACT_NAME := 00-Ref-F407VG
+BUILD_ARTIFACT_NAME := 00-Ref-F407VG-HAL
 BUILD_ARTIFACT_EXTENSION := elf
 BUILD_ARTIFACT_PREFIX := 
 BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME).$(BUILD_ARTIFACT_EXTENSION)
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXECUTABLES += \
-00-Ref-F407VG.elf \
+00-Ref-F407VG-HAL.elf \
 
 SIZE_OUTPUT += \
 default.size.stdout \
 
 OBJDUMP_LIST += \
-00-Ref-F407VG.list \
+00-Ref-F407VG-HAL.list \
 
 OBJCOPY_BIN += \
-00-Ref-F407VG.bin \
+00-Ref-F407VG-HAL.bin \
 
 
 # All Target
 all: main-build
 
 # Main-build Target
-main-build: 00-Ref-F407VG.elf secondary-outputs
+main-build: 00-Ref-F407VG-HAL.elf secondary-outputs
 
 # Tool invocations
-00-Ref-F407VG.elf: $(OBJS) $(USER_OBJS) C:\Users\Ismael\Dropbox\Smelk\Universidad\ y\ Conocimiento\Cursos\Electronica\ARM\ Cortex\ M\ Microcontroller\ DMA\ Programming\ Demystified\SME\Programaciones\00-Ref-F407VG\STM32F407VGTX_FLASH.ld
-	arm-none-eabi-gcc -o "00-Ref-F407VG.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\Ismael\Dropbox\Smelk\Universidad y Conocimiento\Cursos\Electronica\ARM Cortex M Microcontroller DMA Programming Demystified\SME\Programaciones\00-Ref-F407VG\STM32F407VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="00-Ref-F407VG.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+00-Ref-F407VG-HAL.elf: $(OBJS) $(USER_OBJS) C:\Users\Ismael\git\STM32\Boards\ Reference\ code\HAL\STM32F4DISCOVERY\ -\ F407VG\00-Ref-F407VG-HAL\STM32F407VGTX_FLASH.ld
+	arm-none-eabi-gcc -o "00-Ref-F407VG-HAL.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\Ismael\git\STM32\Boards Reference code\HAL\STM32F4DISCOVERY - F407VG\00-Ref-F407VG-HAL\STM32F407VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="00-Ref-F407VG-HAL.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -65,13 +65,13 @@ default.size.stdout: $(EXECUTABLES)
 	@echo 'Finished building: $@'
 	@echo ' '
 
-00-Ref-F407VG.list: $(EXECUTABLES)
-	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "00-Ref-F407VG.list"
+00-Ref-F407VG-HAL.list: $(EXECUTABLES)
+	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "00-Ref-F407VG-HAL.list"
 	@echo 'Finished building: $@'
 	@echo ' '
 
-00-Ref-F407VG.bin: $(EXECUTABLES)
-	arm-none-eabi-objcopy  -O binary $(EXECUTABLES) "00-Ref-F407VG.bin"
+00-Ref-F407VG-HAL.bin: $(EXECUTABLES)
+	arm-none-eabi-objcopy  -O binary $(EXECUTABLES) "00-Ref-F407VG-HAL.bin"
 	@echo 'Finished building: $@'
 	@echo ' '
 
