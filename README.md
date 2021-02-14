@@ -34,9 +34,9 @@ The DISCOVERY-DISC1 F407VG board has the following code repository the following
     - [x] 01-UART2_HelloWord
     - [x] 02-UART2_TXRX
     - [x] 03-UART2_TXRX_IT
-- [ ] SystemClock
-    - [ ] 04-SYSCLK_HSI_MCO
-    - [ ] 05-SYSCLK_PLL_HSI_MCO
+- [x] SystemClock
+    - [x] 04-SYSCLK_HSI_MCO
+    - [x] 05-SYSCLK_PLL_HSE_MCO
 - [ ] GPIO
     - [ ] 06-GPIO_LedBlink_Block
     - [ ] 07-GPIO_LedBlink_NoBlock
