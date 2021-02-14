@@ -37,12 +37,11 @@ The DISCOVERY-DISC1 F407VG board has the following code repository the following
 - [x] SystemClock
     - [x] 04-SYSCLK_HSI_MCO
     - [x] 05-SYSCLK_PLL_HSE_MCO
-- [ ] GPIO
-    - [ ] 06-GPIO_LedBlink_Block
-    - [ ] 07-GPIO_LedBlink_NoBlock
-    - [ ] 07-GPIO_LedBlink_NoBlock_X
-    - [ ] 08-GPIO_Button_Led
-    - [ ] 09-GPIO_Button_Led_IT
+- [x] GPIO
+    - [x] 06-GPIO_LedBlink_Block
+    - [x] 07-GPIO_LedBlink_NoBlock
+    - [x] 08-GPIO_Button_Led
+    - [x] 09-GPIO_Button_Led_IT
 - [ ] DMA - ADC
     - [ ] ADC_Poll
     - [ ] DMA_Interrupt-ToggleLed
