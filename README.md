@@ -73,21 +73,21 @@ The DISCOVERY-DISC1 F407VG board has the following code repository the following
     - [ ] Print_TimeInfo
     - [ ] TS_TIMER
 - [ ] Communication Protocols
-    - [x] UART
-    - [ ] I2C
-    	 - [ ] Master_TX
-	 - [ ] Master_RX
-	 - [ ] Master_RX_TI
-	 - [ ] Slave_TX
-    - [ ] SPI
-    	 - [ ] Master_TX
-	 - [ ] Master_RX
-	 - [ ] Master_RX_TI
-	 - [ ] Slave_TX
-    - [ ] CAN
-    	 - [ ] LoopBack
-	 - [ ] LoopBack_IT
-	 - [ ] Normal_mode_twonodes
+	- [x] UART
+	- [ ] I2C
+		- [ ] Master_TX
+		- [ ] Master_RX
+		- [ ] Master_RX_TI
+		- [ ] Slave_TX
+	- [ ] SPI
+		- [ ] Master_TX
+		- [ ] Master_RX
+		- [ ] Master_RX_TI
+		- [ ] Slave_TX
+	- [ ] CAN
+		- [ ] LoopBack
+		- [ ] LoopBack_IT
+		- [ ] Normal_mode_twonodes
 
 ### Other pherypherals and sensors
 - [ ] SD 
