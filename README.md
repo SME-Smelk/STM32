@@ -30,10 +30,10 @@ The DISCOVERY-DISC1 F407VG board has the following code repository the following
 
 ## Basics
 
-- [ ] UART2
+- [x] UART2
     - [x] 01-UART2_HelloWord
-    - [ ] 02-UART2_TXRX
-    - [ ] 03-UART2_TXRX_IT
+    - [x] 02-UART2_TXRX
+    - [x] 03-UART2_TXRX_IT
 - [ ] SystemClock
     - [ ] 04-SYSCLK_HSI_MCO
     - [ ] 05-SYSCLK_PLL_HSI_MCO
