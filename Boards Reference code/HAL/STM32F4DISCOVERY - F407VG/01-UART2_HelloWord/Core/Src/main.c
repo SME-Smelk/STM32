@@ -3,8 +3,9 @@
   * @Project        : 01-UART2_HelloWorld
   * @Autor          : Ismael Poblete
   * @Company		: -
-  * @Date         	: 13-02-2021
+  * @Date         	: 02-13-2021
   * @brief          : Basic use HAL for UART2, need uart-ttl converter.
+  * @Lib			: CMSIS, HAL.
   * @System Clock
   * 	SYSSource:		HSE-PLL
   * 	SYSCLK: 		84MHz

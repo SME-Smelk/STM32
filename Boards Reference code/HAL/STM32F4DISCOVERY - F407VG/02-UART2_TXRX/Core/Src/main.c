@@ -1,23 +1,19 @@
 /**
   ******************************************************************************
-  * @Project        : 00-BASE-Basic
+  * @Project        : 02-UART2_TXRX
   * @Autor          : Ismael Poblete
   * @Company		: -
-  * @Date         	: 6-28-2020
-  * @brief          : Base programming guide
+  * @Date         	: 02-13-2020
+  * @brief          : Transmit and receive data UART2. Need a uart to tll converter
+  * 				  wite via with terminal and used end of the word \r (CR)
   * @Lib			: CMSIS, HAL.
   * @System Clock
-  * 	SYSSource:		HSI/HSE/HSI-PLL/HSE-PLL (Ej: HSI)
-  * 	SYSCLK: 		XMHz					(EJ: 8MHz)
+  * 	SYSSource:		HSE-PLL
+  * 	SYSCLK: 		84MHz
   * @Perf
   * 	*UART2
   * 		PA2			<-----> USART_TX
   * 		PA3			<-----> USART_RX
-  * 	*GPIO
-  * 		PA5      	------> LD2
-  * 		PC13     	<------ B1(Button)
-  * 	*ADC
-  * 		PA0    	 	------> ADC1,INO
   ******************************************************************************
 **/
 
@@ -27,6 +23,7 @@
 /* Private includes ----------------------------------------------------------*/
 
 /* Private typedef -----------------------------------------------------------*/
+UART_HandleTypeDef huart2;
 
 /* Private define ------------------------------------------------------------*/
 
@@ -36,9 +33,10 @@
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+static void USART2_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
-
+char *user_data = "The application is running\r\n";
 
 /**
   * @brief  The application entry point.
@@ -54,12 +52,35 @@ int main(void)
 	SystemClock_Config();
 
 	/* Initialize all configured peripherals */
-
+	USART2_UART_Init();
 
 	/* User Code */
+	uint16_t len_of_data = strlen(user_data);
+	HAL_UART_Transmit(&huart2,(uint8_t*)user_data,len_of_data,HAL_MAX_DELAY);
+
+	uint8_t rcvd_data;
+	uint8_t data_buffer[100];
+	uint32_t count=0;
 
 	/* Start Code */
-	while (1);
+	while (1)
+	{
+		/* Read UART2*/
+		HAL_UART_Receive(&huart2,&rcvd_data,1,HAL_MAX_DELAY); //Tiene un while, modo bloqueante. Si hay recepcion avanza.
+
+		/* if \r detected, end characte,r then send data otherway add character to the buffer*/
+		if(rcvd_data == '\r')
+		{
+			data_buffer[count++]= '\r';
+			HAL_UART_Transmit(&huart2,data_buffer,count,HAL_MAX_DELAY);
+			count=0;
+			memset(data_buffer, 0, sizeof(data_buffer));
+		} else
+		{
+			data_buffer[count++]= rcvd_data;
+		}
+
+	}
 }
 
 /**
@@ -108,6 +129,26 @@ void SystemClock_Config(void)
   }
 }
 
+/**
+  * @brief USART2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void USART2_UART_Init(void)
+{
+  huart2.Instance = USART2;
+  huart2.Init.BaudRate = 115200;
+  huart2.Init.WordLength = UART_WORDLENGTH_8B;
+  huart2.Init.StopBits = UART_STOPBITS_1;
+  huart2.Init.Parity = UART_PARITY_NONE;
+  huart2.Init.Mode = UART_MODE_TX_RX;
+  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+}
 
 /**
   * @brief  This function is executed in case of error occurrence.
