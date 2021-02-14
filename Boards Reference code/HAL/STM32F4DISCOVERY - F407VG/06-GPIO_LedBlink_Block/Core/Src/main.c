@@ -1,27 +1,21 @@
 /**
   ******************************************************************************
-  * @Project        : 04-SYSCLK_HSI_MCO
+  * @Project        : 06-GPIO_LedBlink_Block
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-14-2020
-  * @brief          : Config the clock of el MCU with 16Mhz HSI (High-Speed Internal)
+  * @brief          : Config GPIO to toggle PD12 (Led Green).
   * @Lib			: CMSIS, HAL.
   * @System Clock
-  * 	SYSSource:		HSI
-  * 	SYSCLK: 		16MHz
+  * 	SYSSource:		HSE
+  * 	SYSCLK: 		84MHz
   * @Perf
   * 	*UART2
   * 		PA2			<-----> USART_TX
   * 		PA3			<-----> USART_RX
-  * @Note
-  *	  	*Config clock to 16 MHz with HSI
-  *			Activate HSI
-  *				RCC_HSI_ON
-  *				RCC_SYSCLKSOURCE_HSI
-  *			Not Activate PLL
-  *				HSI RCC_PLL_NONE
-  *			DIV SYSCLK
-  *				RCC_SYSCLK_DIV1
+  *
+  * 	*LED
+  * 		PD12		<-----> LED_GREEN_pin,
   ******************************************************************************
 **/
 
@@ -42,7 +36,7 @@ UART_HandleTypeDef huart2;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void USART2_UART_Init(void);
-
+static void GPIO_Init(void);
 /* Private user code ---------------------------------------------------------*/
 
 /**
@@ -63,6 +57,7 @@ int main(void)
 	HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);
 
 	/* Initialize all configured peripherals */
+	GPIO_Init();
 	USART2_UART_Init();
 
 	/* User Code */
@@ -85,7 +80,11 @@ int main(void)
 	HAL_UART_Transmit(&huart2,(uint8_t*)msg,strlen(msg),HAL_MAX_DELAY);
 
 	/* Infinite loop */
-	while (1);
+	while (1)
+	{
+		HAL_GPIO_TogglePin(LED_GREEN_port, LED_GREEN_pin);
+		HAL_Delay(500);
+	}
 }
 
 /**
@@ -99,10 +98,15 @@ void SystemClock_Config(void)
 
   /** Initializes the CPU, AHB and APB busses clocks
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
-  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+  RCC_OscInitStruct.PLL.PLLM = 4;
+  RCC_OscInitStruct.PLL.PLLN = 168;
+  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV4;
+  RCC_OscInitStruct.PLL.PLLQ = 7;
+
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     Error_Handler();
@@ -111,13 +115,13 @@ void SystemClock_Config(void)
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
 
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
   {
     Error_Handler();
   }
@@ -145,6 +149,30 @@ static void USART2_UART_Init(void)
   {
     Error_Handler();
   }
+}
+
+/**
+  * @brief GPIO Initialization Function
+  * @param None
+  * @retval None
+  */
+static void GPIO_Init(void)
+{
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+  /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOD_CLK_ENABLE();
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(LED_GREEN_port, LED_GREEN_pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin : LED_GREEN_pin */
+  GPIO_InitStruct.Pin = LED_GREEN_pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(LED_GREEN_port, &GPIO_InitStruct);
+
 }
 
 /**

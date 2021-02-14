@@ -13,21 +13,21 @@
   * 	*UART2
   * 		PA2			<-----> USART_TX
   * 		PA3			<-----> USART_RX
-  *
-  	  	*Config clock to 84 MHz with HSE and PLL
-  	  		Important to configure the latency if the frequency to use is very high (FLASH_LATENCY_2)
-			Activate HSE (8MHz)
-				RCC_HSE_ON
-				RCC_OSCILLATORTYPE_HSE
-			Activate and config PLL
-				RCC_PLL_ON
-				RCC_PLLSOURCE_HSE
-				M=4
-				N=168
-				P=4
-			DIV SYSCLK
-				RCC_SYSCLK_DIV1
-			Result = 8/4*168/4/1 = 84Mhz
+  * @Note
+  *	  	*Config clock to 84 MHz with HSE and PLL
+  *	  		Important to configure the latency if the frequency to use is very high (FLASH_LATENCY_2)
+  *		Activate HSE (8MHz)
+  *				RCC_HSE_ON
+  *				RCC_OSCILLATORTYPE_HSE
+  *			Activate and config PLL
+  *				RCC_PLL_ON
+  *				RCC_PLLSOURCE_HSE
+  *				M=4
+  *				N=168
+  *				P=4
+  *			DIV SYSCLK
+  *				RCC_SYSCLK_DIV1
+  *			Result = 8/4*168/4/1 = 84Mhz
   ******************************************************************************
 **/
 
