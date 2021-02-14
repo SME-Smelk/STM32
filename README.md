@@ -24,11 +24,14 @@ In the process of learning and generating a personal repository as well as frien
 
 #
 
-# DISCOVERY-DISC1 STM32F407VG
+
+
+
+# Board Reference Code: Basics
+
+## DISCOVERY-DISC1 STM32F407VG
 
 The DISCOVERY-DISC1 F407VG board has the following code repository the following plan, at the moment. This list could change**
-
-## Basics
 
 - [x] UART2
     - [x] 01-UART2_HelloWord
@@ -42,26 +45,54 @@ The DISCOVERY-DISC1 F407VG board has the following code repository the following
     - [x] 07-GPIO_LedBlink_NoBlock
     - [x] 08-GPIO_Button_Led
     - [x] 09-GPIO_Button_Led_IT
+- [ ] TIMER
+    - [ ] 13-TIMER2_IT_100ms
+    - [ ] 14-TIMER2_PWM_1us
+    - [ ] 15-TIMER2_IC
+    - [ ] 16-TIMER2_IC_OC
 - [ ] DMA - ADC
     - [ ] ADC_Poll
     - [ ] DMA_Interrupt-ToggleLed
     - [ ] DMA-UART_SRAM
     - [ ] DMA-ADC-SRAM
     - [ ] DMA-SRAM-UART2-TX
-- [ ] TIMER
-    - [ ] 13-TIMER2_IT_100ms
-    - [ ] 14-TIMER2_PWM_1us
-    - [ ] 15-TIMER2_IC
-    - [ ] 16-TIMER2_IC_OC
+- [ ] LowPower Modes
+    - [ ] WFE Button
+    - [ ] WFI
+    - [ ] Run Mode
+    - [ ] Sleep Mode
+    - [ ] Standby Mode
+    - [ ] Stop Mode
+    - [ ] Sleep On Exit
+- [ ] Internal RTC
+    - [ ] Alarm_Stanby_WakeUp
+    - [ ] Alarm_A
+    - [ ] Alarm_A_12
+    - [ ] Date_time
+    - [ ] Demo_app
+    - [ ] Print_TimeInfo
+    - [ ] TS_TIMER
 - [ ] Communication Protocols
-    - [ ] UART
+    - [x] UART
     - [ ] I2C
+    	 - [ ] Master_TX
+	 - [ ] Master_RX
+	 - [ ] Master_RX_TI
+	 - [ ] Slave_TX
     - [ ] SPI
+    	 - [ ] Master_TX
+	 - [ ] Master_RX
+	 - [ ] Master_RX_TI
+	 - [ ] Slave_TX
     - [ ] CAN
-    - [ ] I2S
+    	 - [ ] LoopBack
+	 - [ ] LoopBack_IT
+	 - [ ] Normal_mode_twonodes
 
-### Sensors
-
+### Other pherypherals and sensors
+- [ ] SD 
+    - [ ] write_sd
+    - [ ] read_sd
 - [ ] RTC
     - [ ] DS1307
     - [ ] DS3231
