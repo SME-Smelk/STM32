@@ -4,7 +4,7 @@
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-14-2020
-  * @brief          : Config GPIO to toggle PD12 (Led Green) and PA0 like a input
+  * @brief          : Config GPIO to blink in PD12 (Led Green) and PA0 like a input
   * 				  (User Button). Push button = ON led, Release button - OFF Led.
   * @Lib			: CMSIS, HAL.
   * @System Clock
@@ -14,10 +14,10 @@
   * 	*UART2
   * 		PA2			<-----> USART_TX
   * 		PA3			<-----> USART_RX
-  * 	*LED
-  * 		PD12		<-----> LED_GREEN_pin,
-  * 	*BUTTON
-  * 		PA0			<-----> BUTTON_pin,
+  * 	*USER LED
+  * 		PD12		<-----> LED_GREEN_pin
+  * 	*USER BUTTON
+  * 		PA0			<-----> BUTTON_pin
   ******************************************************************************
 **/
 

@@ -23,7 +23,6 @@
 
 /* Exported macro ------------------------------------------------------------*/
 #define USE_FULL_ASSERT
-#define INTERVAL 500
 
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);

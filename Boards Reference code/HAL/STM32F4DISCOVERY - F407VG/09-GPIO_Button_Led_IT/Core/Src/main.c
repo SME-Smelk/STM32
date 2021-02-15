@@ -14,10 +14,10 @@
   * 	*UART2
   * 		PA2			<-----> USART_TX
   * 		PA3			<-----> USART_RX
-  * 	*LED
-  * 		PD12		<-----> LED_GREEN_pin,
-  * 	*BUTTON
-  * 		PA0			<-----> BUTTON_pin,
+  * 	*USER LED
+  * 		PD12		<-----> LED_GREEN_pin
+  * 	*USER BUTTON
+  * 		PA0			<-----> BUTTON_pin
   ******************************************************************************
 **/
 

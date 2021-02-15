@@ -23,6 +23,7 @@
 
 /* Exported macro ------------------------------------------------------------*/
 #define USE_FULL_ASSERT
+#define INTERVAL 500
 
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
@@ -34,7 +35,5 @@ void Error_Handler(void);
 #define USART_RX_GPIO_Port 			GPIOAx1
 #define LED_GREEN_pin 				GPIO_PIN_12
 #define LED_GREEN_port 				GPIOD
-#define BUTTON_pin 					GPIO_PIN_0
-#define BUTTON_port 				GPIOA
 
 #endif /* __MAIN_H */

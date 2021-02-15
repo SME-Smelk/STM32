@@ -4,7 +4,7 @@
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-14-2020
-  * @brief          : Config GPIO to toggle PD12 (Led Green) No blocking.
+  * @brief          : Config GPIO to blink in PD12 (Led Green) No blocking.
   * @Lib			: CMSIS, HAL.
   * @System Clock
   * 	SYSSource:		HSE
@@ -14,8 +14,8 @@
   * 		PA2			<-----> USART_TX
   * 		PA3			<-----> USART_RX
   *
-  * 	*LED
-  * 		PD12		<-----> LED_GREEN_pin,
+  * 	*USER LED
+  * 		PD12		<-----> LED_GREEN_pin
   ******************************************************************************
 **/
 

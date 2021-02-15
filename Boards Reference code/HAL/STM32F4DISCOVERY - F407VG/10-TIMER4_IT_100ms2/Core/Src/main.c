@@ -1,10 +1,11 @@
 /**
   ******************************************************************************
-  * @Project        : 06-GPIO_LedBlink_Block
+  * @Project        : 10-TIMER2_IT_100ms
   * @Autor          : Ismael Poblete
   * @Company		: -
-  * @Date         	: 02-14-2020
-  * @brief          : Config GPIO to blink in PD12 (Led Green).
+  * @Date         	: 02-15-2020
+  * @brief          : Used the TIMER2 to produced a 100ms interrupt period
+  * 				  that interrupt trigger the toggle led PD12 User led green.
   * @Lib			: CMSIS, HAL.
   * @System Clock
   * 	SYSSource:		HSE
@@ -13,9 +14,15 @@
   * 	*UART2
   * 		PA2			<-----> USART_TX
   * 		PA3			<-----> USART_RX
-  *
-  * 	*USER LED
+  * 	*TIMER4 - LED
   * 		PD12		<-----> LED_GREEN_pin
+  * @note
+  * 	HCLK 84Mhz
+  * 	TIMER2_PRESCALER 1999 (main.h)
+  * 	TIMER2_PERIOD 2099	(main.h)
+  *		fprec_out = 84Mhz /(1999 + 1) = 42000Hz
+  *		fpulse = 42MHz / (2099 + 1) = 20Hz
+  *		fsignal = 20Hz / 2 = 10Hz, 100ms
   ******************************************************************************
 **/
 
@@ -26,6 +33,7 @@
 
 /* Private typedef -----------------------------------------------------------*/
 UART_HandleTypeDef huart2;
+TIM_HandleTypeDef htim2;
 
 /* Private define ------------------------------------------------------------*/
 
@@ -37,6 +45,7 @@ UART_HandleTypeDef huart2;
 void SystemClock_Config(void);
 static void USART2_UART_Init(void);
 static void GPIO_Init(void);
+static void TIM2_Init(void);
 /* Private user code ---------------------------------------------------------*/
 
 /**
@@ -59,6 +68,7 @@ int main(void)
 	/* Initialize all configured peripherals */
 	GPIO_Init();
 	USART2_UART_Init();
+	TIM2_Init();
 
 	/* User Code */
 	char msg[100];
@@ -79,12 +89,12 @@ int main(void)
 	sprintf(msg,"PCLK2  : %ldHz\r\n",HAL_RCC_GetPCLK2Freq());
 	HAL_UART_Transmit(&huart2,(uint8_t*)msg,strlen(msg),HAL_MAX_DELAY);
 
+	/* Init Timer2 */
+	HAL_TIM_Base_Start_IT(&htim2);
+
 	/* Infinite loop */
-	while (1)
-	{
-		HAL_GPIO_TogglePin(LED_GREEN_port, LED_GREEN_pin);
-		HAL_Delay(500);
-	}
+	while (1);
+
 }
 
 /**
@@ -117,9 +127,8 @@ void SystemClock_Config(void)
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
-
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
   {
@@ -172,6 +181,53 @@ static void GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(LED_GREEN_port, &GPIO_InitStruct);
+
+}
+
+
+/**
+  * @brief TIM2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void TIM2_Init(void)
+{
+
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  htim2.Instance = TIM2;
+  htim2.Init.Prescaler = TIMER2_PRESCALER;
+  htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim2.Init.Period = TIMER2_PERIOD;
+  htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim2, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+}
+
+/**
+  * @brief Timer callback
+  * @param htim
+  * @retval None
+  */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
+
+	HAL_GPIO_TogglePin(LED_GREEN_port, LED_GREEN_pin);
 
 }
 
