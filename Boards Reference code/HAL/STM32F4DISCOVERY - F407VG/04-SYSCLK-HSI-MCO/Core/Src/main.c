@@ -3,7 +3,7 @@
   * @Project        : 04-SYSCLK_HSI_MCO
   * @Autor          : Ismael Poblete
   * @Company		: -
-  * @Date         	: 02-14-2020
+  * @Date         	: 02-14-2021
   * @brief          : Config the clock of el MCU with 16Mhz HSI (High-Speed Internal)
   * @Lib			: CMSIS, HAL.
   * @System Clock

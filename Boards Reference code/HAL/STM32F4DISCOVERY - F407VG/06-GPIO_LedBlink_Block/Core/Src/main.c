@@ -3,7 +3,7 @@
   * @Project        : 06-GPIO_LedBlink_Block
   * @Autor          : Ismael Poblete
   * @Company		: -
-  * @Date         	: 02-14-2020
+  * @Date         	: 02-14-2021
   * @brief          : Config GPIO to blink in PD12 (Led Green).
   * @Lib			: CMSIS, HAL.
   * @System Clock

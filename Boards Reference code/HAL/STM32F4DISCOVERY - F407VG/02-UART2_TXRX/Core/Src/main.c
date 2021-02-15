@@ -3,7 +3,7 @@
   * @Project        : 02-UART2_TXRX
   * @Autor          : Ismael Poblete
   * @Company		: -
-  * @Date         	: 02-13-2020
+  * @Date         	: 02-13-2021
   * @brief          : Transmit and receive data UART2. Need a uart to tll converter
   * 				  wite via with terminal and used end of the word \r (CR)
   * @Lib			: CMSIS, HAL.

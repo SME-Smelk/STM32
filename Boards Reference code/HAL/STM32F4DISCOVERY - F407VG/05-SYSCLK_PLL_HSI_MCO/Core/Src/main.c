@@ -3,7 +3,7 @@
   * @Project        : 05-SYSCLK_PLL_HSE_MCO
   * @Autor          : Ismael Poblete
   * @Company		: -
-  * @Date         	: 02-14-2020
+  * @Date         	: 02-14-2021
   * @brief          : Config the clock of el MCU with 84MMhz HSE (High-Speed External)
   * @Lib			: CMSIS, HAL.
   * @System Clock

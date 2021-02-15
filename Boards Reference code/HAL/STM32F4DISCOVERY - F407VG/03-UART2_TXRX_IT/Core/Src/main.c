@@ -3,7 +3,7 @@
   * @Project        : 03-UART2_TXRX_IT
   * @Autor          : Ismael Poblete
   * @Company		: -
-  * @Date         	: 02-13-2020
+  * @Date         	: 02-13-2021
   * @brief          : Receive data via IT and form the word(data) with \n in the end,
   * 				  then when it was ready send data. Need a uart to tll converter
   * @Lib			: CMSIS, HAL.

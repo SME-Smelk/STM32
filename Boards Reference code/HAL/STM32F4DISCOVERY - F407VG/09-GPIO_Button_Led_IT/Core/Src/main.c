@@ -3,7 +3,7 @@
   * @Project        : 09-GPIO_Button_Led_IT
   * @Autor          : Ismael Poblete
   * @Company		: -
-  * @Date         	: 02-14-2020
+  * @Date         	: 02-14-2021
   * @brief          : Config GPIO to toggle PD12 (Led Green) and PA0 like a input
   * 				  interrupt (User Button). We can appreciate the rebound effect.
   * @Lib			: CMSIS, HAL.
