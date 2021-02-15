@@ -25,8 +25,7 @@
 
 /* External variables --------------------------------------------------------*/
 extern UART_HandleTypeDef huart2;
-extern TIM_HandleTypeDef htim2;
-
+extern TIM_HandleTypeDef htim3;
 /******************************************************************************/
 /*           Cortex-M4 Processor Interruption and Exception Handlers          */ 
 /******************************************************************************/
@@ -104,3 +103,13 @@ void SysTick_Handler(void)
 /* please refer to the startup file (startup_stm32f4xx.s).                    */
 /******************************************************************************/
 
+
+/**
+  * @brief This function handles TIM3 update interrupt.
+  */
+void TIM3_IRQHandler(void)
+{
+
+  HAL_TIM_IRQHandler(&htim3);
+
+}
