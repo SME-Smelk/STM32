@@ -45,9 +45,9 @@ The DISCOVERY-DISC1 F407VG board has the following code repository the following
     - [x] 07-GPIO_LedBlink_NoBlock
     - [x] 08-GPIO_Button_Led
     - [x] 09-GPIO_Button_Led_IT
-- [ ] TIMER
-    - [ ] 13-TIMER2_IT_100ms
-    - [ ] 14-TIMER2_PWM_1us
+- [x] TIMER
+    - [x] 13-TIMER2_IT_100ms
+    - [x] 14-TIMER2_PWM_1us
     - [ ] 15-TIMER2_IC
     - [ ] 16-TIMER2_IC_OC
 - [ ] DMA - ADC
