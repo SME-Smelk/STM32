@@ -1,11 +1,10 @@
 /**
   ******************************************************************************
-  * @Project        : 10-TIMER2_IT_100ms
+  * @Project        : 11-TIMER2_PWM_1us
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-15-2021
-  * @brief          : Config TIMER2 to 100ms interrupt to trigger the toggle
-  * 				  PD12 (Led Green)
+  * @brief          : Config TIMER2 PWM to 1us in PA1 (TIMER2 CHANNEL_2)
   * @Lib			: CMSIS, HAL.
   * @System Clock
   * 	SYSSource:		HSE
@@ -14,16 +13,14 @@
   * 	*UART2
   * 		PA2			<-----> USART_TX
   * 		PA3			<-----> USART_RX
-  * 	*LED
-  * 		PD12		<-----> LED_GREEN_pin,
-  *
   * @note
   * 	HCLK: 84Mhz
-  * 	TIMER2_PRESCALER: 1999
-  * 	TIMER2_PERIOD: 2099
-  * 	fout_prescaler = 84Mhz / (1999 + 1) = 42000Mhz
-  * 	fout_pulse = 42000 / (2099 + 1) = 20
-  * 	fsignal = 20 / 2 = 10Hz, 100ms.
+  * 	TIMER2_PRESCALER: 0
+  * 	TIMER2_PERIOD: 83
+  * 	TIMER2_PULSE: 0.5
+  * 	fout_prescaler = 84Mhz / (0 + 1) = 84MMhz
+  * 	fout_period = 84Mhz / (83 + 1) = 1MHz, 1us
+  * 	fpulse = ((TIMER2_PERIOD + 1) * TIMER2_PULSE ) - 1
   *
   ******************************************************************************
 **/
@@ -91,7 +88,7 @@ int main(void)
 	HAL_UART_Transmit(&huart2,(uint8_t*)msg,strlen(msg),HAL_MAX_DELAY);
 
 	/* Init Timer2 */
-	HAL_TIM_Base_Start_IT(&htim2);
+	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
 
 	/* Infinite loop */
 	while (1);
@@ -193,42 +190,45 @@ static void GPIO_Init(void)
   */
 static void TIM2_Init(void)
 {
+	TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+	TIM_MasterConfigTypeDef sMasterConfig = {0};
+	TIM_OC_InitTypeDef sConfigOC = {0};
 
-  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
-  TIM_MasterConfigTypeDef sMasterConfig = {0};
+	htim2.Instance = TIM2;
+	htim2.Init.Prescaler = TIMER2_PRESCALER;
+	htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
+	htim2.Init.Period = TIMER2_PERIOD;
+	htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+	htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+	if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
+	{
+	Error_Handler();
+	}
+	sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+	if (HAL_TIM_ConfigClockSource(&htim2, &sClockSourceConfig) != HAL_OK)
+	{
+	Error_Handler();
+	}
+	if (HAL_TIM_PWM_Init(&htim2) != HAL_OK)
+	{
+	Error_Handler();
+	}
+	sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+	sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+	if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK)
+	{
+	Error_Handler();
+	}
+	sConfigOC.OCMode = TIM_OCMODE_PWM1;
+	sConfigOC.Pulse = ((TIMER2_PERIOD+1)*TIMER2_PULSE)-1;
+	sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+	sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+	if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
+	{
+	Error_Handler();
+	}
 
-  htim2.Instance = TIM2;
-  htim2.Init.Prescaler = TIMER2_PRESCALER;
-  htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim2.Init.Period = TIMER2_PERIOD;
-  htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-  if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
-  if (HAL_TIM_ConfigClockSource(&htim2, &sClockSourceConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
-  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
-  if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-}
-
-/**
-  * @brief Timer callback
-  * @param htim
-  * @retval None
-  */
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
-
-	HAL_GPIO_TogglePin(LED_GREEN_port, LED_GREEN_pin);
-
+	HAL_TIM_MspPostInit(&htim2);
 }
 
 /**

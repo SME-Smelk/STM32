@@ -23,18 +23,19 @@
 
 /* Exported macro ------------------------------------------------------------*/
 #define USE_FULL_ASSERT
-#define TIMER2_PRESCALER 1999
-#define TIMER2_PERIOD 2099
+#define TIMER2_PRESCALER 0
+#define TIMER2_PERIOD 83
+/* Pulse % 0 - 1*/
+#define TIMER2_PULSE 0.5
 
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
+void HAL_TIM_MspPostInit(TIM_HandleTypeDef* htim);
 
 /* Private defines -----------------------------------------------------------*/
 #define USART_TX_Pin 				GPIO_PIN_2
 #define USART_TX_GPIO_Port 			GPIOA
 #define USART_RX_Pin 				GPIO_PIN_3
 #define USART_RX_GPIO_Port 			GPIOAx1
-#define LED_GREEN_pin 				GPIO_PIN_12
-#define LED_GREEN_port 				GPIOD
 
 #endif /* __MAIN_H */
