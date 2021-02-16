@@ -1,4 +1,4 @@
-# STMicroelectronics microcontroller repository
+# STMicroelectronics Microcontroller Repository
 ### Features
 
 In the process of learning and generating a personal repository as well as friendly to the community. This section will host codes on the use of STM32 microcontrollers, but focused on STM32F407VG, for now. 
@@ -46,10 +46,10 @@ The DISCOVERY-DISC1 F407VG board has the following code repository the following
     - [x] 08-GPIO_Button_Led
     - [x] 09-GPIO_Button_Led_IT
 - [x] TIMER
-    - [x] 13-TIMER2_IT_100ms
-    - [x] 14-TIMER2_PWM_1us
-    - [ ] 15-TIMER2_IC
-    - [ ] 16-TIMER2_IC_OC
+    - [x] 10-TIMER2_IT_100ms
+    - [x] 11-TIMER2_PWM_1us
+    - [x] 12-TIMER2_IC
+    - [x] 13-TIMER2_IC_OC
 - [ ] DMA - ADC
     - [ ] ADC_Poll
     - [ ] DMA_Interrupt-ToggleLed
