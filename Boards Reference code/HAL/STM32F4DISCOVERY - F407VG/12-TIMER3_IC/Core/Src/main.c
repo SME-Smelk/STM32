@@ -34,11 +34,11 @@
   *		TIMER3 IC
   *			HCLK: 84Mhz
   *			f_input_timer: 84Mhz
-  *			TIMER2_PRESCALER: 0
-  *			TIMER2_PERIOD: 65535
-  *			fout_prescaler = f_input_timer / (TIMER2_PRESCALER + 1)
+  *			TIMER3_PRESCALER: 0
+  *			TIMER3_PERIOD: 65535
+  *			fout_prescaler = f_input_timer / (TIMER3_PRESCALER + 1)
   *			fout_prescaler = 84Mhz / ( 0 + 1) = 84MHz
-  *			min_frec_to_measure = fout_prescaler / (TIMER2_PERIOD + 1).
+  *			min_frec_to_measure = fout_prescaler / (TIMER3_PERIOD + 1).
   *			min_frec_to_measure = 84Mhz / (65535 + 1) = 1281.7Hz
   *			signal_to_measure (TIMER2) = 10Khz > 1281.7Hz, Ok.
   *
