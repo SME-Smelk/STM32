@@ -68,7 +68,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
 * @param hadc: ADC handle pointer
 * @retval None
 */
-void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
+void DMA_Init(ADC_HandleTypeDef* hadc)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
   if(hadc->Instance==ADC1)
@@ -87,28 +87,25 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
 	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 
-    /* ADC1 DMA2 Init */
-    /* ADC1 Init */
+    /* ADC2 DMA Init */
+    /* ADC2 Init */
     hdma2.Instance = DMA2_Stream0;
     hdma2.Init.Channel = DMA_CHANNEL_0;
-    hdma2.Init.Direction = DMA_PERIPH_TO_MEMORY;
+    hdma2.Init.Direction = DMA_MEMORY_TO_MEMORY;
     hdma2.Init.PeriphInc = DMA_PINC_DISABLE;
     hdma2.Init.MemInc = DMA_MINC_ENABLE;
     hdma2.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
     hdma2.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
-    hdma2.Init.Mode = DMA_CIRCULAR;
+    hdma2.Init.Mode = DMA_NORMAL;
     hdma2.Init.Priority = DMA_PRIORITY_LOW;
-    hdma2.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
-    if (HAL_DMA_Init(&hdma2) != HAL_OK)
-    {
-      Error_Handler();
-    }
-
-    __HAL_LINKDMA(hadc,DMA_Handle,hdma2);
-
-    /* ADC1 interrupt Init */
-    HAL_NVIC_SetPriority(ADC_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(ADC_IRQn);
+    hdma2.Init.FIFOMode = DMA_FIFOMODE_ENABLE;
+    hdma2.Init.FIFOThreshold = DMA_FIFO_THRESHOLD_FULL;
+    hdma2.Init.MemBurst = DMA_MBURST_SINGLE;
+    hdma2.Init.PeriphBurst = DMA_PBURST_SINGLE;
+	if (HAL_DMA_Init(&hdma2) != HAL_OK)
+	{
+		Error_Handler();
+	}
 
   }
 }

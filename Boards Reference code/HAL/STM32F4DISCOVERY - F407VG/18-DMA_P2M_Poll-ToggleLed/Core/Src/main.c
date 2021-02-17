@@ -1,14 +1,12 @@
 /**
   ******************************************************************************
-  * @Project        : 17-ADC_DMA
+  * @Project        : 18-DMA_M2M_Poll-ToggleLed
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-17-2021
   * @Target			: DISCOVERY-DISC1 STM32F407VG
-  * @brief          : Simple ADC with DMA.
-  * 				  Non blocking
-  * 				  Multi Channel
-  * 				  ADC Continuos Conversion mode and DMA circular mode
+  * @brief          : Blinking LED_GREEN PD12. Simple DMA transfer Memory to Memory
+  * 				  from SRAM (data) to register ODR of LED.
   * @Lib			: CMSIS, HAL.
   * @System Clock
   * 	SYSSource:		HSE
@@ -19,17 +17,20 @@
   * 		PA3			<-----> USART_RX
   * 	*GPIO
   * 		PD12      	------> LED_GREEN
-  * 	*ADC
-  *			tempsensor  ------> ADC1,ADC_CHANNEL_TEMPSENSOR
-  * 		PA4    	 	------> ADC1,IN4
-  * 		PA5    	 	------> ADC1,IN5
-  * 		PA6    	 	------> ADC1,IN6
   * @note
-  * 	-Non-Blocking with DMA
-  * 	-The ADC mode Continuos Conversion and DMA circular mode is use to read
-  * 	 continuously multiples channels.
-  * 	-We can see adc process duration in PD12 (LED_GREEN)
-  *		-Board DISCOVERY-DISC1 STM32F407VG have 3.0 ADC Reference Voltage
+  * 	-Inefficient Blocking Poll transfer with DMA
+  * 	-Whenever stream can be used. Use those that are not linked to others
+  * 	 peripherals.
+  * 	-We can see in PD12 (LED_GREEN) blinking
+  * 	-Config DMA:
+  * 		-We use DMA2, because bus matrix. DMA1 don't have to access to the
+  * 		 memory by bus peripheral (DMA_PI)
+  * 		-We used PeriphDataAlignment and MemDataAlignment like a Half word,
+  * 		 because the led ODR register is a 16 bits register and write the
+  * 	 	 value 0x1000 set the PD12, bit 12.
+  * 		-We dont need increment, because is only one data, same too burst.
+  * 		-We need a FIFOMode to use M2M, because
+  * 		-M2M, Transfer Memory to Memory.
   *
   ******************************************************************************
 **/
@@ -40,7 +41,6 @@
 /* Private includes ----------------------------------------------------------*/
 
 /* Private typedef -----------------------------------------------------------*/
-ADC_HandleTypeDef hadc1;
 UART_HandleTypeDef huart2;
 DMA_HandleTypeDef hdma2;
 
@@ -54,14 +54,11 @@ DMA_HandleTypeDef hdma2;
 void SystemClock_Config(void);
 static void GPIO_Init(void);
 static void USART2_UART_Init(void);
-static void ADC1_Init(void);
 static void DMA_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
-uint16_t adc_buf[ADC_BUF_LEN];
-float voltage[4];
-char msg[100];
-float Temp = 0.0;
+uint16_t led_data[2] = { 0x0000, 0x1000 };
+
 /**
   * @brief  The application entry point.
   * @retval int
@@ -79,15 +76,18 @@ int main(void)
 	GPIO_Init();
 	USART2_UART_Init();
 	DMA_Init();
-	ADC1_Init();
 
 	/* Start Code */
-	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_buf, ADC_BUF_LEN);
 
 	while (1)
 	{
 
-
+		HAL_DMA_Start(&hdma2,(uint32_t)&led_data[1],(uint32_t) &GPIOD->ODR, 1);
+		HAL_DMA_PollForTransfer(&hdma2, HAL_DMA_FULL_TRANSFER, HAL_MAX_DELAY);
+		HAL_Delay(1000);
+		HAL_DMA_Start(&hdma2,(uint32_t)&led_data[0],(uint32_t) &GPIOD->ODR, 1);
+		HAL_DMA_PollForTransfer(&hdma2, HAL_DMA_FULL_TRANSFER, HAL_MAX_DELAY);
+		HAL_Delay(1000);
 
 	}
 
@@ -132,71 +132,6 @@ void SystemClock_Config(void)
     Error_Handler();
   }
 }
-
-/**
-  * @brief ADC1 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void ADC1_Init(void)
-{
-  ADC_ChannelConfTypeDef sConfig = {0};
-
-  /** Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion)
-  */
-  hadc1.Instance = ADC1;
-  hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV2;
-  hadc1.Init.Resolution = ADC_RESOLUTION_12B;
-  hadc1.Init.ScanConvMode = ENABLE;
-  hadc1.Init.ContinuousConvMode = ENABLE;
-  hadc1.Init.DiscontinuousConvMode = DISABLE;
-  hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
-  hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
-  hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
-  hadc1.Init.NbrOfConversion = 4;
-  hadc1.Init.DMAContinuousRequests = ENABLE;
-  hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
-  if (HAL_ADC_Init(&hadc1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-  */
-  sConfig.Channel = ADC_CHANNEL_TEMPSENSOR;
-  sConfig.Rank = 1;
-  sConfig.SamplingTime = ADC_SAMPLETIME_112CYCLES;
-  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-  */
-  sConfig.Channel = ADC_CHANNEL_4;
-  sConfig.Rank = 2;
-  sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
-  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-  */
-  sConfig.Channel = ADC_CHANNEL_5;
-  sConfig.Rank = 3;
-  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-  */
-  sConfig.Channel = ADC_CHANNEL_6;
-  sConfig.Rank = 4;
-  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-}
-
 
 /**
   * @brief USART2 Initialization Function
@@ -244,32 +179,32 @@ static void GPIO_Init(void)
 
 
 /**
-  * Enable DMA controller clock
-  */
+* @brief DMA
+*/
 static void DMA_Init(void)
 {
+	/* Peripheral clock enable */
+	__HAL_RCC_DMA2_CLK_ENABLE();
 
-  /* DMA controller clock enable */
-  __HAL_RCC_DMA2_CLK_ENABLE();
-
-  /* DMA interrupt init */
-  /* DMA2_Stream0_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA2_Stream0_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(DMA2_Stream0_IRQn);
-
-}
-
-
-/* Called when buffer is completely filled */
-void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
-{
-	for (int i =0; i<ADC_BUF_LEN; i++)
+	hdma2.Instance = DMA2_Stream0;
+	hdma2.Init.Channel = DMA_CHANNEL_0;
+	hdma2.Init.Direction = DMA_MEMORY_TO_MEMORY;
+	hdma2.Init.PeriphInc = DMA_PINC_DISABLE;
+	hdma2.Init.MemInc = DMA_MINC_DISABLE;
+	hdma2.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
+	hdma2.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
+	hdma2.Init.Mode = DMA_NORMAL;
+	hdma2.Init.Priority = DMA_PRIORITY_LOW;
+	hdma2.Init.FIFOMode = DMA_FIFOMODE_ENABLE;
+	hdma2.Init.FIFOThreshold = DMA_FIFO_THRESHOLD_FULL;
+	hdma2.Init.MemBurst = DMA_MBURST_SINGLE;
+	hdma2.Init.PeriphBurst = DMA_PBURST_SINGLE;
+	if (HAL_DMA_Init(&hdma2) != HAL_OK)
 	{
-		voltage[i] = adc_buf[i] * 3.0 / 4096.0;
+		Error_Handler();
 	}
-	Temp = ((voltage[0] - (float)V25)/(float)Avg_Slope)+25.0;
-	HAL_GPIO_WritePin(LED_GREEN_Port, LED_GREEN_Pin, GPIO_PIN_RESET);
 }
+
 
 /**
   * @brief  This function is executed in case of error occurrence.
