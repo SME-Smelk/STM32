@@ -53,8 +53,8 @@ The DISCOVERY-DISC1 F407VG board has the following code repository the following
 - [x] ADC
     - [x] 14-ADC_singleConv_poll
     - [x] 15-ADC_contConv_poll_tempSen
-    - [x] 16-ADC-contConv_IT
-    - [x] 17-ADC-DMA
+    - [x] 16-ADC_contConv_IT
+    - [x] 17-ADC_DMA
 - [ ] DMA
     - [ ] DMA_ADC-SRAM
     - [ ] DMA_Interrupt-ToggleLed
