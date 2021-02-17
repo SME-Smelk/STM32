@@ -15,6 +15,7 @@
 #include <string.h>
 #include <stdio.h>
 
+
 /* Private includes ----------------------------------------------------------*/
 
 /* Exported types ------------------------------------------------------------*/
@@ -22,6 +23,11 @@
 /* Exported constants --------------------------------------------------------*/
 
 /* Exported macro ------------------------------------------------------------*/
+#define N_CH_ADC 4
+
+/*  */
+#define Avg_Slope 0.0025
+#define V25 0.76
 
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);

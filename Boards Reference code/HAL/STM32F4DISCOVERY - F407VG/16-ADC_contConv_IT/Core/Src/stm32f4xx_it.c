@@ -25,7 +25,7 @@
 
 /* External variables --------------------------------------------------------*/
 extern UART_HandleTypeDef huart2;
-
+extern ADC_HandleTypeDef hadc1;
 /******************************************************************************/
 /*           Cortex-M4 Processor Interruption and Exception Handlers          */ 
 /******************************************************************************/
@@ -102,3 +102,16 @@ void SysTick_Handler(void)
 /* For the available peripheral interrupt handler names,                      */
 /* please refer to the startup file (startup_stm32f4xx.s).                    */
 /******************************************************************************/
+
+/******************************************************************************/
+/* STM32F1xx Peripheral Interrupt Handlers                                    */
+/* Add here the Interrupt Handlers for the used peripherals.                  */
+/* For the available peripheral interrupt handler names,                      */
+/* please refer to the startup file (startup_stm32f1xx.s).                    */
+/******************************************************************************/
+void ADC_IRQHandler(void)
+{
+	HAL_GPIO_WritePin(LED_GREEN_Port, LED_GREEN_Pin, GPIO_PIN_SET);
+	HAL_ADC_IRQHandler(&hadc1);
+
+}

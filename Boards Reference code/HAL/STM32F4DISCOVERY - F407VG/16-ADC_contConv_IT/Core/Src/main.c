@@ -1,10 +1,11 @@
 /**
   ******************************************************************************
-  * @Project        : 15-ADC_contConv_tempSen
+  * @Project        : 16-ADC_contConv_IT
   * @Autor          : Ismael Poblete
   * @Company		: -
-  * @Date         	: 02-16-2021
-  * @brief          : Simple ADC Poll converter, without DMA.
+  * @Date         	: 02-17-2021
+  * @brief          : Simple ADC with interrupt, without DMA.
+  * 				  Non blocking
   * 				  Multi Channel
   * 				  ADC Continuos Conversion mode.
   * @Lib			: CMSIS, HAL.
@@ -23,7 +24,7 @@
   * 		PA5    	 	------> ADC1,IN5
   * 		PA6    	 	------> ADC1,IN6
   * @note
-  * 	-The ADC Poll converter is a block program
+  * 	-Non-Blocking with interrupt
   * 	-The ADC mode Continuos Conversion is use to read continuously multiples channels.
   * 	-We can see adc process duration in PD12 (LED_GREEN)
   *		-Board DISCOVERY-DISC1 STM32F407VG have 3.0 ADC Reference Voltage
@@ -51,13 +52,13 @@ void SystemClock_Config(void);
 static void GPIO_Init(void);
 static void USART2_UART_Init(void);
 static void ADC1_Init(void);
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc);
 
 /*ADC Channels*/
 void ADC_Select_CH4 (void);
 void ADC_Select_CH5 (void);
 void ADC_Select_CH6 (void);
 void ADC_Select_CHTemp (void);
-
 /* Private user code ---------------------------------------------------------*/
 uint16_t raw[N_CH_ADC];
 float voltage[N_CH_ADC];
@@ -82,49 +83,16 @@ int main(void)
 	USART2_UART_Init();
 	ADC1_Init();
 
-	/* User Code */
+	/* Start Code */
+	HAL_ADC_Start_IT(&hadc1);
+
 	while (1)
 	{
-		/*Multi channel and continuous*/
 
-		HAL_GPIO_WritePin(LED_GREEN_Port, LED_GREEN_Pin, GPIO_PIN_SET);
 
-		for(int i=0;i<N_CH_ADC;i++)
-		{
 
-			/* Select the channel to read */
-			switch(i) {
-			  case 0:
-				  ADC_Select_CHTemp();
-			    break;
-			  case 1:
-				  ADC_Select_CH4();
-			    break;
-			  case 2:
-				  ADC_Select_CH5();
-			    break;
-			  case 3:
-				  ADC_Select_CH6();
-			    break;
-			  default:
-				break;
-			}
-
-			/* Data adquisition */
-			HAL_ADC_Start(&hadc1);
-			HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
-			raw[i] =  HAL_ADC_GetValue(&hadc1);
-
-			voltage[i] = raw[i] * 3.0 / 4096.0;
-
-			 if(i == 0){
-				 Temp = ((voltage[i] - (float)V25)/(float)Avg_Slope)+25.0;
-			 }
-
-		}
-
-		HAL_GPIO_WritePin(LED_GREEN_Port, LED_GREEN_Pin, GPIO_PIN_RESET);
 	}
+
 }
 
 /**
@@ -175,24 +143,22 @@ void SystemClock_Config(void)
 static void ADC1_Init(void)
 {
 
-	/** Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion)
-  */
-  hadc1.Instance = ADC1;
-  hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
-  hadc1.Init.Resolution = ADC_RESOLUTION_12B;
-  hadc1.Init.ScanConvMode = ENABLE;
-  hadc1.Init.ContinuousConvMode = ENABLE;
-  hadc1.Init.DiscontinuousConvMode = DISABLE;
-  hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
-  hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
-  hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
-  hadc1.Init.NbrOfConversion = 1;
-  hadc1.Init.DMAContinuousRequests = DISABLE;
-  hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
-  if (HAL_ADC_Init(&hadc1) != HAL_OK)
-  {
-    Error_Handler();
-  }
+
+	/** Common config
+	*/
+	hadc1.Instance = ADC1;
+	hadc1.Init.ScanConvMode = ENABLE;
+	hadc1.Init.ContinuousConvMode = ENABLE;
+	hadc1.Init.DiscontinuousConvMode = DISABLE;
+	hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
+	hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
+	hadc1.Init.NbrOfConversion = 1;
+	if (HAL_ADC_Init(&hadc1) != HAL_OK)
+	{
+		Error_Handler();
+	}
+
+	ADC_Select_CHTemp();
 }
 
 
@@ -238,6 +204,57 @@ static void GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(LED_GREEN_Port, &GPIO_InitStruct);
+}
+
+/**
+  * @brief  This function is executed in case of error occurrence.
+  * @retval None
+  */
+
+uint8_t i = 0;
+
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
+{
+
+
+	/* ADC data adquisition */
+	HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
+	raw[i] =  HAL_ADC_GetValue(&hadc1);
+	voltage[i] = raw[i] * 3.0 / 4096.0;
+
+	if(i == 0){
+		Temp = ((voltage[i] - (float)V25)/(float)Avg_Slope)+25.0;
+	}
+
+	/* Start config to the next channel*/
+	i++;
+	switch(i) {
+		case N_CH_ADC:
+			ADC_Select_CHTemp();
+			break;
+		case 1:
+			ADC_Select_CH4();
+			break;
+		case 2:
+			ADC_Select_CH5();
+		break;
+			case 3:
+			ADC_Select_CH6();
+			break;
+		default:
+		break;
+	}
+
+	/* Reset to the first channel if all channels are done (i>=N_CH_ADC) */
+	if(i >= N_CH_ADC){
+		i=0;
+	}
+
+	/* Init interrupt*/
+	HAL_ADC_Start_IT(&hadc1);
+
+	HAL_GPIO_WritePin(LED_GREEN_Port, LED_GREEN_Pin, GPIO_PIN_RESET);
+
 }
 
 void ADC_Select_CHTemp (void)
