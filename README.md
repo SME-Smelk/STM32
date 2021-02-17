@@ -50,11 +50,11 @@ The DISCOVERY-DISC1 F407VG board has the following code repository the following
     - [x] 11-TIMER2_PWM_1us
     - [x] 12-TIMER2_IC
     - [x] 13-TIMER2_IC_OC
-- [ ] ADC
+- [x] ADC
     - [x] 14-ADC_singleConv_poll
     - [x] 15-ADC_contConv_poll_tempSen
     - [x] 16-ADC-contConv_IT
-    - [ ] 17-ADC-DMA
+    - [x] 17-ADC-DMA
 - [ ] DMA
     - [ ] DMA-ADC-SRAM
     - [ ] DMA_Interrupt-ToggleLed
