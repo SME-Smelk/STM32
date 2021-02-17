@@ -81,7 +81,27 @@ int main(void)
 	DMA_Init();
 	ADC1_Init();
 
-	/* Start Code */
+	/* User Code */
+	char msg[100];
+
+	memset(msg,0,sizeof(msg));
+	sprintf(msg,"SYSCLK : %ldHz\r\n",HAL_RCC_GetSysClockFreq());
+	HAL_UART_Transmit(&huart2,(uint8_t*)msg,strlen(msg),HAL_MAX_DELAY);
+
+	memset(msg,0,sizeof(msg));
+	sprintf(msg,"HCLK   : %ldHz\r\n",HAL_RCC_GetHCLKFreq());
+	HAL_UART_Transmit(&huart2,(uint8_t*)msg,strlen(msg),HAL_MAX_DELAY);
+
+	memset(msg,0,sizeof(msg));
+	sprintf(msg,"PCLK1  : %ldHz\r\n",HAL_RCC_GetPCLK1Freq());
+	HAL_UART_Transmit(&huart2,(uint8_t*)msg,strlen(msg),HAL_MAX_DELAY);
+
+	memset(msg,0,sizeof(msg));
+	sprintf(msg,"PCLK2  : %ldHz\r\n",HAL_RCC_GetPCLK2Freq());
+	HAL_UART_Transmit(&huart2,(uint8_t*)msg,strlen(msg),HAL_MAX_DELAY);
+
+
+	/* Start */
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_buf, ADC_BUF_LEN);
 
 	while (1)
@@ -131,6 +151,9 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+
+  /* Config MCO, signal output of SYSCLK in PC9 pin */
+  HAL_RCC_MCOConfig(RCC_MCO2, RCC_MCO2SOURCE_SYSCLK, RCC_MCODIV_1);
 }
 
 /**

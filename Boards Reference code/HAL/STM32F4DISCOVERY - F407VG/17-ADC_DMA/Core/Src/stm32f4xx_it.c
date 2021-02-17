@@ -26,7 +26,7 @@
 /* External variables --------------------------------------------------------*/
 extern UART_HandleTypeDef huart2;
 extern ADC_HandleTypeDef hadc1;
-extern DMA_HandleTypeDef hdma_adc1;
+extern DMA_HandleTypeDef hdma2;
 /******************************************************************************/
 /*           Cortex-M4 Processor Interruption and Exception Handlers          */ 
 /******************************************************************************/
@@ -120,6 +120,6 @@ void ADC_IRQHandler(void)
 void DMA2_Stream0_IRQHandler(void)
 {
   HAL_GPIO_WritePin(LED_GREEN_Port, LED_GREEN_Pin, GPIO_PIN_SET);
-  HAL_DMA_IRQHandler(&hdma_adc1);
+  HAL_DMA_IRQHandler(&hdma2);
 
 }
