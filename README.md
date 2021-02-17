@@ -56,10 +56,10 @@ The DISCOVERY-DISC1 F407VG board has the following code repository the following
     - [x] 16-ADC-contConv_IT
     - [x] 17-ADC-DMA
 - [ ] DMA
-    - [ ] DMA-ADC-SRAM
+    - [ ] DMA_ADC-SRAM
     - [ ] DMA_Interrupt-ToggleLed
-    - [ ] DMA-UART_SRAM
-    - [ ] DMA-SRAM-UART2-TX
+    - [ ] DMA_UART_SRAM
+    - [ ] DMA_SRAM-UART2-TX
 - [ ] LowPower Modes
     - [ ] WFE Button
     - [ ] WFI
@@ -108,10 +108,10 @@ The DISCOVERY-DISC1 F407VG board has the following code repository the following
 ### Aplications
 
 - [ ] With Interfaces
-    - [ ] ADC-FFT
     - [ ] GPS Communication
 	- [ ] IMU/AHRS MPU6050
 - [ ] Signal Procesing
+	- [ ] ADC-FFT
 	- [ ] DSP
 	- [ ] Filters
 	
