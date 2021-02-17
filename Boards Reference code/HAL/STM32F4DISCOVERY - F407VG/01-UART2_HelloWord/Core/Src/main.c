@@ -4,6 +4,7 @@
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-13-2021
+  * @Target			: DISCOVERY-DISC1 STM32F407VG
   * @brief          : Basic use HAL for UART2, need uart-ttl converter.
   * @Lib			: CMSIS, HAL.
   * @System Clock

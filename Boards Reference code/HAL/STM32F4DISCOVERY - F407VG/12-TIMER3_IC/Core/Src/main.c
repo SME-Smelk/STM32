@@ -4,6 +4,7 @@
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-15-2021
+  * @Target			: DISCOVERY-DISC1 STM32F407VG
   * @brief          : Config TIMER3 CH1 like a input capture in PA6
   * 				  Config TIMER2 CH2 like a PWM 10khz in PA1
   * 				  PA1 (Source) should be connected to PA6 (Destination)

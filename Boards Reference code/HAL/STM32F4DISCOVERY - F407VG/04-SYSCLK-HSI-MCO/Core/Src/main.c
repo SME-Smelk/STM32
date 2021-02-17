@@ -4,6 +4,7 @@
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-14-2021
+  * @Target			: DISCOVERY-DISC1 STM32F407VG
   * @brief          : Config the clock of el MCU with 16Mhz HSI (High-Speed Internal)
   * @Lib			: CMSIS, HAL.
   * @System Clock

@@ -4,6 +4,7 @@
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-14-2021
+  * @Target			: DISCOVERY-DISC1 STM32F407VG
   * @brief          : Config GPIO to toggle PD12 (Led Green) and PA0 like a input
   * 				  interrupt (User Button). We can appreciate the rebound effect.
   * @Lib			: CMSIS, HAL.

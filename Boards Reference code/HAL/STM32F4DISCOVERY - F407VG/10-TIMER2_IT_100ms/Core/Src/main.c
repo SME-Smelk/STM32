@@ -4,6 +4,7 @@
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-15-2021
+  * @Target			: DISCOVERY-DISC1 STM32F407VG
   * @brief          : Config TIMER2 to 100ms interrupt to trigger the toggle
   * 				  PD12 (Led Green)
   * @Lib			: CMSIS, HAL.

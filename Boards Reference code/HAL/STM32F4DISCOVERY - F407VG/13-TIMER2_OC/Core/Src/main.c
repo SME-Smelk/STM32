@@ -4,6 +4,7 @@
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-15-2021
+  * @Target			: DISCOVERY-DISC1 STM32F407VG
   * @brief          : Config TIMER3 CH1-4 like a output capture (OC) in PA6,PA7,PB0,PB1
   * 				  Config TIMER2 CH2 like a input capture (IC)
   * 				  PA1 (Source) should be connected one at a time to PA6,PA7,PB0,PB1 (Destination)

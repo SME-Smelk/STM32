@@ -4,6 +4,7 @@
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-16-2021
+  * @Target			: DISCOVERY-DISC1 STM32F407VG
   * @brief          : Simple ADC Poll converter, without DMA.
   * 				  Mode: Single Conversion
   * 				  Single Channel

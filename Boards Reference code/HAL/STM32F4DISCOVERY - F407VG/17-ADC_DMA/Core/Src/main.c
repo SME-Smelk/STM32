@@ -4,6 +4,7 @@
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-17-2021
+  * @Target			: DISCOVERY-DISC1 STM32F407VG
   * @brief          : Simple ADC with DMA.
   * 				  Non blocking
   * 				  Multi Channel

@@ -4,6 +4,7 @@
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-14-2021
+  * @Target			: DISCOVERY-DISC1 STM32F407VG
   * @brief          : Config the clock of el MCU with 84MMhz HSE (High-Speed External)
   * @Lib			: CMSIS, HAL.
   * @System Clock

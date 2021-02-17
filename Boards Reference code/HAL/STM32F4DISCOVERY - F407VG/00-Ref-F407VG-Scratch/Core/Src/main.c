@@ -4,7 +4,8 @@
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 6-28-2020
-  * @brief          : Archivo base para crear programaciones.
+  * @Target			: DISCOVERY-DISC1 STM32F407VG
+  * @brief          : Base programming guide.
   * @System Clock
   * 	SYSSource:		HSI/HSE/HSI-PLL/HSE-PLL (Por defecto HSI)
   * 	SYSCLK: 		XMHz					(Por defecto 8MHz)

@@ -4,6 +4,7 @@
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-15-2021
+  * @Target			: DISCOVERY-DISC1 STM32F407VG
   * @brief          : Config TIMER2 PWM to 1us in PA1 (TIMER2 CHANNEL_2)
   * @Lib			: CMSIS, HAL.
   * @System Clock

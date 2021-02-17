@@ -4,6 +4,7 @@
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-14-2021
+  * @Target			: DISCOVERY-DISC1 STM32F407VG
   * @brief          : Config GPIO to blink in PD12 (Led Green) and PA0 like a input
   * 				  (User Button). Push button = ON led, Release button - OFF Led.
   * @Lib			: CMSIS, HAL.

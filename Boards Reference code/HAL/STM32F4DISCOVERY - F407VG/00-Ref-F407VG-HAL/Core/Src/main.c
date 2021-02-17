@@ -4,6 +4,7 @@
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 6-28-2020
+  * @Target			: DISCOVERY-DISC1 STM32F407VG
   * @brief          : Base programming guide
   * @Lib			: CMSIS, HAL.
   * @System Clock

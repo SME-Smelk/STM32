@@ -4,6 +4,7 @@
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-13-2021
+  * @Target			: DISCOVERY-DISC1 STM32F407VG
   * @brief          : Receive data via IT and form the word(data) with \n in the end,
   * 				  then when it was ready send data. Need a uart to tll converter
   * @Lib			: CMSIS, HAL.
