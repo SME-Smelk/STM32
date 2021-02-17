@@ -25,7 +25,6 @@
 
 /* External variables --------------------------------------------------------*/
 extern UART_HandleTypeDef huart2;
-extern ADC_HandleTypeDef hadc1;
 
 /******************************************************************************/
 /*           Cortex-M4 Processor Interruption and Exception Handlers          */ 

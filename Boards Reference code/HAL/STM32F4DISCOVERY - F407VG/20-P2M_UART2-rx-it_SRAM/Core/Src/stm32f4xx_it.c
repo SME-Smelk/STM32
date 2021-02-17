@@ -24,8 +24,7 @@
 /* Private user code ---------------------------------------------------------*/
 
 /* External variables --------------------------------------------------------*/
-extern UART_HandleTypeDef huart2;
-extern DMA_HandleTypeDef hdma2;
+extern DMA_HandleTypeDef hdma1;
 
 /******************************************************************************/
 /*           Cortex-M4 Processor Interruption and Exception Handlers          */ 
@@ -104,8 +103,9 @@ void SysTick_Handler(void)
 /* please refer to the startup file (startup_stm32f4xx.s).                    */
 /******************************************************************************/
 
-void DMA2_Stream0_IRQHandler(void){
+/* DMA1 Handler*/
+void DMA1_Stream5_IRQHandler(void){
 
-	HAL_DMA_IRQHandler(&hdma2);
+	HAL_DMA_IRQHandler(&hdma1);
 
 }
