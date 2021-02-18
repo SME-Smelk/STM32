@@ -8,7 +8,7 @@
   * @brief          : Config the clock of el MCU with 84MMhz HSE (High-Speed External)
   * @Lib			: CMSIS, HAL.
   * @System Clock
-  * 	SYSSource:		HSE
+  * 	SYSSource:		PLL(HSE)
   * 	SYSCLK: 		84MHz
   * @Perf
   * 	*UART2

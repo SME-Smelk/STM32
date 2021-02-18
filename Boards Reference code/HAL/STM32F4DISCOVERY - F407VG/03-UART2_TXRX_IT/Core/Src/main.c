@@ -9,7 +9,7 @@
   * 				  then when it was ready send data. Need a uart to tll converter
   * @Lib			: CMSIS, HAL.
   * @System Clock
-  * 	SYSSource:		HSE-PLL
+  * 	SYSSource:		PLL(HSE)
   * 	SYSCLK: 		84MHz
   * @Perf
   * 	*UART2

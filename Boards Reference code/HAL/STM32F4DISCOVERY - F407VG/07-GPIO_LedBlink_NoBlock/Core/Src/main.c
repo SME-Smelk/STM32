@@ -8,7 +8,7 @@
   * @brief          : Config GPIO to blink in PD12 (Led Green) No blocking.
   * @Lib			: CMSIS, HAL.
   * @System Clock
-  * 	SYSSource:		HSE
+  * 	SYSSource:		PLL(HSE)
   * 	SYSCLK: 		84MHz
   * @Perf
   * 	*UART2

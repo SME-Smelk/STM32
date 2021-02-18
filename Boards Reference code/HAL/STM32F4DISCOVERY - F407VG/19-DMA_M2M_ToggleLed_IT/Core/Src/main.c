@@ -9,7 +9,7 @@
   * 				  Memory to Memory from SRAM (data) to register ODR of LED.
   * @Lib			: CMSIS, HAL.
   * @System Clock
-  * 	SYSSource:		PLL (HSE)
+  * 	SYSSource:		PLL(HSE)
   * 	SYSCLK: 		84MHz
   * @Perf
   * 	*UART2

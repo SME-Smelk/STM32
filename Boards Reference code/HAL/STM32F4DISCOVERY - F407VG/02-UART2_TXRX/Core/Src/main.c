@@ -9,7 +9,7 @@
   * 				  wite via with terminal and used end of the word \r (CR)
   * @Lib			: CMSIS, HAL.
   * @System Clock
-  * 	SYSSource:		HSE-PLL
+  * 	SYSSource:		PLL(HSE)
   * 	SYSCLK: 		84MHz
   * @Perf
   * 	*UART2

@@ -11,7 +11,7 @@
   * 				  ADC Continuos Conversion mode.
   * @Lib			: CMSIS, HAL.
   * @System Clock
-  * 	SYSSource:		HSE
+  * 	SYSSource:		PLL(HSE)
   * 	SYSCLK: 		84MHz
   * @Perf
   * 	*UART2

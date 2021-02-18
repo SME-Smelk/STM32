@@ -9,7 +9,7 @@
   * 				  See data via window "Memory Browser"
   * @Lib			: CMSIS, HAL.
   * @System Clock
-  * 	SYSSource:		PLL (HSE)
+  * 	SYSSource:		PLL(HSE)
   * 	SYSCLK: 		84MHz
   * @Perf
   * 	*UART2

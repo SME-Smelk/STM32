@@ -8,7 +8,7 @@
   * @brief          : Basic use HAL for UART2, need uart-ttl converter.
   * @Lib			: CMSIS, HAL.
   * @System Clock
-  * 	SYSSource:		HSE-PLL
+  * 	SYSSource:		PLL(HSE)
   * 	SYSCLK: 		84MHz
   * @Perf
   * 	*UART2

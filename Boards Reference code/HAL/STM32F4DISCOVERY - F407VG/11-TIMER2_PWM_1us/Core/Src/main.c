@@ -8,7 +8,7 @@
   * @brief          : Config TIMER2 PWM to 1us in PA1 (TIMER2 CHANNEL_2)
   * @Lib			: CMSIS, HAL.
   * @System Clock
-  * 	SYSSource:		HSE
+  * 	SYSSource:		PLL(HSE)
   * 	SYSCLK: 		84MHz
   * @Perf
   * 	*UART2

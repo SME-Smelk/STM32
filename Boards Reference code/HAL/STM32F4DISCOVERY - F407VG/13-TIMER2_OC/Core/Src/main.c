@@ -10,7 +10,7 @@
   * 				  PA1 (Source) should be connected one at a time to PA6,PA7,PB0,PB1 (Destination)
   * @Lib			: CMSIS, HAL.
   * @System Clock
-  * 	SYSSource:		HSE
+  * 	SYSSource:		PLL(HSE)
   * 	SYSCLK: 		84MHz
   * @Perf
   * 	*UART2

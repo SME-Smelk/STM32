@@ -9,7 +9,7 @@
   * 				  interrupt (User Button). We can appreciate the rebound effect.
   * @Lib			: CMSIS, HAL.
   * @System Clock
-  * 	SYSSource:		HSE
+  * 	SYSSource:		PLL(HSE)
   * 	SYSCLK: 		84MHz
   * @Perf
   * 	*UART2
