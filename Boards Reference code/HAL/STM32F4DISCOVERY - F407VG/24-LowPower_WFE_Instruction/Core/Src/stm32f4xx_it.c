@@ -103,4 +103,14 @@ void SysTick_Handler(void)
 /* please refer to the startup file (startup_stm32f4xx.s).                    */
 /******************************************************************************/
 
+/**
+* @brief This function handles USART2 global interrupt.
+*/
+
+void EXTI0_IRQHandler(void)
+{
+
+	HAL_GPIO_EXTI_IRQHandler(USER_BUTTON_Pin);
+
+}
 

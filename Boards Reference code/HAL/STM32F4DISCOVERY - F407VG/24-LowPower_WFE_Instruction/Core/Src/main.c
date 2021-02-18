@@ -1,13 +1,13 @@
 /**
   ******************************************************************************
-  * @Project        : 23-LowPower_WFI_Instruction
+  * @Project        : 24-LowPower_WFE_Instruction
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-18-2021
   * @Target			: DISCOVERY-DISC1 STM32F407VG
-  * @brief          : Example the use WFI instruction for trigger the sleep mode.
-  * 				  WFI (Waiting for interrupt), it stays in sleep mode until
-  * 				  an interruption occurs (User Button).
+  * @brief          : Example the use WFE instruction for trigger the sleep mode.
+  * 				  WFE (Waiting for event), it stays in sleep mode until
+  * 				  an event occurs (User Button).
   * @Lib			: CMSIS, HAL.
   * @System Clock
   * 	SYSSource:		HSI
@@ -20,13 +20,18 @@
   * 		PA0      	------> USER_BUTTON
   * @Note
   * 	-Systick is desactivate CTRL = 0, because can wake up as it is an active
-  * 	 interrupt of HAL and it can wake up the system of WFI.
+  * 	 interrupt and set a evetn of HAL and it can wake up the system of WFE.
   * 	-In WFI is more selective, its wake up depend of Actual priority and PRIMASK
-  * 	 -WFE depend of the Actual priority, PRIMASK and SEVONPEND.
-  * 	-Use the macro SLEEPMODE_BY_WFI in main.h to activate or desactivate WFI
+  * 	-WFE depend of the Actual priority, PRIMASK and SEVONPEND (Events).
+  * 	-WFI put the processor immediately to sleep. WFE put the processor to sleep
+  * 	 only if event register (SEVONPEND) value is 0, wake up with 1 (USER_BUTTON).
+  * 	-User button is config like a GPIO_MODE_EVT_FALLING
+  * 	-WFE have a rare condition with UART low speed baud. We used 921600 after
+  * 	 WFE it wake up few times. A low baud speed UART wakeup all time.
+  * 	-Use the macro SLEEPMODE_BY_WFE in main.h to activate or desactivate WFE
   * 	for electrical consumption tests.
   * 	 	-First descomment macro and test consumption.
-  * 	 		Normal mode: 6.8ma
+  * 	 		Normal mode: 6.78ma
   * 	 	-Second comment and see the consumption of the sleep mode.
   * 	 		Sleep Mode: 3.72mA
   *
@@ -55,8 +60,7 @@ static void GPIO_AnalogConfig(void);
 
 /* Private user code ---------------------------------------------------------*/
 char some_data1[] = "Go to sleep...\r\n";
-char some_data2[] = "WakeUp to send this data\r\n";
-char some_data3[] = "The interrupt finish. I am in the loop.\r\n";
+char some_data3[] = "Wake Up.\r\n";
 
 /**
   * @brief  The application entry point.
@@ -101,11 +105,11 @@ int main(void)
 	/* Start Code */
 	while (1){
 		HAL_UART_Transmit(&huart2,(uint8_t*)some_data1,(uint16_t)strlen((char*)some_data1),HAL_MAX_DELAY);
-	#ifdef SLEEPMODE_BY_WFI
+		#ifdef SLEEPMODE_BY_WFE
 		/* Systick is not required so disabled it before going to sleep*/
 		HAL_SuspendTick();
 		/* going to sleep here */
-		__WFI();
+		__WFE();
 	#endif
 		/* Continues from here when wakes up */
 		/* Enable the Systick */
@@ -156,7 +160,7 @@ static void UART2_Init(void)
 {
 
   huart2.Instance = USART2;
-  huart2.Init.BaudRate = 115200;
+  huart2.Init.BaudRate = 921600;
   huart2.Init.WordLength = UART_WORDLENGTH_8B;
   huart2.Init.StopBits = UART_STOPBITS_1;
   huart2.Init.Parity = UART_PARITY_NONE;
@@ -205,22 +209,10 @@ static void GPIO_Init(void)
 	GPIO_InitTypeDef gpio = {0};
 
 	gpio.Pin = USER_BUTTON_Pin;
-	gpio.Mode = GPIO_MODE_IT_RISING;
+	gpio.Mode = GPIO_MODE_EVT_FALLING;
 	gpio.Pull = GPIO_NOPULL;
 	HAL_GPIO_Init(USER_BUTTON_Port,&gpio);
 
-	HAL_NVIC_SetPriority(EXTI0_IRQn,15,0);
-	HAL_NVIC_EnableIRQ(EXTI0_IRQn);
-
-}
-
-/* Button Interrupt */
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-{
-	if ( HAL_UART_Transmit(&huart2,(uint8_t*)some_data2,(uint16_t)strlen((char*)some_data2),HAL_MAX_DELAY) != HAL_OK)
-	{
-		Error_Handler();
-	}
 }
 
 /**
