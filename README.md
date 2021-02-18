@@ -55,11 +55,12 @@ The DISCOVERY-DISC1 F407VG board has the following code repository the following
     - [x] 15-ADC_contConv_poll_tempSen
     - [x] 16-ADC_contConv_IT
     - [x] 17-ADC_DMA
-- [ ] DMA
-    - [ ] DMA_ADC-SRAM
-    - [ ] DMA_Interrupt-ToggleLed
-    - [ ] DMA_UART_SRAM
-    - [ ] DMA_SRAM-UART2-TX
+- [x] DMA
+    - [x] 17-ADC_DMA (previously)
+    - [x] 18-DMA_M2M_Poll-ToggleLed
+    - [x] 19-DMA_M2M_ToggleLed_IT
+    - [x] 20-DMA_P2M_UART2-RX_SRAM
+    - [x] 21-DMA_M2P_SRAM_UART2-TX
 - [ ] LowPower Modes
     - [ ] WFE Button
     - [ ] WFI
