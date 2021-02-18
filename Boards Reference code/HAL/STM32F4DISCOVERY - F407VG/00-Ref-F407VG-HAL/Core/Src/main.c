@@ -8,8 +8,8 @@
   * @brief          : Base programming guide
   * @Lib			: CMSIS, HAL.
   * @System Clock
-  * 	SYSSource:		HSI/HSE/HSI-PLL/HSE-PLL (Ej: HSI)
-  * 	SYSCLK: 		XMHz					(EJ: 8MHz)
+  * 	SYSSource:		HSI/HSE/PLL(HSI)/PLL(HSE) 	(Ej: HSI)
+  * 	SYSCLK: 		XMHz						(EJ: 8MHz)
   * @Perf
   * 	*UART2
   * 		PA2			<-----> USART_TX

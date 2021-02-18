@@ -1,13 +1,13 @@
 /**
   ******************************************************************************
-  * @Project        : 22-LowPower_SleepOnExit_Feature
+  * @Project        : 23-LowPower_WFI_Instruction
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-18-2021
   * @Target			: DISCOVERY-DISC1 STM32F407VG
-  * @brief          : Use the feature SleepOnExit. Sleep all the time that we are
-  * 				  not in an ISR. WakeUp in a ISR TIMER6 10ms, at the exit it
-  * 				  fall sleep.
+  * @brief          : Example the use WFI instruction for trigger the sleep mode.
+  * 				  WFI (Waiting for interrupt), it stays in sleep mode until
+  * 				  an interruption occurs (User Button).
   * @Lib			: CMSIS, HAL.
   * @System Clock
   * 	SYSSource:		HSI
@@ -16,20 +16,17 @@
   * 	*UART2
   * 		PA2			<-----> USART_TX
   * 		PA3			<-----> USART_RX
-  * 	*TIMER6 IT 10ms
   * 	*GPIO
-  * 		PD12      	------> LED_GREEN
-  * @note
-  * -To fall down sleep mode with feature SleepOnExit try HAL_PWR_EnableSleepOnExit();
-  * -Probe the current consumption with JP1 ldd. It allows the consumption to be
-  *  measured by removing the jumper and connecting an ammeter.
-  * -To probe the current consumption of the system try:
-  *
-  * 	-comment the macro SLEEP_ON_EXIT_SLEEPMODE  API to Normal mode and current
-  * 	 without sleep mode. Probe the current consumption. Ej: 7.78mA
-  *
-  * 	-Descomment the macro SLEEP_ON_EXIT_SLEEPMODE in main.h to enter in sleep mode
-  * 	 all the time that we are not in an ISR.Probe the current consumption. Ej: 5.22mA
+  * 		PA0      	------> USER_BUTTON
+  * @Note
+  * 	-Systick is desactivate CTRL = 0, because can wake up as it is an active
+  * 	 interrupt of HAL and it can wake up the system of WFI.
+  * 	-Use the macro SLEEPMODE_BY_WFI in main.h to activate or desactivate WFI
+  * 	for electrical consumption tests.
+  * 	 	-First descomment macro and test consumption.
+  * 	 		Normal mode: 6.8ma
+  * 	 	-Second comment and see the consumption of the sleep mode.
+  * 	 		Sleep Mode: 3.72mA
   *
   ******************************************************************************
 **/
@@ -41,7 +38,7 @@
 
 /* Private typedef -----------------------------------------------------------*/
 UART_HandleTypeDef huart2;
-TIM_HandleTypeDef htimer6;
+
 /* Private define ------------------------------------------------------------*/
 
 /* Private macro -------------------------------------------------------------*/
@@ -51,12 +48,13 @@ TIM_HandleTypeDef htimer6;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void GPIO_Init(void);
-static void GPIO_AnalogConfig(void);
 static void UART2_Init(void);
-static void TIMER6_Init(void);
+static void GPIO_AnalogConfig(void);
 
 /* Private user code ---------------------------------------------------------*/
-char some_data[] = "We are testing SLEEPONEXIT feature\r\n";
+char some_data1[] = "Go to sleep...\r\n";
+char some_data2[] = "WakeUp to send this data\r\n";
+char some_data3[] = "The interrupt finish. I am in the loop.\r\n";
 
 /**
   * @brief  The application entry point.
@@ -65,7 +63,7 @@ char some_data[] = "We are testing SLEEPONEXIT feature\r\n";
 int main(void)
 {
 
-	/* Reset of all peripherals, Initializes the Flash interface and the Systick. */	HAL_Init();
+	/* Reset of all peripherals, Initializes the Flash interface and the Systick. */
 	HAL_Init();
 
 	/* Configure the system clock */
@@ -75,7 +73,9 @@ int main(void)
 	GPIO_AnalogConfig();
 	GPIO_Init();
 	UART2_Init();
-	TIMER6_Init();
+
+	/* Desactivate Systick */
+	 SysTick->CTRL = 0;
 
 	/* User Code */
 	char msg[100];
@@ -96,25 +96,14 @@ int main(void)
 	sprintf(msg,"PCLK2  : %ldHz\r\n",HAL_RCC_GetPCLK2Freq());
 	HAL_UART_Transmit(&huart2,(uint8_t*)msg,strlen(msg),HAL_MAX_DELAY);
 
-	/* System Control Register (SCR)
-	 * bit 1: SLEEPDEEP
-	 * Manual: SCB->SCR |= ( 1 << 1);
-	 * */
-
-	/*Enable SleepOnExit: sleep all the time that we are not in an ISR
-	 * WakeUp in a ISR, in the exit sleep.
-	 * */
-#ifdef SLEEP_ON_EXIT_SLEEPMODE
-	HAL_PWR_EnableSleepOnExit();
-#endif
-	/* lets start with fresh Status register of Timer to avoid any spurious interrupts */
-    TIM6->SR = 0;
-
-	//Lets start the timer in interrupt mode
-	HAL_TIM_Base_Start_IT(&htimer6);
-
-	while (1);
-	return 0;
+	/* Start Code */
+	while (1){
+		HAL_UART_Transmit(&huart2,(uint8_t*)some_data1,(uint16_t)strlen((char*)some_data1),HAL_MAX_DELAY);
+	#ifdef SLEEPMODE_BY_WFI
+		__WFI();
+	#endif
+		HAL_UART_Transmit(&huart2,(uint8_t*)some_data3,(uint16_t)strlen((char*)some_data3),HAL_MAX_DELAY);
+	}
 }
 
 /**
@@ -126,10 +115,6 @@ void SystemClock_Config(void)
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
-  /** Configure the main internal regulator output voltage
-  */
-  __HAL_RCC_PWR_CLK_ENABLE();
-  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
@@ -157,6 +142,24 @@ void SystemClock_Config(void)
 
   /* Config MCO, signal output of SYSCLK in PC9 pin */
   HAL_RCC_MCOConfig(RCC_MCO2, RCC_MCO2SOURCE_SYSCLK, RCC_MCODIV_1);
+}
+
+static void UART2_Init(void)
+{
+
+  huart2.Instance = USART2;
+  huart2.Init.BaudRate = 115200;
+  huart2.Init.WordLength = UART_WORDLENGTH_8B;
+  huart2.Init.StopBits = UART_STOPBITS_1;
+  huart2.Init.Parity = UART_PARITY_NONE;
+  huart2.Init.Mode = UART_MODE_TX_RX;
+  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
 }
 
 /* Change GPIO to analog for low power. */
@@ -193,54 +196,24 @@ static void GPIO_Init(void)
     /* User button */
 	GPIO_InitTypeDef gpio = {0};
 
-	gpio.Pin = GPIO_PIN_12;
-	gpio.Mode = GPIO_MODE_OUTPUT_PP;
+	gpio.Pin = USER_BUTTON_Pin;
+	gpio.Mode = GPIO_MODE_IT_RISING;
 	gpio.Pull = GPIO_NOPULL;
-	HAL_GPIO_Init(GPIOD,&gpio);
+	HAL_GPIO_Init(USER_BUTTON_Port,&gpio);
+
+	HAL_NVIC_SetPriority(EXTI0_IRQn,15,0);
+	HAL_NVIC_EnableIRQ(EXTI0_IRQn);
 
 }
 
-static void UART2_Init(void)
+/* Button Interrupt */
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-
-  huart2.Instance = USART2;
-  huart2.Init.BaudRate = 115200;
-  huart2.Init.WordLength = UART_WORDLENGTH_8B;
-  huart2.Init.StopBits = UART_STOPBITS_1;
-  huart2.Init.Parity = UART_PARITY_NONE;
-  huart2.Init.Mode = UART_MODE_TX_RX;
-  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
-  if (HAL_UART_Init(&huart2) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-}
-
-
-static void TIMER6_Init(void)
-{
-	htimer6.Instance = TIM6;
-	htimer6.Init.Prescaler = 1999;
-	htimer6.Init.Period = 79;
-	if( HAL_TIM_Base_Init(&htimer6) != HAL_OK )
+	if ( HAL_UART_Transmit(&huart2,(uint8_t*)some_data2,(uint16_t)strlen((char*)some_data2),HAL_MAX_DELAY) != HAL_OK)
 	{
 		Error_Handler();
 	}
-
 }
-
-
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
-	 if ( HAL_UART_Transmit(&huart2,(uint8_t*)some_data,(uint16_t)strlen((char*)some_data),HAL_MAX_DELAY) != HAL_OK)
-	 {
-		 Error_Handler();
-	 }
-	 HAL_GPIO_WritePin(LED_GREEN_Port, LED_GREEN_Pin, GPIO_PIN_RESET);
-}
-
 
 /**
   * @brief  This function is executed in case of error occurrence.

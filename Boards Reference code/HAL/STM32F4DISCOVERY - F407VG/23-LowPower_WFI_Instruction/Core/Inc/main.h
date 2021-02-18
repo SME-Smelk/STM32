@@ -14,7 +14,6 @@
 #include "stm32f4xx_hal.h"
 #include "stdio.h"
 #include "string.h"
-
 /* Private includes ----------------------------------------------------------*/
 
 /* Exported types ------------------------------------------------------------*/
@@ -22,8 +21,7 @@
 /* Exported constants --------------------------------------------------------*/
 
 /* Exported macro ------------------------------------------------------------*/
-
-/*#define SLEEP_ON_EXIT_SLEEPMODE*/
+/*#define SLEEPMODE_BY_WFI*/
 
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
@@ -35,5 +33,7 @@ void Error_Handler(void);
 #define USART_RX_GPIO_Port GPIOA
 #define LED_GREEN_Pin GPIO_PIN_12
 #define LED_GREEN_Port GPIOD
+#define USER_BUTTON_Pin GPIO_PIN_0
+#define USER_BUTTON_Port GPIOA
 
 #endif /* __MAIN_H */
