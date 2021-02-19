@@ -61,12 +61,12 @@ The DISCOVERY-DISC1 F407VG board has the following code repository the following
     - [x] 19-DMA_M2M_ToggleLed_IT
     - [x] 20-DMA_P2M_UART2-RX_SRAM
     - [x] 21-DMA_M2P_SRAM_UART2-TX
-- [ ] LowPower Modes
+- [x] LowPower Modes
     - [x] 22-LowPower_SleepOnExit_Feature
     - [x] 23-LowPower_WFI_Instruction
     - [x] 24-LowPower_WFE_Instruction
     - [x] 25-LowPower_modes
-    - [ ] 26-LowPower_BackupSRAM_Standby
+    - [x] 26-LowPower_BackupSRAM_Standby
 - [ ] Internal RTC
     - [ ] Alarm_Stanby_WakeUp
     - [ ] Alarm_A
