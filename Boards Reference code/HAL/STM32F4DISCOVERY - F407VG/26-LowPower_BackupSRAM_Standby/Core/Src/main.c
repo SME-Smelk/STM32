@@ -1,14 +1,11 @@
 /**
   ******************************************************************************
-  * @Project        : 25-LowPower_modes
+  * @Project        : 26-LowPower_Backup_SRAM_Standby
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-19-2021
   * @Target			: DISCOVERY-DISC1 STM32F407VG
-  * @brief          : Example the use the LowPower modes:
-  * 					-Sleep Mode
-  * 					-Stop Mode
-  * 					-Standby Mode
+  * @brief          : Example the use BackUp SRAM recovery in Standby Mode Low power.
   * 				  The change of mode is via user button.
   * @Lib			: CMSIS, HAL.
   * @System Clock
@@ -21,26 +18,19 @@
   * 	*GPIO
   * 		PA0      	------> USER_BUTTON
   * @Note
+  * 	-In Standby Mode: SRAM and register contents are lost except for registers in the
+  * 	 backup domain. The backup domain consist in RTC registers, RTC backup register and
+  * 	 backup SRAM.
+  * 	-The STM32F4 have a Back up memory 4Kbyte of SRAM. It can be use to save data when
+  * 	 a loss power is produced, like the effect of the Standby Mode which produce a loss
+  * 	 data inside. The normal SRAM for effect of the Standby mode is deleted.
   * 	-Systick is desactivate CTRL = 0, because can wake up as it is an active
   * 	 interrupt it can wake up the system.
-  * 	-In WFI is more selective, its wake up depend of Actual priority and PRIMASK
-  * 	-Run mode, default mode. Is a non low power mode after a system or a power-on reset.
   * 	-Low Power Modes:
-  * 		-Sleep mode: CPU CLK is turned OFF and there is no effect on other clocks
-  * 			or analog clock sources. The current consumption is HIGHEST in this mode,
-  * 			compared to other Low Power Modes.
-  * 		-Stop Mode: In Stop mode, all clocks in the 1.2 V domain are stopped, the
-  * 			PLLs, the HSI and the HSE RC oscillators are disabled. Internal SRAM and
-  * 			register contents are preserved. Have may different categories.
-  * 		-Standby Mode: It is based on the Cortex®-M4 with FPU deepsleep mode, with the
+  * 		-Standby Mode: It is based on the Cortex®-M4 with FPU DeepSleep mode, with the
   * 			voltage regulator disabled. The 1.2 V domain is consequently powered off.
   * 			The PLLs, the HSI oscillator and the HSE oscillator are also switched off.
-  * 	-Use the button to change thru low power modes. Once time you press the button
-  * 	 it just wait 2 seconds to start the mode (to avoid debounce):
-  * 	 	-1. Run mode (Default)
-  * 	 	-2. Sleep mode
-  * 	 	-3. Stop mode
-  * 	 	-4. Standby mode (Reset to main)
+  * 	-Use the button to exit of the standby mode by "wake up pin" A0 (USER_BUTTON).
   *
   ******************************************************************************
 **/
@@ -68,12 +58,31 @@ static void GPIO_AnalogConfig(void);
 
 uint8_t flag_user_waiting = 0;
 uint8_t i = 0;
+
+void printmsg(char *format,...)
+ {
+
+	char str[80];
+
+	/*Extract the the argument list using VA apis */
+	va_list args;
+	va_start(args, format);
+	vsprintf(str, format,args);
+	HAL_UART_Transmit(&huart2,(uint8_t *)str, strlen(str),HAL_MAX_DELAY);
+	va_end(args);
+
+ }
+
 /**
   * @brief  The application entry point.
   * @retval int
   */
 int main(void)
 {
+
+	uint32_t * pBackupSRAMbase=0;
+
+	char write_buf[] = "Hello";
 
 	/* Reset of all peripherals, Initializes the Flash interface and the Systick. */
 	HAL_Init();
@@ -105,85 +114,62 @@ int main(void)
 	sprintf(msg,"PCLK2  : %ldHz\r\n",HAL_RCC_GetPCLK2Freq());
 	HAL_UART_Transmit(&huart2,(uint8_t*)msg,strlen(msg),HAL_MAX_DELAY);
 
-	/* Start Code */
-	while (1){
-		i=0;
-		char *str1 = "In Run mode: \n";
-		HAL_UART_Transmit(&huart2, (uint8_t *) str1, strlen (str1), HAL_MAX_DELAY);
-		flag_user_waiting = 1;
-		while(flag_user_waiting);
-		i++;
-		/******************* SLEEP MODE *****************/
-		char *str2 = "Sleep Mode: In 2 seg... ";
-		HAL_UART_Transmit(&huart2, (uint8_t *) str2, strlen (str2), HAL_MAX_DELAY);
+	//1. Turn on the clock in RCC register for backup sram
+	__HAL_RCC_BKPSRAM_CLK_ENABLE();
 
-		  /** Blink the LED **/
-		  for (int i=0; i<4; i++)
-		  {
-			  HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_12);
-			  HAL_Delay(500);
-		  }
+	//2. Enable Write access to the backup domain
+	__HAL_RCC_PWR_CLK_ENABLE();
+	HAL_PWR_EnableBkUpAccess();
 
-		char *str3 = "In Sleep Mode.\n";
-		HAL_UART_Transmit(&huart2, (uint8_t *) str3, strlen (str3), HAL_MAX_DELAY);
+	pBackupSRAMbase = (uint32_t*)BKPSRAM_BASE;
 
-		/***     Go to Sleep Mode    ****/
-		HAL_SuspendTick();
-		__WFI();
+	//Enable clock for PWR Controller block
+	__HAL_RCC_PWR_CLK_ENABLE();
 
-		/*** wake up from sleep mode ****/
-		HAL_ResumeTick();
-		i++;
-		/******************* STOP MODE ******************/
-		char *str4 = "Stop Mode: In 2 seg... ";
-		HAL_UART_Transmit(&huart2, (uint8_t *) str4, strlen (str4), HAL_MAX_DELAY);
+	if(__HAL_PWR_GET_FLAG(PWR_FLAG_SB) != RESET)
+	{
+		__HAL_PWR_CLEAR_FLAG(PWR_FLAG_SB);
+		__HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);
 
-		  /** Blink the LED **/
-		  for (int i=0; i<4; i++)
-		  {
-			  HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_12);
-			  HAL_Delay(500);
-		  }
+		printmsg("woke up from the standby mode\r\n");
+		uint8_t data = (uint8_t)*pBackupSRAMbase;
+		if(data != 'H')
+		{
+			printmsg("Backup SRAM data is lost\r\n");
+		}
+		else
+		{
+			printmsg("Backup SRAM data is safe \r\n");
+		}
 
-		char *str5 = "In Stop Mode.\n";
-		HAL_UART_Transmit(&huart2, (uint8_t *) str5, strlen (str5), HAL_MAX_DELAY);
-
-		/*** enable sleep on exit for interrupt only operations ****/
-		HAL_SuspendTick();
-		HAL_PWR_EnableSleepOnExit();
-
-		/*** Go to Stop Mode ****/
-		HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON, PWR_STOPENTRY_WFI);
-
-		/*** wake up from stop mode ****/
-		i++;
-		/******************* STANDBY MODE ******************/
-
-		char *str6 = "Standby Mode: In 2 seg... ";
-		HAL_UART_Transmit(&huart2, (uint8_t *) str6, strlen (str6), HAL_MAX_DELAY);
-
-		  /** Blink the LED **/
-		  for (int i=0; i<4; i++)
-		  {
-			  HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_12);
-			  HAL_Delay(500);
-		  }
-
-		char *str7 = "In Standby Mode.\n";
-		HAL_UART_Transmit(&huart2, (uint8_t *) str7, strlen (str7), HAL_MAX_DELAY);
-
-	    //Enable the wakeup pin 1 in pwr_csr register
-	    HAL_PWR_EnableWakeUpPin(PWR_WAKEUP_PIN1);
-
-	    //Enable backup voltage reg.
-	    HAL_PWREx_EnableBkUpReg();
-
-	    HAL_PWR_EnterSTANDBYMode();
-
-
-		/*** wake up from sleep mode ****/
+	}else
+	{
+		for(uint32_t i =0 ; i < strlen(write_buf)+1 ; i++)
+		{
+			*(pBackupSRAMbase+i) = write_buf[i];
+		}
 	}
 
+
+	printmsg("Press the user button to enter standby mode\r\n");
+	while(HAL_GPIO_ReadPin(GPIOC,GPIO_PIN_13) != GPIO_PIN_RESET);
+
+	//when user pushes the user button, it comes here
+	printmsg("Going to Standby mode\r\n");
+
+	//Enable the wakeup pin 1 in pwr_csr register
+	HAL_PWR_EnableWakeUpPin(PWR_WAKEUP_PIN1);
+
+	//Enable backup voltage reg.
+	HAL_PWREx_EnableBkUpReg();
+
+	HAL_PWR_EnterSTANDBYMode();
+
+
+
+	while(1);
+
+	return 0;
 }
 
 /**
