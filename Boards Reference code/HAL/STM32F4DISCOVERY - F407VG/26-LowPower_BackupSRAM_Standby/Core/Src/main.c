@@ -7,6 +7,7 @@
   * @Target			: DISCOVERY-DISC1 STM32F407VG
   * @brief          : Example the use BackUp SRAM recovery in Standby Mode Low power.
   * 				  The change of mode is via user button.
+  * 				  We write "hello" in SRAM Backup.
   * @Lib			: CMSIS, HAL.
   * @System Clock
   * 	SYSSource:		HSI
