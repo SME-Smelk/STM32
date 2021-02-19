@@ -66,7 +66,7 @@ The DISCOVERY-DISC1 F407VG board has the following code repository the following
     - [x] 23-LowPower_WFI_Instruction
     - [x] 24-LowPower_WFE_Instruction
     - [x] 25-LowPower_modes
-    - [ ] 26-LosPower_BackupSRAM_Standby
+    - [ ] 26-LowPower_BackupSRAM_Standby
 - [ ] Internal RTC
     - [ ] Alarm_Stanby_WakeUp
     - [ ] Alarm_A
