@@ -1,11 +1,11 @@
 /**
   ******************************************************************************
-  * @Project        : 29-RTC_Alarm_A
+  * @Project        : 30-RTC_Alarm_Standby_WakeUp
   * @Autor          : Ismael Poblete
   * @Company		: -
-  * @Date         	: 02-19-2021
+  * @Date         	: 02-20-2021
   * @Target			: DISCOVERY-DISC1 STM32F407VG
-  * @brief          : RTC Date and time each second.
+  * @brief          : RTC used like a wakeup in StandBy Mode.
   * @Lib			: CMSIS, HAL.
   * @System Clock
   * 	SYSSource:		PLL(HSE)
@@ -19,8 +19,8 @@
   * 		PA0      	------> USER_BUTTON
   * 	*RTC
   * 		Alarm A		------> ALARM_MINUTES 0
-  * 							ALARM_SECONDS 10
-  * 							00:10
+  * 							ALARM_SECONDS 3
+  * 							00:3
   * @note
   * 	-STM32 RTC emdebs two alarms alarm A and alarm B. An alarm can be generated
   * 	 at a given time or date programmed by the user.
@@ -109,6 +109,7 @@ int main(void)
 	RTC_Init();
 
 	/* User Code */
+/*
 	char msg[100];
 
 	memset(msg,0,sizeof(msg));
@@ -126,33 +127,39 @@ int main(void)
 	memset(msg,0,sizeof(msg));
 	sprintf(msg,"PCLK2  : %ldHz\r\n",HAL_RCC_GetPCLK2Freq());
 	HAL_UART_Transmit(&huart2,(uint8_t*)msg,strlen(msg),HAL_MAX_DELAY);
+*/
 
-	/* Start Code */
+
+	//Enable clock for PWR Controller block
+	__HAL_RCC_PWR_CLK_ENABLE();
+
+	if(__HAL_PWR_GET_FLAG(PWR_FLAG_SB) != RESET)
+	{
+		__HAL_PWR_CLEAR_FLAG(PWR_FLAG_SB);
+		__HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);
+		__HAL_RTC_ALARM_CLEAR_FLAG(&hrtc,RTC_FLAG_ALRAF);
+
+		printmsg("Woke up from standby mode\r\n");
+
+		 RTC_TimeTypeDef  RTC_TimeRead;
+		 RTC_DateTypeDef RTC_DateRead;
+
+		HAL_RTC_GetTime(&hrtc,&RTC_TimeRead,RTC_FORMAT_BIN);
+		HAL_RTC_GetDate(&hrtc,&RTC_DateRead,RTC_FORMAT_BIN);
+
+		printmsg("Current Time is : %02d:%02d:%02d\r\n",RTC_TimeRead.Hours,\
+		RTC_TimeRead.Minutes,RTC_TimeRead.Seconds);
+
+		HAL_GPIO_WritePin(LED_GREEN_Port,LED_GREEN_Pin,GPIO_PIN_SET);
+		HAL_Delay(2000);
+		HAL_GPIO_WritePin(LED_GREEN_Port,LED_GREEN_Pin,GPIO_PIN_RESET);
+
+	}
 
 	printmsg("This is RTC Alarm Test program\r\n");
 
-	while (1){
 
-		 /* Time adquisition */
-		 HAL_RTC_GetTime(&hrtc,&RTC_TimeRead,RTC_FORMAT_BIN);
-
-		 HAL_RTC_GetDate(&hrtc,&RTC_DateRead,RTC_FORMAT_BIN);
-
-		 printmsg("Current Time is : %02d:%02d:%02d\r\n",RTC_TimeRead.Hours,\
-				 RTC_TimeRead.Minutes,RTC_TimeRead.Seconds);
-		 printmsg("Current Date is : %02d-%2d-%2d  <%s> \r\n",RTC_DateRead.Month,RTC_DateRead.Date,\
-				 RTC_DateRead.Year,getDayofweek(RTC_DateRead.WeekDay));
-
-		 /* Alarm trigger*/
-		if(flag_alarm){
-			HAL_GPIO_WritePin(LED_GREEN_Port,LED_GREEN_Pin,GPIO_PIN_SET);
-			HAL_Delay(5000);
-			HAL_GPIO_WritePin(LED_GREEN_Port,LED_GREEN_Pin,GPIO_PIN_RESET);
-			flag_alarm = 0;
-		}
-
-		HAL_Delay(1000);
-	}
+	while(1);
 }
 
 /**
@@ -321,7 +328,16 @@ static void GPIO_Init(void)
 	 printmsg("Current Date is : %02d-%2d-%2d  <%s> \r\n",RTC_DateRead.Month,RTC_DateRead.Date,\
 			 RTC_DateRead.Year,getDayofweek(RTC_DateRead.WeekDay));
 
+	 //make sure that WUF and RTC alarm A flag are cleared
+	 __HAL_RTC_ALARM_CLEAR_FLAG(&hrtc,RTC_FLAG_ALRAF);
+	 __HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);
+
 	 RTC_AlarmConfig();
+
+	 printmsg("Went to STANDBY mode\r\n");
+
+	 //Go to standby mode
+	 HAL_PWR_EnterSTANDBYMode();
 
 }
 
@@ -336,13 +352,13 @@ void  RTC_AlarmConfig(void)
 	 HAL_RTC_DeactivateAlarm(&hrtc,RTC_ALARM_A);
 
 	 /* Alarm for hour o second*/
-/*
+
 	 AlarmA_Set.Alarm = RTC_ALARM_A;
 	 AlarmA_Set.AlarmTime.Minutes = ALARM_MINUTES;
 	 AlarmA_Set.AlarmTime.Seconds = ALARM_SECONDS;
 	 AlarmA_Set.AlarmMask = RTC_ALARMMASK_HOURS | RTC_ALARMMASK_DATEWEEKDAY ;
 	 AlarmA_Set.AlarmSubSecondMask = RTC_ALARMSUBSECONDMASK_NONE;
-*/
+
 	 /* Alarm for week days*/
 /*
 	 AlarmA_Set.Alarm = RTC_ALARM_A;
