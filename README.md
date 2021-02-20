@@ -69,9 +69,9 @@ The DISCOVERY-DISC1 F407VG board has the following code repository the following
     - [x] 26-LowPower_BackupSRAM_Standby
 - [x] Internal RTC
     - [x] 27-RTC_DateTime
-    - [x] 28-RTC_DateTime_Standby
+    - [x] 28-RTC_DateTime_Standby (NOT TESTED: X3 LSE not provided in board)
     - [x] 29-RTC_Alarm_A
-    - [x] 30-RTC_Alarm_Stanby_WakeUp
+    - [x] 30-RTC_Alarm_Stanby_WakeUp (NOT TESTED: X3 LSE not provided in board)
     - [x] 31-RTC_Demo_APIs
 - [ ] Communication Protocols
 	- [x] UART
