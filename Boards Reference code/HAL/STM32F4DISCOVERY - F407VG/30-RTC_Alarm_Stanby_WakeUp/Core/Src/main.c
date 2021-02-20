@@ -6,6 +6,10 @@
   * @Date         	: 02-20-2021
   * @Target			: DISCOVERY-DISC1 STM32F407VG
   * @brief          : RTC used like a wakeup in StandBy Mode.
+  * 				  PROGRAM NOT TESTED: We need a LSE X3 External clock witch
+  * 				  is not provided for DISCOVERY-DISC1. LSE is a backup Domain.
+  * 				  HSE or LSI are off in LP Standby because they are not in
+  * 				  backup domain.
   * @Lib			: CMSIS, HAL.
   * @System Clock
   * 	SYSSource:		PLL(HSE)
@@ -20,10 +24,13 @@
   * 	*RTC
   * 		Alarm A		------> ALARM_MINUTES 0
   * 							ALARM_SECONDS 3
-  * 							00:3
+  * 							00:03
   * @note
   * 	-STM32 RTC emdebs two alarms alarm A and alarm B. An alarm can be generated
   * 	 at a given time or date programmed by the user.
+  * 	-Without LSE (Clock BackUp Domain) the time and date will be lost.
+  * 	-DISCOVERY-DISC1 STM32F407VG do not provide the provide X3 LSE it will
+  * 	 provide for user.
   * 	-Use macros ALARM_MINUTES and ALARM_SECONDS to represent the alarm at 00:10,
   * 	 its means, the button should be pressed before that time. The start time is
   * 	 59:50.

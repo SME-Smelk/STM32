@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @Project        : 27-RTC_DateTime
+  * @Project        : 28-RTC_DateTime_Standby
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-19-2021
@@ -8,8 +8,8 @@
   * @brief          : RTC Date and time each second, no lost by Standby.
   * 				  PROGRAM NOT TESTED: We need a LSE X3 External clock witch
   * 				  is not provided for DISCOVERY-DISC1. LSE is a backup Domain.
-  * 				  HSE or LSI is not in backup domain.
-  * 				  LowPower Standby.
+  * 				  HSE or LSI are off in LP Standby because they are not in
+  * 				  backup domain.
   * @Lib			: CMSIS, HAL.
   * @System Clock
   * 	SYSSource:		PLL(HSE)
@@ -23,6 +23,9 @@
   * 		PA0      	------> USER_BUTTON
   * 	*RTC			------> Date Time
   * @note
+  * 	-Without LSE (Clock BackUp Domain) the time and date will be lost.
+  * 	-DISCOVERY-DISC1 STM32F407VG do not provide the provide X3 LSE it will
+  * 	 provide for user.
   * 	-We use LSE 32.768kHz (Need be provided for user)
   * 	-Table of prescaler RTC:
   * 	RTCCLK			PREDIV_A 	PREDIV_S	ck_spre
