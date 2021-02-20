@@ -67,12 +67,12 @@ The DISCOVERY-DISC1 F407VG board has the following code repository the following
     - [x] 24-LowPower_WFE_Instruction
     - [x] 25-LowPower_modes
     - [x] 26-LowPower_BackupSRAM_Standby
-- [ ] Internal RTC
+- [x] Internal RTC
     - [x] 27-RTC_DateTime
     - [x] 28-RTC_DateTime_Standby
     - [x] 29-RTC_Alarm_A
-    - [ ] 30-RTC_Alarm_Stanby_WakeUp
-    - [ ] 31-RTC_Demo_APIs
+    - [x] 30-RTC_Alarm_Stanby_WakeUp
+    - [x] 31-RTC_Demo_APIs
 - [ ] Communication Protocols
 	- [x] UART
 	- [ ] I2C
