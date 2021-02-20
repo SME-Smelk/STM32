@@ -12,6 +12,8 @@
   * @System Clock
   * 	SYSSource:		HSI
   * 	SYSCLK: 		16MHz
+  * 	RTCSource:		None
+  * 	RTCCLK: 		None
   * @Perf
   * 	*UART2
   * 		PA2			<-----> USART_TX

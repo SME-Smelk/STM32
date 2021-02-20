@@ -13,6 +13,8 @@
   * @System Clock
   * 	SYSSource:		PLL(HSE)
   * 	SYSCLK: 		84MHz
+  * 	RTCSource:		None
+  * 	RTCCLK: 		None
   * @Perf
   * 	*UART2
   * 		PA2			<-----> USART_TX

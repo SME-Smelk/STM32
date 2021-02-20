@@ -3,13 +3,15 @@
   * @Project        : 00-BASE-Basic
   * @Autor          : Ismael Poblete
   * @Company		: -
-  * @Date         	: 6-28-2020
+  * @Date         	: 02-20-2021
   * @Target			: DISCOVERY-DISC1 STM32F407VG
   * @brief          : Base programming guide
   * @Lib			: CMSIS, HAL.
   * @System Clock
   * 	SYSSource:		HSI/HSE/PLL(HSI)/PLL(HSE) 	(Ej: HSI)
   * 	SYSCLK: 		XMHz						(EJ: 8MHz)
+  * 	RTCSource:		None/LSI/LSE/HSE-DIVx 			(Ej: LSI)
+  * 	RTCCLK: 		None/XMHz						(EJ: 32kHz)
   * @Perf
   * 	*UART2
   * 		PA2			<-----> USART_TX
