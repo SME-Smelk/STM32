@@ -8,7 +8,7 @@
   * @brief          : RTC Date and time each second, no lost by Standby.
   * 				  PROGRAM NOT TESTED: We need a LSE X3 External clock witch
   * 				  is not provided for DISCOVERY-DISC1. LSE is a backup Domain.
-  * 				  HSE or LSI is not in backup Domain.
+  * 				  HSE or LSI is not in backup domain.
   * 				  LowPower Standby.
   * @Lib			: CMSIS, HAL.
   * @System Clock
@@ -18,10 +18,10 @@
   * 	*UART2
   * 		PA2			<-----> USART_TX
   * 		PA3			<-----> USART_RX
-  * 	*USER_LED
-  * 		PD12      	------> LED_GREEN
-  * 	*BUTTON
+  * 	*GPIO
+  * 		PD12      	------> USER_LED
   * 		PA0      	------> USER_BUTTON
+  * 	*RTC			------> Date Time
   * @note
   * 	-We use LSE 32.768kHz (Need be provided for user)
   * 	-Table of prescaler RTC:

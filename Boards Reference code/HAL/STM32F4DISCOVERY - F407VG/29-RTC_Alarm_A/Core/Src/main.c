@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @Project        : 27-RTC_DateTime
+  * @Project        : 29-RTC_Alarm_A
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-19-2021
@@ -16,14 +16,23 @@
   * 		PA3			<-----> USART_RX
   * 	*GPIO
   * 		PD12      	------> USER_LED
-  * 	*RTC			------> Date Time
+  * 		PA0      	------> USER_BUTTON
+  * 	*RTC
+  * 		Alarm A		------> ALARM_MINUTES 0
+  * 							ALARM_SECONDS 10
+  * 							00:10
   * @note
+  * 	-STM32 RTC emdebs two alarms alarm A and alarm B. An alarm can be generated
+  * 	 at a given time or date programmed by the user.
+  * 	-Use macros ALARM_MINUTES and ALARM_SECONDS to represent the alarm at 00:10,
+  * 	 its means, the button should be pressed before that time. The start time is
+  * 	 50:53.
   * 	-We use LSI 32Khz
   * 	-Table of prescaler RTC:
-  * 	RTCCLK			PREDIV_A 	PREDIV_S	ck_spre
-  * 	LSE 32.768kHz	127			255			1Hz
-  * 	LSI 32Khz		127			249			1Hz****
-  * 	LSI 37Khz		124			295			1Hz
+  * 		RTCCLK			PREDIV_A 	PREDIV_S	ck_spre
+  * 		LSE 32.768kHz	127			255			1Hz
+  * 		LSI 32Khz		127			249			1Hz****
+  * 		LSI 37Khz		124			295			1Hz
   ******************************************************************************
 **/
 
@@ -48,11 +57,14 @@ static void GPIO_Init(void);
 void Error_handler(void);
 static void UART2_Init(void);
 static void RTC_Init(void);
+void RTC_CalendarConfig(void);
+void RTC_AlarmConfig(void);
 
 /* Private user code ---------------------------------------------------------*/
 RTC_TimeTypeDef RTC_TimeRead;
 RTC_DateTypeDef RTC_DateRead;
 
+uint8_t flag_alarm = 0;
 
 void printmsg(char *format,...)
  {
@@ -68,12 +80,14 @@ void printmsg(char *format,...)
 
  }
 
+
 char* getDayofweek(uint8_t number)
 {
 	char *weekday[] = { "Monday", "TuesDay", "Wednesday","Thursday","Friday","Saturday","Sunday"};
 
 	return weekday[number-1];
 }
+
 
 /**
   * @brief  The application entry point.
@@ -115,15 +129,29 @@ int main(void)
 
 	/* Start Code */
 
+	printmsg("This is RTC Alarm Test program\r\n");
+
 	while (1){
 
+		 /* Time adquisition */
 		 HAL_RTC_GetTime(&hrtc,&RTC_TimeRead,RTC_FORMAT_BIN);
+
 		 HAL_RTC_GetDate(&hrtc,&RTC_DateRead,RTC_FORMAT_BIN);
 
-		 printmsg("Current Time is : %02d:%02d:%02d\r\n",RTC_TimeRead.Hours,RTC_TimeRead.Minutes,RTC_TimeRead.Seconds);
-		 printmsg("Current Date is : %02d-%2d-%2d  <%s> \r\n",RTC_DateRead.Month,RTC_DateRead.Date,RTC_DateRead.Year,getDayofweek(RTC_DateRead.WeekDay));
-		 HAL_Delay(1000);
+		 printmsg("Current Time is : %02d:%02d:%02d\r\n",RTC_TimeRead.Hours,\
+				 RTC_TimeRead.Minutes,RTC_TimeRead.Seconds);
+		 printmsg("Current Date is : %02d-%2d-%2d  <%s> \r\n",RTC_DateRead.Month,RTC_DateRead.Date,\
+				 RTC_DateRead.Year,getDayofweek(RTC_DateRead.WeekDay));
 
+		 /* Alarm trigger*/
+		if(flag_alarm){
+			HAL_GPIO_WritePin(LED_GREEN_Port,LED_GREEN_Pin,GPIO_PIN_SET);
+			HAL_Delay(5000);
+			HAL_GPIO_WritePin(LED_GREEN_Port,LED_GREEN_Pin,GPIO_PIN_RESET);
+			flag_alarm = 0;
+		}
+
+		HAL_Delay(1000);
 	}
 }
 
@@ -253,6 +281,7 @@ static void GPIO_Init(void)
 {
 
     __HAL_RCC_GPIOD_CLK_ENABLE();
+    __HAL_RCC_GPIOA_CLK_ENABLE();
 
 	GPIO_InitTypeDef ledgpio = {0};
 
@@ -260,6 +289,82 @@ static void GPIO_Init(void)
 	ledgpio.Mode = GPIO_MODE_OUTPUT_PP;
 	ledgpio.Pull = GPIO_NOPULL;
 	HAL_GPIO_Init(LED_GREEN_Port,&ledgpio);
+
+	ledgpio.Pin = BUTTON_Pin;
+	ledgpio.Mode = GPIO_MODE_IT_FALLING;
+	ledgpio.Pull = GPIO_NOPULL;
+	HAL_GPIO_Init(BUTTON_Port,&ledgpio);
+
+	HAL_NVIC_SetPriority(EXTI0_IRQn,15,0);
+	HAL_NVIC_EnableIRQ(EXTI0_IRQn);
+}
+
+/**
+  * @brief  EXTI line detection callbacks.
+  * @param  GPIO_Pin Specifies the pins connected EXTI line
+  * @retval None
+  */
+ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+	 RTC_TimeTypeDef RTC_TimeRead;
+	 RTC_DateTypeDef RTC_DateRead;
+
+	 //RTC_CalendarConfig();
+
+	 HAL_RTC_GetTime(&hrtc,&RTC_TimeRead,RTC_FORMAT_BIN);
+
+	 HAL_RTC_GetDate(&hrtc,&RTC_DateRead,RTC_FORMAT_BIN);
+
+	 printmsg("-----------------\r\n");
+	 printmsg("Current Time is : %02d:%02d:%02d\r\n",RTC_TimeRead.Hours,\
+			 RTC_TimeRead.Minutes,RTC_TimeRead.Seconds);
+	 printmsg("Current Date is : %02d-%2d-%2d  <%s> \r\n",RTC_DateRead.Month,RTC_DateRead.Date,\
+			 RTC_DateRead.Year,getDayofweek(RTC_DateRead.WeekDay));
+
+	 RTC_AlarmConfig();
+
+}
+
+
+void  RTC_AlarmConfig(void)
+{
+
+	 RTC_AlarmTypeDef AlarmA_Set;
+
+	 memset(&AlarmA_Set,0,sizeof(AlarmA_Set));
+
+	 HAL_RTC_DeactivateAlarm(&hrtc,RTC_ALARM_A);
+
+	 AlarmA_Set.Alarm = RTC_ALARM_A;
+	 AlarmA_Set.AlarmTime.Minutes = ALARM_MINUTES;
+	 AlarmA_Set.AlarmTime.Seconds = ALARM_SECONDS;
+	 AlarmA_Set.AlarmMask = RTC_ALARMMASK_HOURS | RTC_ALARMMASK_DATEWEEKDAY ;
+	 AlarmA_Set.AlarmSubSecondMask = RTC_ALARMSUBSECONDMASK_NONE;
+	 if ( HAL_RTC_SetAlarm_IT(&hrtc, &AlarmA_Set, RTC_FORMAT_BIN) != HAL_OK)
+	 {
+		 Error_Handler();
+	 }
+
+	 printmsg("Alarm Set Successful\r\n");
+	 printmsg("-----------------\r\n");
+
+}
+
+
+void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
+{
+
+	printmsg("-----------------\r\n");
+	printmsg("Alarm Triggered \r\n");
+
+	RTC_TimeTypeDef RTC_TimeRead;
+
+	HAL_RTC_GetTime(hrtc,&RTC_TimeRead,RTC_FORMAT_BIN);
+
+	printmsg("Current Time is : %02d:%02d:%02d\r\n",RTC_TimeRead.Hours,\
+	RTC_TimeRead.Minutes,RTC_TimeRead.Seconds);
+	printmsg("-----------------\r\n");
+	flag_alarm = 1;
 
 }
 
