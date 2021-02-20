@@ -36,11 +36,11 @@
   * 			voltage regulator disabled. The 1.2 V domain is consequently powered off.
   * 			The PLLs, the HSI oscillator and the HSE oscillator are also switched off.
   * 	-Use the button to change thru low power modes. Once time you press the button
-  * 	 it just wait 2 seconds to start the mode (to avoid debounce):
-  * 	 	-1. Run mode (Default)
-  * 	 	-2. Sleep mode
-  * 	 	-3. Stop mode
-  * 	 	-4. Standby mode (Reset to main)
+  * 	 it just wait 2 seconds to start the next mode (to avoid debounce):
+  * 	 	-1. Run mode (Default): 8mA
+  * 	 	-2. Sleep mode: 3.52mA
+  * 	 	-3. Stop mode: 1.97mA
+  * 	 	-4. Standby mode (Reset to main): 0.56mA
   *
   ******************************************************************************
 **/
