@@ -22,6 +22,8 @@
   * 	-In Standby Mode: SRAM and register contents are lost except for registers in the
   * 	 backup domain. The backup domain consist in RTC registers, RTC backup register and
   * 	 backup SRAM.
+  * 	-BackUp Memory SRAM not depend of clocks, agains that depend on LP Voltage regulator
+  * 	 from backup domain
   * 	-The STM32F4 have a Back up memory 4Kbyte of SRAM. It can be use to save data when
   * 	 a loss power is produced, like the effect of the Standby Mode which produce a loss
   * 	 data inside. The normal SRAM for effect of the Standby mode is deleted.
