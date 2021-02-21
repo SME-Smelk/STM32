@@ -1,26 +1,27 @@
 /**
   ******************************************************************************
-  * @Project        : 00-BASE-Basic
+  * @Project        : 32-I2C_Master_SLave_TX_RX_AllOne
   * @Autor          : Ismael Poblete
   * @Company		: -
-  * @Date         	: 02-20-2021
+  * @Date         	: 02-21-2021
   * @Target			: DISCOVERY-DISC1 STM32F407VG
-  * @brief          : Base programming guide
+  * @brief          : I2C Master and Slave programming.
+  * 				  Master Write and Read from Slave.
   * @Lib			: CMSIS, HAL.
   * @System Clock
-  * 	SYSSource:		HSI/HSE/PLL(HSI)/PLL(HSE) 	(Ej: HSI)
-  * 	SYSCLK: 		XMHz						(EJ: 8MHz)
-  * 	RTCSource:		None/LSI/LSE/HSE-DIVx 			(Ej: LSI)
-  * 	RTCCLK: 		None/XMHz						(EJ: 32kHz)
+  * 	SYSSource:		PLL(HSE)
+  * 	SYSCLK: 		84MHz
+  * 	RTCSource:		None
+  * 	RTCCLK: 		None
   * @Perf
   * 	*UART2
   * 		PA2			<-----> USART_TX
   * 		PA3			<-----> USART_RX
   * 	*GPIO
-  * 		PA5      	------> LD2
-  * 		PC13     	<------ B1(Button)
-  * 	*ADC
-  * 		PA0    	 	------> ADC1,INO
+  * 		PD12      	------> LED_GREEN
+  * 	*I2C1
+  * 		PB6			<-----> I2C1_SCL
+  * 		PB7			<-----> I2C1_SDA
   ******************************************************************************
 **/
 
@@ -195,8 +196,8 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-  RCC_OscInitStruct.PLL.PLLM = 8;
-  RCC_OscInitStruct.PLL.PLLN = 336;
+  RCC_OscInitStruct.PLL.PLLM = 4;
+  RCC_OscInitStruct.PLL.PLLN = 84;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = 7;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
@@ -209,17 +210,10 @@ void SystemClock_Config(void)
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_I2S;
-  PeriphClkInitStruct.PLLI2S.PLLI2SN = 192;
-  PeriphClkInitStruct.PLLI2S.PLLI2SR = 2;
-  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
   {
     Error_Handler();
   }
