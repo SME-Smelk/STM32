@@ -22,6 +22,14 @@
   * 	*I2C1
   * 		PB6			<-----> I2C1_SCL
   * 		PB7			<-----> I2C1_SDA
+  * @note
+  * 	-In this program we tested the I2C Master - Slave have. We have a two macros
+  * 	 in main.h to config this program.
+  * 	 -To convert this device a Slave comment MASTER_DEVICE
+  * 	 -To convert this device a Master descomment MASTER_DEVICE
+  * 	 	If we want to enable the program to write descomment MASTER_WRITE.
+  * 	 	If we want to enable the program to read comment MASTER_WRITE.
+  *
   ******************************************************************************
 **/
 

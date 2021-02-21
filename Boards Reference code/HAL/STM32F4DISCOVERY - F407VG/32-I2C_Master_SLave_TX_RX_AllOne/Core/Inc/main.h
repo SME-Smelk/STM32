@@ -23,7 +23,6 @@
 #define MASTER_DEVICE
 #define MASTER_WRITE
 
-#define I2C_MASTER_MODE_EN
 #define SLAVE_ADDRESS 0x68
 
 /* Mode Master/Slave - Read/Write */
