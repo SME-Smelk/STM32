@@ -75,11 +75,10 @@ The DISCOVERY-DISC1 F407VG board has the following code repository the following
     - [x] 31-RTC_Demo_APIs
 - [ ] Communication Protocols
 	- [x] UART
-	- [ ] I2C
-		- [ ] Master_TX
-		- [ ] Master_RX
-		- [ ] Master_RX_TI
-		- [ ] Slave_TX
+	- [x] I2C
+		- [x] 32-I2C_Master_Slave_TX_RX_AllOne
+			- [x] Master Write - Slave Read
+			- [x] Master Read - Slave Write
 	- [ ] SPI
 		- [ ] Master_TX
 		- [ ] Master_RX
