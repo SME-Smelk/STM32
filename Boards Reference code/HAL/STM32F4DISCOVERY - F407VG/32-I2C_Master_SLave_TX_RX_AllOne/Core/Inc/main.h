@@ -29,23 +29,21 @@
 #define MASTER_WRITE_CMD       0xC1
 #define MASTER_READ_CMD        0XC2
 
-/*slave*/
-#define SLAVE_OWN_ADDRESS      (uint8_t)0x53;
-#define SLAVE_ADDRESS_READ    (uint8_t) 0xA7
-#define SLAVE_ADDRESS_WRITE    (uint8_t) 0xA6
-
 /*bufer lenght*/
 #define READ_LEN    5
 #define WRITE_LEN   5
 
 /* Exported macro ------------------------------------------------------------*/
-#define USE_FULL_ASSERT
 
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
 
 /* Private defines -----------------------------------------------------------*/
-#define LED_GREEN_pin 				GPIO_PIN_12
-#define LED_GREEN_port 				GPIOD
+#define USER_BUTTON_Pin GPIO_PIN_0
+#define USER_BUTTON_GPIO_Port GPIOA
+#define LED_GREEN_Pin GPIO_PIN_12
+#define LED_GREEN_GPIO_Port GPIOD
+#define LED_RED_Pin GPIO_PIN_13
+#define LED_RED_GPIO_Port GPIOD
 
 #endif /* __MAIN_H */

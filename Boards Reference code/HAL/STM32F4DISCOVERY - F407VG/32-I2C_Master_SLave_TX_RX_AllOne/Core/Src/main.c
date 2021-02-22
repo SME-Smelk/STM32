@@ -54,6 +54,7 @@ static void I2C1_Init(void);
 static void GPIO_Init(void);
 static void I2C1_Init(void);
 static void USART2_UART_Init(void);
+
 /* Private user code ---------------------------------------------------------*/
 uint8_t master_tx_buffer[5]={0xa5, 0x55, 0xa5, 0x55, 0xb0};
 uint8_t master_rx_buffer[5];
@@ -84,108 +85,115 @@ int main(void)
 	I2C1_Init();
 	USART2_UART_Init();
 
-	/* User Code */
-
-	/* Start Code */
-while (1)
-{
-
-	while(hi2c1.State != HAL_I2C_STATE_READY);
-
-	#ifdef MASTER_DEVICE
-
-	/********** MASTER: WRITE TX TO SLAVE *************/
-	#ifdef MASTER_WRITE
-	/* first send the master write cmd to slave */
-	master_write_req = MASTER_WRITE_CMD;
-	HAL_I2C_Master_Transmit(&hi2c1, SLAVE_ADDRESS_WRITE, (uint8_t*) &master_write_req, 1, HAL_MAX_DELAY);
-	while(hi2c1.State != HAL_I2C_STATE_READY);
-
-	/* Now send the number of bytes to be written */
-	master_write_req = WRITE_LEN;
-	HAL_I2C_Master_Transmit(&hi2c1, SLAVE_ADDRESS_WRITE, (uint8_t*) &master_write_req, 1, HAL_MAX_DELAY);
-	while(hi2c1.State != HAL_I2C_STATE_READY);
-
-	/* NOW send the data stream */
-	HAL_I2C_Master_Transmit(&hi2c1, SLAVE_ADDRESS_WRITE, master_tx_buffer, WRITE_LEN, HAL_MAX_DELAY);
-	while(hi2c1.State != HAL_I2C_STATE_READY);
-
-
-	#else
-	/************ MASTER: READ TX TO SLAVE ************/
-
-	/* first send the master read cmd to slave */
-	master_read_req = MASTER_READ_CMD;
-	HAL_I2C_Master_Transmit(&hi2c1, SLAVE_ADDRESS_WRITE, (uint8_t*) &master_read_req, 1, HAL_MAX_DELAY);
-	while(hi2c1.State != HAL_I2C_STATE_READY);
-
-	/* Now send the number of bytes to be read */
-	master_write_req = READ_LEN;
-	HAL_I2C_Master_Transmit(&hi2c1, SLAVE_ADDRESS_WRITE, (uint8_t*) &master_read_req, 1, HAL_MAX_DELAY);
-	while(hi2c1.State != HAL_I2C_STATE_READY);
-
-	/* NOW read the data stream */
-	memset(master_rx_buffer,0, 5);
-	HAL_I2C_Master_Receive(&hi2c1, SLAVE_ADDRESS_READ, (uint8_t*) &master_rx_buffer, READ_LEN, HAL_MAX_DELAY);
-	while(hi2c1.State != HAL_I2C_STATE_READY);
-
-	for(int i=0;i<10;i++){
-	  HAL_GPIO_WritePin(LED_GREEN_port, LED_GREEN_pin, GPIO_PIN_SET);
-	  HAL_Delay(200);
-	  HAL_GPIO_WritePin(LED_GREEN_port, LED_GREEN_pin, GPIO_PIN_RESET);
-	  HAL_Delay(200);
+	while(!HAL_GPIO_ReadPin(USER_BUTTON_GPIO_Port, USER_BUTTON_Pin));
+	if((HAL_I2C_IsDeviceReady(&hi2c1, SLAVE_ADDRESS, 10, 10) == HAL_OK)){
+		HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_SET);
+	}else{
+		HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_RESET);
 	}
 
-	#endif
+	while (1)
+	{
+		#ifdef MASTER_DEVICE
 
-	#else
+		HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, GPIO_PIN_SET);
 
-	/**********SLAVE: WRITE TX TO MASTER *************/
+		while(!HAL_GPIO_ReadPin(USER_BUTTON_GPIO_Port, USER_BUTTON_Pin));
 
-	/* first rcv the commmand from the master */
-	HAL_I2C_Slave_Receive(&hi2c1, &slave_rcv_cmd, 1, HAL_MAX_DELAY);
-	while(hi2c1.State != HAL_I2C_STATE_READY);
+		HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, GPIO_PIN_RESET);
 
-	if(slave_rcv_cmd == MASTER_WRITE_CMD){
+		/********** MASTER: WRITE TX TO SLAVE *************/
+		#ifdef MASTER_WRITE
 
-	  /* prepare to rcv from the master
-	   * first rcv no bytes to be written by master*/
-	  HAL_I2C_Slave_Receive(&hi2c1, &slave_rcv_cmd, 1, HAL_MAX_DELAY);
-	  while(hi2c1.State != HAL_I2C_STATE_READY);
+		master_write_req = MASTER_WRITE_CMD;
+		HAL_I2C_Master_Transmit(&hi2c1, SLAVE_ADDRESS, (uint8_t*) &master_write_req, 1, HAL_MAX_DELAY);
+		while(hi2c1.State != HAL_I2C_STATE_READY);
 
-	  memset(slave_rx_buffer,0, sizeof(slave_rx_buffer));
-	  HAL_I2C_Slave_Receive(&hi2c1, &slave_rcv_cmd, 1, HAL_MAX_DELAY);
-	  while(hi2c1.State != HAL_I2C_STATE_READY);
+		/* Now send the number of bytes to be written */
+		master_write_req = WRITE_LEN;
+		HAL_I2C_Master_Transmit(&hi2c1, SLAVE_ADDRESS, (uint8_t*) &master_write_req, 1, HAL_MAX_DELAY);
+		while(hi2c1.State != HAL_I2C_STATE_READY);
 
-	  for(int i=0;i<10;i++){
-		  HAL_GPIO_WritePin(LED_GREEN_port, LED_GREEN_pin, GPIO_PIN_SET);
+		/* NOW send the data stream */
+		HAL_I2C_Master_Transmit(&hi2c1, SLAVE_ADDRESS, master_tx_buffer, WRITE_LEN, HAL_MAX_DELAY);
+		while(hi2c1.State != HAL_I2C_STATE_READY);
+
+		#else
+		/************ MASTER: READ TX FROM SLAVE ************/
+
+		/* first send the master read cmd to slave */
+		master_read_req = MASTER_READ_CMD;
+		HAL_I2C_Master_Transmit(&hi2c1, SLAVE_ADDRESS, (uint8_t*) &master_read_req, 1, HAL_MAX_DELAY);
+		while(hi2c1.State != HAL_I2C_STATE_READY);
+
+		/* Now send the number of bytes to be read */
+		master_write_req = READ_LEN;
+		HAL_I2C_Master_Transmit(&hi2c1, SLAVE_ADDRESS, (uint8_t*) &master_read_req, 1, HAL_MAX_DELAY);
+		while(hi2c1.State != HAL_I2C_STATE_READY);
+
+		/* NOW read the data stream */
+		memset(master_rx_buffer,0, 5);
+		HAL_I2C_Master_Receive(&hi2c1, SLAVE_ADDRESS, (uint8_t*) &master_rx_buffer, READ_LEN, HAL_MAX_DELAY);
+		while(hi2c1.State != HAL_I2C_STATE_READY);
+
+		for(int i=0;i<10;i++){
+		  HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, GPIO_PIN_SET);
 		  HAL_Delay(200);
-		  HAL_GPIO_WritePin(LED_GREEN_port, LED_GREEN_pin, GPIO_PIN_RESET);
+		  HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, GPIO_PIN_RESET);
 		  HAL_Delay(200);
-	  }
+		}
 
+		#endif
+
+		#else
+
+		/**********SLAVE: WRITE TX TO MASTER *************/
+
+		/* first rcv the commmand from the master */
+		HAL_I2C_Slave_Receive(&hi2c1, &slave_rcv_cmd, 1, HAL_MAX_DELAY);
+		while(hi2c1.State != HAL_I2C_STATE_READY);
+
+		if(slave_rcv_cmd == MASTER_WRITE_CMD){
+
+		  /* prepare to rcv from the master
+		   * first rcv no bytes to be written by master*/
+		  HAL_I2C_Slave_Receive(&hi2c1, &slave_rcv_cmd, 1, HAL_MAX_DELAY);
+		  while(hi2c1.State != HAL_I2C_STATE_READY);
+
+		  memset(slave_rx_buffer,0, sizeof(slave_rx_buffer));
+		  HAL_I2C_Slave_Receive(&hi2c1, slave_rx_buffer, slave_rcv_cmd, HAL_MAX_DELAY);
+		  while(hi2c1.State != HAL_I2C_STATE_READY);
+
+		  for(int i=0;i<10;i++){
+			  HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, GPIO_PIN_SET);
+			  HAL_Delay(100);
+			  HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, GPIO_PIN_RESET);
+			  HAL_Delay(100);
+		  }
+
+		}
+
+		if(slave_rcv_cmd == MASTER_READ_CMD){
+
+		  HAL_I2C_Slave_Receive(&hi2c1, &slave_rcv_cmd, 1, HAL_MAX_DELAY);
+		  while(hi2c1.State != HAL_I2C_STATE_READY);
+
+		  /* NOW send the data stream */
+		  HAL_I2C_Slave_Transmit(&hi2c1, slave_tx_buffer, slave_rcv_cmd, HAL_MAX_DELAY);
+		  while(hi2c1.State != HAL_I2C_STATE_READY);
+
+		  for(int i=0;i<10;i++){
+			  HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, GPIO_PIN_SET);
+			  HAL_Delay(100);
+			  HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, GPIO_PIN_RESET);
+			  HAL_Delay(100);
+		  }
+
+		}
+		#endif
 	}
+	return 0;
 
-	if(slave_rcv_cmd == MASTER_READ_CMD){
-
-	  HAL_I2C_Slave_Receive(&hi2c1, &slave_rcv_cmd, 1, HAL_MAX_DELAY);
-	  while(hi2c1.State != HAL_I2C_STATE_READY);
-
-	  /* NOW send the data stream */
-	  HAL_I2C_Slave_Transmit(&hi2c1, slave_tx_buffer, slave_rcv_cmd, HAL_MAX_DELAY);
-	  while(hi2c1.State != HAL_I2C_STATE_READY);
-
-	  for(int i=0;i<10;i++){
-		  HAL_GPIO_WritePin(LED_GREEN_port, LED_GREEN_pin, GPIO_PIN_SET);
-		  HAL_Delay(200);
-		  HAL_GPIO_WritePin(LED_GREEN_port, LED_GREEN_pin, GPIO_PIN_RESET);
-		  HAL_Delay(200);
-	  }
-
-	}
-	#endif
-	}
-return 0;
 }
 
 /**
@@ -236,17 +244,25 @@ static void GPIO_Init(void)
   GPIO_InitTypeDef GPIO_InitStruct = {0};
 
   /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(LED_GREEN_port, LED_GREEN_pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOD, LED_GREEN_Pin|LED_RED_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pin : LED_GREEN_pin */
-  GPIO_InitStruct.Pin = LED_GREEN_pin;
+  /*Configure GPIO pin : USER_BUTTON_Pin */
+  GPIO_InitStruct.Pin = USER_BUTTON_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(USER_BUTTON_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : LED_GREEN_Pin LED_RED_Pin */
+  GPIO_InitStruct.Pin = LED_GREEN_Pin|LED_RED_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(LED_GREEN_port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+
 
 }
 
@@ -286,11 +302,10 @@ static void I2C1_Init(void)
   hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
 #ifdef MASTER_DEVICE
   hi2c1.Init.OwnAddress1 = 0;
-  hi2c1.Init.OwnAddress2 = 0;
 #else
-  hi2c1.Init.OwnAddress1 = SLAVE_ADDRESS_READ;
-  hi2c1.Init.OwnAddress2 = SLAVE_ADDRESS_WRITE;
+  hi2c1.Init.OwnAddress1 = SLAVE_ADDRESS;
 #endif
+  hi2c1.Init.OwnAddress2 = 0;
   hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
   hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
   hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
@@ -311,20 +326,3 @@ void Error_Handler(void)
 
 
 }
-
-#ifdef  USE_FULL_ASSERT
-/**
-  * @brief  Reports the name of the source file and the source line number
-  *         where the assert_param error has occurred.
-  * @param  file: pointer to the source file name
-  * @param  line: assert_param error line source number
-  * @retval None
-  */
-void assert_failed(uint8_t *file, uint32_t line)
-{
-  /* User can add his own implementation to report the file name and line number,
-     tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
-}
-#endif /* USE_FULL_ASSERT */
-
-
