@@ -89,6 +89,40 @@ The DISCOVERY-DISC1 F407VG board has the following code repository the following
 		- [ ] LoopBack_IT
 		- [ ] Normal_mode_twonodes
 
+### Bootloaders
+
+- [ ] Bootloader
+    - [ ] Bootloader Base Code
+    - [ ] Test-ToggleLed-STBootloader
+    - [ ] Bootloader-UART
+    - [ ] UserCode
+    - [ ] Bootloader-Code
+
+### RTOS
+
+- [ ] RTOS FreeRTOS
+    - [ ] FreeRTOS Code Base
+    - [ ] FreeRTOS SystemView SEGGER Code Base
+    - [ ] CreateTask 4 leds
+    - [ ] UART2
+    - [ ] LedButton
+    - [ ] LedButtonIT
+    - [ ] Task-Notify
+    - [ ] TaskDelete
+    - [ ] DinamicPriorityInterrupt
+    - [ ] TaskDelay
+    - [ ] Hook-PowerSaving
+    - [ ] Queue-Command
+    - [ ] Bin_sema_taks
+    - [ ] Count-Sema-Taks
+    - [ ] Mutex-BinSema
+    - [ ] MutexAPI
+
+### Cortex M4 Programming
+
+- [ ] Cortex-M4
+    - [ ] --
+
 ### Other pherypherals and sensors
 - [ ] SD 
     - [ ] write_sd
@@ -111,37 +145,3 @@ The DISCOVERY-DISC1 F407VG board has the following code repository the following
 	- [ ] DSP
 	- [ ] Filters
 	
-### RTOS
-
-- [ ] RTOS FreeRTOS
-    - [ ] FreeRTOS Code Base
-    - [ ] FreeRTOS SystemView SEGGER Code Base
-    - [ ] CreateTask 4 leds
-    - [ ] UART2
-    - [ ] LedButton
-    - [ ] LedButtonIT
-    - [ ] Task-Notify
-    - [ ] TaskDelete
-    - [ ] DinamicPriorityInterrupt
-    - [ ] TaskDelay
-    - [ ] Hook-PowerSaving
-    - [ ] Queue-Command
-    - [ ] Bin_sema_taks
-    - [ ] Count-Sema-Taks
-    - [ ] Mutex-BinSema
-    - [ ] MutexAPI
-
-### Bootloaders
-
-- [ ] Bootloader
-    - [ ] Bootloader Base Code
-    - [ ] Test-ToggleLed-STBootloader
-    - [ ] Bootloader-UART
-    - [ ] UserCode
-    - [ ] Bootloader-Code
-
-### Cortex M4 Programming
-
-- [ ] Cortex-M4
-    - [ ] --
-
