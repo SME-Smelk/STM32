@@ -1,9 +1,9 @@
 /**
   ******************************************************************************
-  * @Project        : 32-I2C_Master_SLave_TX_RX_AllOne
+  * @Project        : 32-I2C_Master_Slave_TX_RX_AllOne
   * @Autor          : Ismael Poblete
   * @Company		: -
-  * @Date         	: 02-21-2021
+  * @Date         	: 02-22-2021
   * @Target			: DISCOVERY-DISC1 STM32F407VG
   * @brief          : I2C Master and Slave programming.
   * 				  Master Write and Read from Slave.
@@ -19,7 +19,8 @@
   * 		PA3			<-----> USART_RX
   * 	*GPIO
   * 		PD12      	------> LED_GREEN
-  * 	*I2C1
+  * 		PD13      	------> LED_RED
+  * 	*I2C1 100khz
   * 		PB6			<-----> I2C1_SCL
   * 		PB7			<-----> I2C1_SDA
   * @note
