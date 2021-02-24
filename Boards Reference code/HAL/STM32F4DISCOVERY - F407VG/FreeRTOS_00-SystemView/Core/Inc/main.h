@@ -22,7 +22,6 @@
 /* Exported constants --------------------------------------------------------*/
 
 /* Exported macro ------------------------------------------------------------*/
-#define USE_FULL_ASSERT
 
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);

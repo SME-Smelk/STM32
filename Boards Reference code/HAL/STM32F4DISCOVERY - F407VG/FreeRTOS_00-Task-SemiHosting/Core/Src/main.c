@@ -1,21 +1,17 @@
 /**
   ******************************************************************************
-  * @Project        : FreeRTOS_00-Tasks-SemiHosting
+  * @Project        : FreeRTOS_00-Task-SemiHosting
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-23-2021
   * @Target			: DISCOVERY-DISC1 STM32F407VG
-  * @brief          : Basic FreeRTOS task programming and Semihosting.
-  * @Lib			: CMSIS, HAL. Third party: FreeRTOS
+  * @brief          : Basic FreeRTOS task programming and SemiHosting.
+  * @Lib			: CMSIS, HAL. Third party: FreeRTOS.
   * @System Clock
   * 	SYSSource:		PLL(HSE)
   * 	SYSCLK: 		84MHz
   * 	RTCSource:		None
   * 	RTCCLK: 		None
-  * @Perf
-  * 	*UART2
-  * 		PA2			<-----> USART_TX
-  * 		PA3			<-----> USART_RX
   * @RTOS
   * 	*task
   * 		task1: Example task1
@@ -93,7 +89,6 @@ void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
-  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
 
   /** Initializes the CPU, AHB and APB busses clocks
   */
@@ -154,5 +149,6 @@ void vtask2_Handler(void *params){
   */
 void Error_Handler(void)
 {
-
+	while(1);
 }
+

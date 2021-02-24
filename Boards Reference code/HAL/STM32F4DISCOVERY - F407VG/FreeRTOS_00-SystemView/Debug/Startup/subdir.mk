@@ -9,8 +9,11 @@ S_SRCS += \
 OBJS += \
 ./Startup/startup_stm32f407vgtx.o 
 
+S_DEPS += \
+./Startup/startup_stm32f407vgtx.d 
+
 
 # Each subdirectory must supply rules for building sources it contributes
-Startup/%.o: ../Startup/%.s
-	arm-none-eabi-gcc -mcpu=cortex-m4 -g3 -c -I"C:/Users/Ismael/Dropbox/Smelk/Universidad y Conocimiento/Cursos/Electronica/Mastering RTOS Hands-on FreeRTOS and STM32Fx with Debugging(RTOS)/SME/Programaciones/00-Ref-FreeRTOS-SystemView/Third-Party/SEGGER/Config" -x assembler-with-cpp --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "$@" "$<"
+Startup/startup_stm32f407vgtx.o: ../Startup/startup_stm32f407vgtx.s
+	arm-none-eabi-gcc -mcpu=cortex-m4 -g3 -c -I"C:/Users/Ismael/git/STM32/Boards Reference code/HAL/STM32F4DISCOVERY - F407VG/FreeRTOS_00-SystemView/Third-Party/SEGGER/Config" -x assembler-with-cpp -MMD -MP -MF"Startup/startup_stm32f407vgtx.d" -MT"$@" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "$@" "$<"
 

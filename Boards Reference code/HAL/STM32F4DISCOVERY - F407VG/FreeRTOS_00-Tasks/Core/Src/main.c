@@ -86,7 +86,6 @@ void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
-  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
 
   /** Initializes the CPU, AHB and APB busses clocks
   */
@@ -144,6 +143,6 @@ void vtask2_Handler(void *params){
   */
 void Error_Handler(void)
 {
-
-
+	while(1);
 }
+
