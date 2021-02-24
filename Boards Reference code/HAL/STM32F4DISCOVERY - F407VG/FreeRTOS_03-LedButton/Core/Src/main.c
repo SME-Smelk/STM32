@@ -159,7 +159,6 @@ void task_Greenled_handler(void *params){
   */
 void task_button_handler(void *params){
 	while(1){
-		//La lectura depende de la placa, algunas placa como NUCLEO si el boton esta presionado es 0.
 		if(HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)){
 			//Button pressed
 			button_state=BUTTON_PRESSED;

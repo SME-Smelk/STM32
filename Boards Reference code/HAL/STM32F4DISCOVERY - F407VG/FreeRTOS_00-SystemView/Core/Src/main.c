@@ -138,7 +138,7 @@ void SystemClock_Config(void)
 void vtask1_Handler(void *params){
 	while(1){
 		UART2_write("Hello-world: From Task-1\r\n");
-		//Libero CPU de tarea 1. Fuerzo cambio de contenido a la proxima tarea
+		/*Release CPU of task1 and switch to the next task*/
 		taskYIELD();
 	}
 }
@@ -150,7 +150,7 @@ void vtask1_Handler(void *params){
 void vtask2_Handler(void *params){
 	while(1){
 		UART2_write("Hello-world: From Task-2\r\n");
-		//Libero CPU de tarea 2. Fuerzo cambio de contenido a la proxima tarea
+		/*Release CPU of task2 and switch to the next task*/
 		taskYIELD();
 	}
 }

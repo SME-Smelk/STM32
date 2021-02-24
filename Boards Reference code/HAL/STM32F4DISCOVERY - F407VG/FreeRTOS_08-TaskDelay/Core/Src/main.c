@@ -173,11 +173,10 @@ HAL_GPIO_Init(BUTTON_PORT, &GPIO_InitStruct);
 void vtask1_Handler(void *params){
 	while(1){
 
-		//Realizo e imprimo lectura de boton
+		/*Read de button status and print it*/
 		sprintf(msg,"Tarea 1. Lectura: %d\n",HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN));
 		UART2_write(msg);
-
-		//Genero delay de 1000ms
+		/*Delay*/
 		vTaskDelay(pdMS_TO_TICKS(1000));
 
 	}
@@ -190,9 +189,9 @@ void vtask1_Handler(void *params){
 void vtask2_Handler(void *params){
 	while(1){
 
-		//Genero intermitencia en señal de boton
+		/*Blinking the led*/
 		HAL_GPIO_TogglePin(BUTTON_PORT, BUTTON_PIN);
-		//Genero delay de 1000ms
+		/*Delay*/
 		vTaskDelay(pdMS_TO_TICKS(1000));
 	}
 }

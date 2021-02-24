@@ -175,21 +175,21 @@ void vtask1_Handler(void *params){
 
 	UBaseType_t p1,p2;
 
-	//Imprimo ejecucion tarea 1
+	/*Print the task1*/
 	UART2_write("Tarea1 ejecutandose...\n");
-	//Imprimo el valor actual de prioridad tarea 1
+	/*Print the value of the priority of the task1*/
 	sprintf(msg,"Tarea 1. Prioridad: %ld\n",uxTaskPriorityGet(xTaskHandler1));
 	UART2_write(msg);
-	//Imprimo el valor actual de prioridad tarea 2
+	/*Print the value of the priority of the task2*/
 	sprintf(msg,"Tarea 2. Prioridad: %ld\n",uxTaskPriorityGet(xTaskHandler2));
 	UART2_write(msg);
 
 	while(1){
 		if(switch_prio){
-			//Adquiero prioridad de las dos tareas
+			/*Adquire the priority of the tasks*/
 			p1=uxTaskPriorityGet(xTaskHandler1);
 			p2=uxTaskPriorityGet(xTaskHandler2);
-			//Cambio las prioridades de forma inversa
+			/* Priority Inverter*/
 			vTaskPrioritySet(xTaskHandler1, p2);
 			vTaskPrioritySet(xTaskHandler2, p1);
 
@@ -209,21 +209,21 @@ void vtask2_Handler(void *params){
 
 	UBaseType_t p1,p2;
 
-	//Imprimo ejecucion tarea 1
+	/*Print the task1*/
 	UART2_write("Tarea2 ejecutandose...\n");
-	//Imprimo el valor actual de prioridad tarea 1
+	/*Print the value of the priority of the task1*/
 	sprintf(msg,"Tarea 1. Prioridad: %ld\n",uxTaskPriorityGet(xTaskHandler1));
 	UART2_write(msg);
-	//Imprimo el valor actual de prioridad tarea 2
+	/*Print the value of the priority of the task2*/
 	sprintf(msg,"Tarea 2. Prioridad: %ld\n",uxTaskPriorityGet(xTaskHandler2));
 	UART2_write(msg);
 
 	while(1){
 		if(switch_prio){
-			//Adquiero prioridad de las dos tareas
+			/*Adquire the priority of the tasks*/
 			p1=uxTaskPriorityGet(xTaskHandler1);
 			p2=uxTaskPriorityGet(xTaskHandler2);
-			//Cambio las prioridades de forma inversa
+			/* Priority Inverter*/
 			vTaskPrioritySet(xTaskHandler1, p2);
 			vTaskPrioritySet(xTaskHandler2, p1);
 
@@ -245,13 +245,13 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 
 void rtos_delay(uint32_t delay_in_ms){
 
-	//Current tick
+	/*Current tick*/
 	uint32_t current_tick_count = xTaskGetTickCount();
 
-	//MiliSeconds to Ticks
+	/*MiliSeconds to Ticks*/
 	uint32_t delay_in_ticks= (delay_in_ms * configTICK_RATE_HZ) / 1000;
 
-	//delay
+	/*delay*/
 	while(xTaskGetTickCount()< (current_tick_count + delay_in_ticks) );
 
 }

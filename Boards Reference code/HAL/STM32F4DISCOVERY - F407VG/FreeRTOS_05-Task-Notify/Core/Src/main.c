@@ -177,8 +177,8 @@ void vled_task_Handler(void *params){
 		if(xTaskNotifyWait(0,0,&current_notification_value,portMAX_DELAY) == pdTRUE)	//Para eIncrement
 		{
 			HAL_GPIO_TogglePin(LED_GREEN_PORT, LED_GREEN_PIN);
-			//UART2_write("Notificacion Recibida\r\n");	//Para eNoAction
-			sprintf(msg,"Notificacion Recibida: Boton presionado: %ld \r\n",current_notification_value); //Para eIncrement
+			//UART2_write("Notification received\r\n");	//Para eNoAction
+			sprintf(msg,"Notification received. Button Pressed: %ld \r\n",current_notification_value); //Para eIncrement
 			UART2_write(msg); //Para eIncrement
 		}
 

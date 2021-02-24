@@ -181,7 +181,6 @@ HAL_NVIC_EnableIRQ(EXTI0_IRQn);
 void task_Greenled_handler(void *params){
 	while(1){
 
-
 		if(button_state == BUTTON_PRESSED){
 			//Turn on the led
 			HAL_GPIO_WritePin(LED_GREEN_PORT, LED_GREEN_PIN, GPIO_PIN_SET);
