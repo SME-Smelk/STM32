@@ -1,0 +1,2 @@
+usart2.c:17:6:USART2_UART_Init	8	static
+usart2.c:35:6:UART2_write	16	static
