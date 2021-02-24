@@ -89,15 +89,6 @@ The DISCOVERY-DISC1 F407VG board has the following code repository the following
 		- [ ] LoopBack_IT
 		- [ ] Normal_mode_twonodes
 
-### Bootloaders
-
-- [ ] Bootloader
-    - [ ] Bootloader Base Code
-    - [ ] Test-ToggleLed-STBootloader
-    - [ ] Bootloader-UART
-    - [ ] UserCode
-    - [ ] Bootloader-Code
-
 ### RTOS
 
 - [x] RTOS FreeRTOS
@@ -119,6 +110,15 @@ The DISCOVERY-DISC1 F407VG board has the following code repository the following
     - [x] FreeRTOS_13-Mutex-BinSema
     - [x] FreeRTOS_14-MutexAPI
  
+### Bootloaders
+
+- [ ] Bootloader
+    - [ ] Bootloader Base Code
+    - [ ] Test-ToggleLed-STBootloader
+    - [ ] Bootloader-UART
+    - [ ] UserCode
+    - [ ] Bootloader-Code
+
 ### Cortex M4 Programming
 
 - [ ] Cortex-M4
