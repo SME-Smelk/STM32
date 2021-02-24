@@ -89,6 +89,27 @@ The DISCOVERY-DISC1 F407VG board has the following code repository the following
 		- [ ] LoopBack_IT
 		- [ ] Normal_mode_twonodes
 
+### RTOS
+
+- [x] RTOS FreeRTOS
+    - [x] FreeRTOS_00-SystemView
+    - [x] FreeRTOS_00-Tasks
+    - [x] FreeRTOS_00-Task-SemiHosting
+    - [x] FreeRTOS_01-UART2
+    - [x] FreeRTOS_02-SystemView-Cooperative
+    - [x] FreeRTOS_03-LedButton
+    - [x] FreeRTOS_04-Led-ButtonIT
+    - [x] FreeRTOS_05-Task-Notify
+    - [x] FreeRTOS_06-TaskDelete
+    - [x] FreeRTOS_07-DinamicPriorityInterrupt
+    - [x] FreeRTOS_08-TaskDelay
+    - [x] FreeRTOS_09-Hook-PowerSaving
+    - [x] FreeRTOS_10-Queue-Command
+    - [x] FreeRTOS_11-Bin_Sema_Taks
+    - [x] FreeRTOS_12-Count-Sema-Taks
+    - [x] FreeRTOS_13-Mutex-BinSema
+    - [x] FreeRTOS_14-MutexAPI
+ 
 ### Bootloaders
 
 - [ ] Bootloader
@@ -97,26 +118,6 @@ The DISCOVERY-DISC1 F407VG board has the following code repository the following
     - [ ] Bootloader-UART
     - [ ] UserCode
     - [ ] Bootloader-Code
-
-### RTOS
-
-- [ ] RTOS FreeRTOS
-    - [ ] FreeRTOS Code Base
-    - [ ] FreeRTOS SystemView SEGGER Code Base
-    - [ ] CreateTask 4 leds
-    - [ ] UART2
-    - [ ] LedButton
-    - [ ] LedButtonIT
-    - [ ] Task-Notify
-    - [ ] TaskDelete
-    - [ ] DinamicPriorityInterrupt
-    - [ ] TaskDelay
-    - [ ] Hook-PowerSaving
-    - [ ] Queue-Command
-    - [ ] Bin_sema_taks
-    - [ ] Count-Sema-Taks
-    - [ ] Mutex-BinSema
-    - [ ] MutexAPI
 
 ### Cortex M4 Programming
 
