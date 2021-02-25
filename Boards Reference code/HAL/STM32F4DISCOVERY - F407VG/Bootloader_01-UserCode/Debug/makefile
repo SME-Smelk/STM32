@@ -29,34 +29,26 @@ endif
 
 -include ../makefile.defs
 
-BUILD_ARTIFACT_NAME := 03-UserCode
-BUILD_ARTIFACT_EXTENSION := elf
-BUILD_ARTIFACT_PREFIX := 
-BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME).$(BUILD_ARTIFACT_EXTENSION)
-
 # Add inputs and outputs from these tool invocations to the build variables 
 EXECUTABLES += \
-03-UserCode.elf \
+Bootloader_01-UserCode.elf \
 
 SIZE_OUTPUT += \
 default.size.stdout \
 
 OBJDUMP_LIST += \
-03-UserCode.list \
+Bootloader_01-UserCode.list \
 
 OBJCOPY_BIN += \
-03-UserCode.bin \
+Bootloader_01-UserCode.bin \
 
 
 # All Target
-all: main-build
-
-# Main-build Target
-main-build: 03-UserCode.elf secondary-outputs
+all: Bootloader_01-UserCode.elf secondary-outputs
 
 # Tool invocations
-03-UserCode.elf: $(OBJS) $(USER_OBJS) C:\Users\Ismael\Dropbox\Smelk\Universidad\ y\ Conocimiento\Cursos\Electronica\STM32Fx\ Microcontroller\ Custom\ Bootloader\ Development\SME\Programaciones\03-UserCode\STM32F407VGTX_FLASH.ld
-	arm-none-eabi-gcc -o "03-UserCode.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\Ismael\Dropbox\Smelk\Universidad y Conocimiento\Cursos\Electronica\STM32Fx Microcontroller Custom Bootloader Development\SME\Programaciones\03-UserCode\STM32F407VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="03-UserCode.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Bootloader_01-UserCode.elf: $(OBJS) $(USER_OBJS) C:\Users\ismae\git\STM32\Boards\ Reference\ code\HAL\STM32F4DISCOVERY\ -\ F407VG\Bootloader_01-UserCode\STM32F407VGTX_FLASH.ld
+	arm-none-eabi-gcc -o "Bootloader_01-UserCode.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\ismae\git\STM32\Boards Reference code\HAL\STM32F4DISCOVERY - F407VG\Bootloader_01-UserCode\STM32F407VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Bootloader_01-UserCode.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -65,13 +57,13 @@ default.size.stdout: $(EXECUTABLES)
 	@echo 'Finished building: $@'
 	@echo ' '
 
-03-UserCode.list: $(EXECUTABLES)
-	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "03-UserCode.list"
+Bootloader_01-UserCode.list: $(EXECUTABLES)
+	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "Bootloader_01-UserCode.list"
 	@echo 'Finished building: $@'
 	@echo ' '
 
-03-UserCode.bin: $(EXECUTABLES)
-	arm-none-eabi-objcopy  -O binary $(EXECUTABLES) "03-UserCode.bin"
+Bootloader_01-UserCode.bin: $(EXECUTABLES)
+	arm-none-eabi-objcopy  -O binary $(EXECUTABLES) "Bootloader_01-UserCode.bin"
 	@echo 'Finished building: $@'
 	@echo ' '
 
@@ -82,14 +74,7 @@ clean:
 
 secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST) $(OBJCOPY_BIN)
 
-fail-specified-linker-script-missing:
-	@echo 'Error: Cannot find the specified linker script. Check the linker settings in the build configuration.'
-	@exit 2
-
-warn-no-linker-script-specified:
-	@echo 'Warning: No linker script specified. Check the linker settings in the build configuration.'
-
-.PHONY: all clean dependents fail-specified-linker-script-missing warn-no-linker-script-specified
+.PHONY: all clean dependents
 .SECONDARY:
 
 -include ../makefile.targets

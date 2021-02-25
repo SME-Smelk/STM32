@@ -25,7 +25,7 @@
 
 /* Exported macro ------------------------------------------------------------*/
 #define BL_DEBUG_MSG_EN
-
+#define WAITING_BOOT_TIME_MS 5000
 #define FLASH_SECTOR2_BASE_ADDRESS 0x08008000U
 
 /* Exported functions prototypes ---------------------------------------------*/

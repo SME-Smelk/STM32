@@ -1,22 +1,27 @@
 /**
   ******************************************************************************
-  * @Project        : 00-BASE-Basic
+  * @Project        : Bootloader_01-BootCode
   * @Autor          : Ismael Poblete
   * @Company		: -
-  * @Date         	: 6-28-2020
-  * @brief          : Archivo base para crear programaciones.
+  * @Date         	: 02-25-2021
+  * @Target			: DISCOVERY-DISC1 STM32F407VG
+  * @brief          : Example of bootloader program.
+  * @Lib			: CMSIS, HAL.
   * @System Clock
-  * 	SYSSource:		HSI/HSE/HSI-PLL/HSE-PLL (Por defecto HSI)
-  * 	SYSCLK: 		XMHz					(Por defecto 8MHz)
+  * 	SYSSource:		HSI
+  * 	SYSCLK: 		16MHz
+  * 	RTCSource:		None
+  * 	RTCCLK: 		None
   * @Perf
   * 	*UART2
   * 		PA2			<-----> USART_TX
   * 		PA3			<-----> USART_RX
   * 	*GPIO
-  * 		PA5      	------> LD2
-  * 		PC13     	<------ B1(Button)
-  * 	*ADC
-  * 		PA0    	 	------> ADC1,INO
+  * 		PD12      	------> LD4 Green
+  * 		PD13      	------> LD3 Orange
+  * 		PD14      	------> LD5 Red
+  * 		PD15      	------> LD6 Blue
+  * 		PA0     	<------ User Button
   ******************************************************************************
 **/
 
@@ -32,7 +37,7 @@
 /* Private macro -------------------------------------------------------------*/
 
 /* Private variables ---------------------------------------------------------*/
-char some_data[] = "Hello World\r\n";
+//char some_data[] = "Hello World\r\n";
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
@@ -44,14 +49,17 @@ void CRC_Init(void);
 void printmsg(char *format,...);
 
 void bootloader_jump_to_user_app(void);
-void  bootloader_uart_read_data(void);
+void bootloader_uart_read_data(void);
+
 /* Private user code ---------------------------------------------------------*/
 UART_HandleTypeDef huart2;
 UART_HandleTypeDef huart3;
 CRC_HandleTypeDef hcrc;
 
-#define D_UART &huart2
+#define BOOT_UART &huart2
 #define C_UART &huart3
+
+uint32_t last_time = 0;
 
 /*Commands */
 
@@ -88,21 +96,41 @@ int main(void)
     CRC_Init();
 
 	/* Start Code */
+    printmsg("\n\r");
+    printmsg("--------------\n\r");
+    printmsg("Boot-SME V1.0.\n\r");
+    printmsg("--------------\n\r");
+
+    printmsg("BL_DEBUG_MSG: Waiting Button... %u sec left.\n\r",(WAITING_BOOT_TIME_MS/1000));
 
     /* Lets check whether button is pressed or not, if not pressed jump to user application */
+    last_time = HAL_GetTick();
+    while(((HAL_GetTick() - last_time) < WAITING_BOOT_TIME_MS) && (HAL_GPIO_ReadPin(B1_GPIO_Port,B1_Pin) == GPIO_PIN_RESET)){
+
+    }
     if ( HAL_GPIO_ReadPin(B1_GPIO_Port,B1_Pin) == GPIO_PIN_SET )
     {
-  	  printmsg("BL_DEBUG_MSG:Button is pressed .. going to BL mode\n\r");
+  	  printmsg("BL_DEBUG_MSG: Button is pressed .. Going to Boot mode\n\r");
 
-  	  //we should continue in bootloader mode
-  	  bootloader_uart_read_data();
+  	  /* Red Led  */
+  	  HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, GPIO_PIN_SET);
+
+  	  /*we should continue in bootloader mode*/
+  	  while(1);
+  	  //bootloader_uart_read_data();
 
     }
     else
     {
-  	  printmsg("BL_DEBUG_MSG:Button is not pressed .. executing user app\n");
+		printmsg("BL_DEBUG_MSG: Button is not pressed .. Executing user APP\n");
 
-  		//jump to user application
+		/* Blue Led */
+		HAL_GPIO_WritePin(LD6_GPIO_Port, LD6_Pin, GPIO_PIN_SET);
+
+
+		//while(1);
+
+  		/*jump to user application*/
   		bootloader_jump_to_user_app();
 
     }
@@ -206,7 +234,7 @@ void USART3_Init(void)
 	va_list args;
 	va_start(args, format);
 	vsprintf(str, format,args);
-	HAL_UART_Transmit(D_UART,(uint8_t *)str, strlen(str),HAL_MAX_DELAY);
+	HAL_UART_Transmit(BOOT_UART,(uint8_t *)str, strlen(str),HAL_MAX_DELAY);
 	va_end(args);
 #endif
  }
@@ -298,13 +326,13 @@ void bootloader_uart_read_data(void)
                 bootloader_handle_en_rw_protect(bl_rx_buffer);
                 break;
             case BL_MEM_READ:
-                bootloader_handle_mem_read(bl_rx_buffer);  //
+                bootloader_handle_mem_read(bl_rx_buffer);
                 break;
             case BL_READ_SECTOR_P_STATUS:
                 bootloader_handle_read_sector_protection_status(bl_rx_buffer);
                 break;
             case BL_OTP_READ:
-                bootloader_handle_read_otp(bl_rx_buffer); //
+                bootloader_handle_read_otp(bl_rx_buffer);
                 break;
 			case BL_DIS_R_W_PROTECT:
                 bootloader_handle_dis_rw_protect(bl_rx_buffer);
@@ -329,12 +357,11 @@ void bootloader_jump_to_user_app(void)
    //just a function pointer to hold the address of the reset handler of the user app.
     void (*app_reset_handler)(void);
 
-    printmsg("BL_DEBUG_MSG:bootloader_jump_to_user_app\n");
-
+    printmsg("BL_DEBUG_MSG: bootloader_jump_to_user_app\r\n");
 
     // 1. configure the MSP by reading the value from the base address of the sector 2
     uint32_t msp_value = *(volatile uint32_t *)FLASH_SECTOR2_BASE_ADDRESS;
-    printmsg("BL_DEBUG_MSG:MSP value : %#x\n",msp_value);
+    printmsg("BL_DEBUG_MSG: MSP value : %#x\r\n",msp_value);
 
     //This function comes from CMSIS.
     __set_MSP(msp_value);
@@ -348,7 +375,7 @@ void bootloader_jump_to_user_app(void)
 
     app_reset_handler = (void*) resethandler_address;
 
-    printmsg("BL_DEBUG_MSG: app reset handler addr : %#x\n",app_reset_handler);
+    printmsg("BL_DEBUG_MSG: app reset handler addr : %#x\r\n",app_reset_handler);
 
     //3. jump to reset handler of the user application
     app_reset_handler();
