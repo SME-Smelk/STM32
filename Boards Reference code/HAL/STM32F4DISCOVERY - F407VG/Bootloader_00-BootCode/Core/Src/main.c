@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @Project        : Bootloader_01-BootCode
+  * @Project        : Bootloader_00-BootCode
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-25-2021
