@@ -112,12 +112,10 @@ The DISCOVERY-DISC1 F407VG board has the following code repository the following
  
 ### Bootloaders
 
-- [ ] Bootloader
-    - [ ] Bootloader Base Code
-    - [ ] Test-ToggleLed-STBootloader
-    - [ ] Bootloader-UART
-    - [ ] UserCode
-    - [ ] Bootloader-Code
+- [x] Bootloader
+    - [x] Bootloader_00-BootCode
+    - [x] Bootloader_01-BootCode
+    - [x] Bootloader_01-UserCode
 
 ### Cortex M4 Programming
 
