@@ -22,9 +22,6 @@
 /* Exported constants --------------------------------------------------------*/
 
 /* Exported macro ------------------------------------------------------------*/
-#define BL_DEBUG_MSG_EN
-
-#define FLASH_SECTOR2_BASE_ADDRESS 0x08008000U
 
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);

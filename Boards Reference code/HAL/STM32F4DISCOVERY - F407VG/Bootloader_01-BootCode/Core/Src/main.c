@@ -5,7 +5,7 @@
   * @Company		: -
   * @Date         	: 02-25-2021
   * @Target			: DISCOVERY-DISC1 STM32F407VG
-  * @brief          : Example of bootloader program.
+  * @brief          : Example of bootloader program at 0x8000000.
   * @Lib			: CMSIS, HAL.
   * @System Clock
   * 	SYSSource:		HSI
@@ -37,13 +37,11 @@
 /* Private macro -------------------------------------------------------------*/
 
 /* Private variables ---------------------------------------------------------*/
-//char some_data[] = "Hello World\r\n";
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 void GPIO_Init(void);
 void USART2_Init(void);
-void USART3_Init(void);
 void CRC_Init(void);
 
 void printmsg(char *format,...);
@@ -53,11 +51,9 @@ void bootloader_uart_read_data(void);
 
 /* Private user code ---------------------------------------------------------*/
 UART_HandleTypeDef huart2;
-UART_HandleTypeDef huart3;
 CRC_HandleTypeDef hcrc;
 
 #define BOOT_UART &huart2
-#define C_UART &huart3
 
 uint32_t last_time = 0;
 
@@ -92,7 +88,6 @@ int main(void)
 	/* Configure the peripherals */
     GPIO_Init();
     USART2_Init();
-    USART3_Init();
     CRC_Init();
 
 	/* Start Code */
@@ -116,8 +111,9 @@ int main(void)
   	  HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, GPIO_PIN_SET);
 
   	  /*we should continue in bootloader mode*/
-  	  while(1);
-  	  //bootloader_uart_read_data();
+  	  //while(1);
+
+  	  bootloader_uart_read_data();
 
     }
     else
@@ -145,18 +141,13 @@ void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
-  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
 
-  /** Initializes the CPU, AHB+ and APB busses clocks
+  /** Initializes the CPU, AHB and APB busses clocks
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
-  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-  RCC_OscInitStruct.PLL.PLLM = 8;
-  RCC_OscInitStruct.PLL.PLLN = 336;
-  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
-  RCC_OscInitStruct.PLL.PLLQ = 7;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     Error_Handler();
@@ -165,22 +156,19 @@ void SystemClock_Config(void)
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5) != HAL_OK)
+
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
   {
     Error_Handler();
   }
-  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_I2S;
-  PeriphClkInitStruct.PLLI2S.PLLI2SN = 192;
-  PeriphClkInitStruct.PLLI2S.PLLI2SR = 2;
-  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
-  {
-    Error_Handler();
-  }
+
+  /* Config MCO, signal output of SYSCLK in PC9 pin */
+  HAL_RCC_MCOConfig(RCC_MCO2, RCC_MCO2SOURCE_SYSCLK, RCC_MCODIV_1);
 }
 
 void USART2_Init(void)
@@ -195,29 +183,6 @@ void USART2_Init(void)
   huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
   huart2.Init.OverSampling = UART_OVERSAMPLING_16;
   if (HAL_UART_Init(&huart2) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-}
-
-/**
-  * @brief USART3 Initialization Function
-  * @param None
-  * @retval None
-  */
-void USART3_Init(void)
-{
-
-  huart3.Instance = USART3;
-  huart3.Init.BaudRate = 115200;
-  huart3.Init.WordLength = UART_WORDLENGTH_8B;
-  huart3.Init.StopBits = UART_STOPBITS_1;
-  huart3.Init.Parity = UART_PARITY_NONE;
-  huart3.Init.Mode = UART_MODE_TX_RX;
-  huart3.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart3.Init.OverSampling = UART_OVERSAMPLING_16;
-  if (HAL_UART_Init(&huart3) != HAL_OK)
   {
     Error_Handler();
   }
@@ -295,9 +260,9 @@ void bootloader_uart_read_data(void)
 		memset(bl_rx_buffer,0,200);
 		//here we will read and decode the commands coming from host
 		//first read only one byte from the host , which is the "length" field of the command packet
-		HAL_UART_Receive(C_UART,bl_rx_buffer,1,HAL_MAX_DELAY);
+		HAL_UART_Receive(BOOT_UART,bl_rx_buffer,1,HAL_MAX_DELAY);
 		rcv_len= bl_rx_buffer[0];
-		HAL_UART_Receive(C_UART,&bl_rx_buffer[1],rcv_len,HAL_MAX_DELAY);
+		HAL_UART_Receive(BOOT_UART,&bl_rx_buffer[1],rcv_len,HAL_MAX_DELAY);
 
 		switch(bl_rx_buffer[1])
 		{
@@ -435,7 +400,7 @@ void bootloader_send_ack(uint8_t command_code, uint8_t follow_len)
 	uint8_t ack_buf[2];
 	ack_buf[0] = BL_ACK;
 	ack_buf[1] = follow_len;
-	HAL_UART_Transmit(C_UART,ack_buf,2,HAL_MAX_DELAY);
+	HAL_UART_Transmit(BOOT_UART,ack_buf,2,HAL_MAX_DELAY);
 
 }
 
@@ -443,7 +408,7 @@ void bootloader_send_ack(uint8_t command_code, uint8_t follow_len)
 void bootloader_send_nack(void)
 {
 	uint8_t nack = BL_NACK;
-	HAL_UART_Transmit(C_UART,&nack,1,HAL_MAX_DELAY);
+	HAL_UART_Transmit(BOOT_UART,&nack,1,HAL_MAX_DELAY);
 }
 
 //This verifies the CRC of the given buffer in pData .
@@ -468,11 +433,11 @@ uint8_t bootloader_verify_crc (uint8_t *pData, uint32_t len, uint32_t crc_host)
 	return VERIFY_CRC_FAIL;
 }
 
-/* This function writes data in to C_UART */
+/* This function writes data in to BOOT_UART */
 void bootloader_uart_write_data(uint8_t *pBuffer,uint32_t len)
 {
     /*you can replace the below ST's USART driver API call with your MCUs driver API call */
-	HAL_UART_Transmit(C_UART,pBuffer,len,HAL_MAX_DELAY);
+	HAL_UART_Transmit(BOOT_UART,pBuffer,len,HAL_MAX_DELAY);
 
 }
 
@@ -782,16 +747,12 @@ uint8_t execute_flash_erase(uint8_t sector_number , uint8_t number_of_sector)
 /*Helper function to handle BL_MEM_WRITE command */
 void bootloader_handle_mem_write_cmd(uint8_t *pBuffer)
 {
-	uint8_t chksum = 0;
-	uint8_t len = 0;
-	uint8_t addr_valid = ADDR_VALID;
+
 	uint8_t write_status = 0x00;
-	len = pBuffer[0];
 	uint8_t payload_len = pBuffer[6];
 
 	uint32_t mem_address = *((uint32_t *) ( &pBuffer[2]) );
 
-	chksum = pBuffer[len];
 
     printmsg("BL_DEBUG_MSG:bootloader_handle_mem_write_cmd\n");
 
@@ -1026,16 +987,10 @@ uint16_t read_OB_rw_protection_status(void)
 void bootloader_handle_mem_read (uint8_t *pBuffer)
 {
 
-	uint8_t chksum = 0;
-	uint8_t len = 0;
-	uint8_t addr_valid = ADDR_VALID;
 	uint8_t write_status = 0x00;
-	len = pBuffer[0];
 	uint8_t payload_len = pBuffer[6];
 
 	uint32_t mem_address = *((uint32_t *) ( &pBuffer[2]) );
-
-	chksum = pBuffer[len];
 
     printmsg("BL_DEBUG_MSG:bootloader_handle_mem_read_cmd\n");
 
