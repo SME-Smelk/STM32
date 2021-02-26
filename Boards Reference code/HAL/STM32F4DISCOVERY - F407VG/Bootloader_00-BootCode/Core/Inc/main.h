@@ -24,7 +24,6 @@
 /* Exported constants --------------------------------------------------------*/
 
 /* Exported macro ------------------------------------------------------------*/
-#define BL_DEBUG_MSG_EN
 #define WAITING_BOOT_TIME_MS 5000
 #define FLASH_SECTOR2_BASE_ADDRESS 0x08008000U
 
@@ -33,45 +32,6 @@ void Error_Handler(void);
 
 void bootloader_uart_read_data(void);
 void bootloader_jump_to_user_app(void);
-
-//Controladores de los Comandos:
-//1
-void bootloader_handle_getver_cmd(uint8_t *bl_rx_buffer);
-uint8_t get_bootloader_version(void);
-//2
-void bootloader_handle_gethelp_cmd(uint8_t *pBuffer);
-//3
-void bootloader_handle_getcid_cmd(uint8_t *pBuffer);
-uint16_t get_mcu_chip_id(void);
-//4
-void bootloader_handle_getrdp_cmd(uint8_t *pBuffer);
-uint8_t get_flash_rdp_level(void);
-//5
-void bootloader_handle_go_cmd(uint8_t *pBuffer);
-uint8_t verify_address(uint32_t go_address);
-//6
-void bootloader_handle_flash_erase_cmd(uint8_t *pBuffer);
-uint8_t execute_flash_erase(uint8_t sector_number , uint8_t number_of_sector);
-//7
-void bootloader_handle_mem_write_cmd(uint8_t *pBuffer);
-uint8_t execute_mem_write(uint8_t *pBuffer, uint32_t mem_address, uint32_t len);
-//8
-void bootloader_handle_en_rw_protect(uint8_t *pBuffer);
-uint8_t configure_flash_sector_rw_protection(uint8_t sector_details, uint8_t protection_mode, uint8_t disable);
-//9
-void bootloader_handle_mem_read (uint8_t *pBuffer);
-//10
-void bootloader_handle_read_sector_protection_status(uint8_t *pBuffer);
-//11
-void bootloader_handle_read_otp(uint8_t *pBuffer);
-//12
-void bootloader_handle_dis_rw_protect(uint8_t *pBuffer);
-
-//Funnciones de ayuda
-void bootloader_send_ack(uint8_t command_code, uint8_t follow_len);
-void bootloader_send_nack(void);
-uint8_t bootloader_verify_crc (uint8_t *pData, uint32_t len, uint32_t crc_host);
-void bootloader_uart_write_data(uint8_t *pBuffer,uint32_t len);
 
 /* Private defines -----------------------------------------------------------*/
 #define B1_Pin GPIO_PIN_0

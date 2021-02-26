@@ -25,8 +25,10 @@
 
 /* Exported macro ------------------------------------------------------------*/
 #define BL_DEBUG_MSG_EN
+//#define BOOTLOADER_ACK_NACK
 #define WAITING_BOOT_TIME_MS 5000
 #define FLASH_SECTOR2_BASE_ADDRESS 0x08008000U
+
 
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
@@ -87,7 +89,6 @@ void bootloader_uart_write_data(uint8_t *pBuffer,uint32_t len);
 
 //version 1.0
 #define BL_VERSION 0x10
-
 // our bootloader commands
 
 //#define  <command name >	<command_code>

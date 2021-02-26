@@ -191,7 +191,7 @@ void USART2_Init(void)
 
 /* prints formatted string to console over UART */
  void printmsg(char *format,...)
- {
+{
 #ifdef BL_DEBUG_MSG_EN
 	char str[80];
 
@@ -396,19 +396,22 @@ void bootloader_handle_getver_cmd(uint8_t *bl_rx_buffer)
 /*This function sends ACK if CRC matches along with "len to follow"*/
 void bootloader_send_ack(uint8_t command_code, uint8_t follow_len)
 {
+#ifdef BOOTLOADER_ACK_NACK
 	 //here we send 2 byte.. first byte is ack and the second byte is len value
 	uint8_t ack_buf[2];
 	ack_buf[0] = BL_ACK;
 	ack_buf[1] = follow_len;
 	HAL_UART_Transmit(BOOT_UART,ack_buf,2,HAL_MAX_DELAY);
-
+#endif
 }
 
 /*This function sends NACK */
 void bootloader_send_nack(void)
 {
+#ifdef BOOTLOADER_ACK_NACK
 	uint8_t nack = BL_NACK;
 	HAL_UART_Transmit(BOOT_UART,&nack,1,HAL_MAX_DELAY);
+#endif
 }
 
 //This verifies the CRC of the given buffer in pData .
