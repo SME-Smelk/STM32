@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @Project        : 01-UART2_HelloWorld
+  * @Project        : UART2_01-HelloWord
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-13-2021

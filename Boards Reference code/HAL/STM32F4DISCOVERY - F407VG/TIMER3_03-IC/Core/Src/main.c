@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @Project        : 12-TIMER3_IC
+  * @Project        : TIMER3_03-IC
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-15-2021

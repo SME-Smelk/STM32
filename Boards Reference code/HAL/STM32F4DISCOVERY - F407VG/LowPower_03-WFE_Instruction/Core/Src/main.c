@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @Project        : 24-LowPower_WFE_Instruction
+  * @Project        : LowPower_03-WFE_Instruction
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-18-2021

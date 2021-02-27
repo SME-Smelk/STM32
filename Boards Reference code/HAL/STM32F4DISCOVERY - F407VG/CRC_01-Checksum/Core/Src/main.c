@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @Project        : Bootloader_01-BootCode
+  * @Project        : CRC_01-Checksum
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-25-2021

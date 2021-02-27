@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @Project        : 06-GPIO_LedBlink_Block
+  * @Project        : GPIO_02-LedBlink_NoBlock
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-14-2021

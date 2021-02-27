@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @Project        : 04-SYSCLK_HSI_MCO
+  * @Project        : SYSCLK_01-HSI_MCO
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-14-2021

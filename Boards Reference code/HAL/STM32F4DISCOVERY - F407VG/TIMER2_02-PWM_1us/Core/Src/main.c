@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @Project        : 11-TIMER2_PWM_1us
+  * @Project        : TIMER2_02-PWM_1us
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-15-2021

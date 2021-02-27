@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @Project        : 27-RTC_DateTime
+  * @Project        : RTC_01-DateTime
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-19-2021

@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @Project        : 30-RTC_Alarm_Standby_WakeUp
+  * @Project        : RTC_04-Alarm_Stanby_WakeUp
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-20-2021

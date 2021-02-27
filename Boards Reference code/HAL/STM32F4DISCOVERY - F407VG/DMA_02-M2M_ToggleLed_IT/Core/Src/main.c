@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @Project        : 19-DMA_M2M_ToggleLed_IT
+  * @Project        : DMA_02-M2M_ToggleLed_IT
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-17-2021

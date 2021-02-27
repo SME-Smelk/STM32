@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @Project        : 14-ADC_single_poll
+  * @Project        : ADC_01-singleConv_poll
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-16-2021

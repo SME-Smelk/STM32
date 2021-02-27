@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @Project        : 32-I2C_Master_Slave_TX_RX_AllOne
+  * @Project        : I2C_01-Master_SLave_TX_RX_AllOne
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-22-2021

@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @Project        : 23-LowPower_WFI_Instruction
+  * @Project        : LowPower_02-WFI_Instruction
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-18-2021

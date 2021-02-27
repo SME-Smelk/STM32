@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @Project        : 26-LowPower_Backup_SRAM_Standby
+  * @Project        : LowPower_05-BackupSRAM_Standby
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-19-2021

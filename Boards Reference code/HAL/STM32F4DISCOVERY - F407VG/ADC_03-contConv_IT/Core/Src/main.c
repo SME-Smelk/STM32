@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @Project        : 16-ADC_contConv_IT
+  * @Project        : ADC_03-contConv_IT
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-17-2021

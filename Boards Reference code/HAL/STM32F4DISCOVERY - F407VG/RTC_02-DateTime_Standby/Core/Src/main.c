@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @Project        : 28-RTC_DateTime_Standby
+  * @Project        : RTC_02-DateTime_Standby
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-19-2021

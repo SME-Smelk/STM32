@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @Project        : 25-LowPower_modes
+  * @Project        : LowPower_04-Modes
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-19-2021

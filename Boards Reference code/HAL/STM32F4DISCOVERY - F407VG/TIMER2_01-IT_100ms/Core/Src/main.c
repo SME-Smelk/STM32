@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @Project        : 10-TIMER2_IT_100ms
+  * @Project        : TIMER2_01-IT_100ms
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-15-2021

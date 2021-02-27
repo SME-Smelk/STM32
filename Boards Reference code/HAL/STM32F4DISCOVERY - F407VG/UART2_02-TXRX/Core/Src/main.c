@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @Project        : 02-UART2_TXRX
+  * @Project        : UART2_02-TXRX
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-13-2021

@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @Project        : 22-LowPower_SleepOnExit_Feature
+  * @Project        : LowPower_01-SleepOnExit_Feature
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-18-2021

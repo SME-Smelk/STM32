@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @Project        : 20-DMA_UART2-RX_SRAM
+  * @Project        : DMA_03-P2M_UART2-RX_SRAM
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-17-2021

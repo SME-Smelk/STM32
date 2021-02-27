@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @Project        : 05-SYSCLK_PLL_HSE_MCO
+  * @Project        : SYSCLK_02-PLL_HSE_MCO
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-14-2021

@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @Project        : 15-ADC_contConv_tempSen
+  * @Project        : ADC_02-contConv_tempSen
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-16-2021

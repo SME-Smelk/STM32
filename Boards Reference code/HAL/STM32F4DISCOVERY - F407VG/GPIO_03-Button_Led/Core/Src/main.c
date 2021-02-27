@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @Project        : 08-GPIO_Button_Led
+  * @Project        : GPIO_03-Button_Led
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-14-2021

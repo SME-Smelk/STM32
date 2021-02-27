@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @Project        : 29-RTC_Alarm_A
+  * @Project        : RTC_03-Alarm_A
   * @Autor          : Ismael Poblete
   * @Company		: -
   * @Date         	: 02-19-2021
