@@ -73,6 +73,10 @@ The DISCOVERY-DISC1 F407VG board has the following code repository the following
     - [x] 29-RTC_Alarm_A
     - [x] 30-RTC_Alarm_Stanby_WakeUp (NOT TESTED: X3 LSE not provided in board)
     - [x] 31-RTC_Demo_APIs
+- [x] Cyclic Redundancy Check (CRC)
+    - [x] CRC_01-Checksum
+- [ ] Protection Modes
+    - [ ] Proct_01-Level1
 - [ ] Communication Protocols
 	- [x] UART
 	- [x] I2C
