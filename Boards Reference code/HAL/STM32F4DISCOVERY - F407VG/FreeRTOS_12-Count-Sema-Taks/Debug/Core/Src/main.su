@@ -1,8 +1,0 @@
-core_cm4.h:1760:22:__NVIC_SetPendingIRQ	16	static
-main.c:69:5:main	16	static
-main.c:124:6:SystemClock_Config	96	static
-main.c:163:6:GPIO_Init	40	static
-main.c:198:13:vHandlerTask	16	static
-main.c:217:13:vPeriodicTask	16	static
-main.c:239:6:EXTI0_IRQ_CallBack	16	static,ignoring_inline_asm
-main.c:280:6:Error_Handler	4	static

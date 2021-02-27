@@ -1,5 +1,0 @@
-main.c:55:5:main	16	static
-main.c:85:6:SystemClock_Config	96	static
-main.c:124:6:vtask1_Handler	16	static
-main.c:134:6:vtask2_Handler	16	static
-main.c:145:6:Error_Handler	4	static
