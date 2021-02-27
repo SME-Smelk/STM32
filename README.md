@@ -34,45 +34,45 @@ In the process of learning and generating a personal repository as well as frien
 The DISCOVERY-DISC1 F407VG board has the following code repository the following plan, at the moment. This list could change**
 
 - [x] UART2
-    - [x] 01-UART2_HelloWord
-    - [x] 02-UART2_TXRX
-    - [x] 03-UART2_TXRX_IT
+    - [x] UART2_01-HelloWord
+    - [x] UART2_02-TXRX
+    - [x] UART2_03-TXRX_IT
 - [x] SystemClock
-    - [x] 04-SYSCLK_HSI_MCO
-    - [x] 05-SYSCLK_PLL_HSE_MCO
+    - [x] SYSCLK_01-HSI_MCO
+    - [x] SYSCLK_02-PLL_HSE_MCO
 - [x] GPIO
-    - [x] 06-GPIO_LedBlink_Block
-    - [x] 07-GPIO_LedBlink_NoBlock
-    - [x] 08-GPIO_Button_Led
-    - [x] 09-GPIO_Button_Led_IT
+    - [x] GPIO_01-LedBlink_Block
+    - [x] GPIO_02-LedBlink_NoBlock
+    - [x] GPIO_03-Button_Led
+    - [x] GPIO_04-Button_Led_IT
 - [x] TIMER
-    - [x] 10-TIMER2_IT_100ms
-    - [x] 11-TIMER2_PWM_1us
-    - [x] 12-TIMER2_IC
-    - [x] 13-TIMER2_IC_OC
+    - [x] TIMER2_01-IT_100ms
+    - [x] TIMER2_02-PWM_1us
+    - [x] TIMER2_03-IC
+    - [x] TIMER2_04-IC_OC
 - [x] ADC
-    - [x] 14-ADC_singleConv_poll
-    - [x] 15-ADC_contConv_poll_tempSen
-    - [x] 16-ADC_contConv_IT
-    - [x] 17-ADC_DMA
+    - [x] ADC_01-singleConv_poll
+    - [x] ADC_02-contConv_poll_tempSen
+    - [x] ADC_03-contConv_IT
+    - [x] ADC_04-DMA
 - [x] DMA
-    - [x] 17-ADC_DMA (previously)
-    - [x] 18-DMA_M2M_Poll-ToggleLed
-    - [x] 19-DMA_M2M_ToggleLed_IT
-    - [x] 20-DMA_P2M_UART2-RX_SRAM
-    - [x] 21-DMA_M2P_SRAM_UART2-TX
+    - [x] ADC_01-DMA (previously)
+    - [x] DMA_02-M2M_Poll-ToggleLed
+    - [x] DMA_03-M2M_ToggleLed_IT
+    - [x] DMA_04-P2M_UART2-RX_SRAM
+    - [x] DMA_05-M2P_SRAM_UART2-TX
 - [x] LowPower Modes
-    - [x] 22-LowPower_SleepOnExit_Feature
-    - [x] 23-LowPower_WFI_Instruction
-    - [x] 24-LowPower_WFE_Instruction
-    - [x] 25-LowPower_modes
-    - [x] 26-LowPower_BackupSRAM_Standby
+    - [x] LowPower_01-SleepOnExit_Feature
+    - [x] LowPower_02-WFI_Instruction
+    - [x] LowPower_03-WFE_Instruction
+    - [x] LowPower_04-modes
+    - [x] LowPower_05-BackupSRAM_Standby
 - [x] Internal RTC
-    - [x] 27-RTC_DateTime
-    - [x] 28-RTC_DateTime_Standby (NOT TESTED: X3 LSE not provided in board)
-    - [x] 29-RTC_Alarm_A
-    - [x] 30-RTC_Alarm_Stanby_WakeUp (NOT TESTED: X3 LSE not provided in board)
-    - [x] 31-RTC_Demo_APIs
+    - [x] RTC_01-DateTime
+    - [x] RTC_02-DateTime_Standby (NOT TESTED: X3 LSE not provided in board)
+    - [x] RTC_03-Alarm_A
+    - [x] RTC_04-Alarm_Stanby_WakeUp (NOT TESTED: X3 LSE not provided in board)
+    - [x] RTC_05-Demo_APIs
 - [x] Cyclic Redundancy Check (CRC)
     - [x] CRC_01-Checksum
 - [ ] Protection Modes
@@ -80,7 +80,7 @@ The DISCOVERY-DISC1 F407VG board has the following code repository the following
 - [ ] Communication Protocols
 	- [x] UART
 	- [x] I2C
-		- [x] 32-I2C_Master_Slave_TX_RX_AllOne
+		- [x] I2C_01-Master_Slave_TX_RX_AllOne
 			- [x] Master Write - Slave Read
 			- [x] Master Read - Slave Write
 	- [ ] SPI
