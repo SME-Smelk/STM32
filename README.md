@@ -118,7 +118,7 @@ The DISCOVERY-DISC1 F407VG board has the following code repository the following
 
 - [x] Bootloader
     - [x] Bootloader_00-BootCode
-    - [x] Bootloader_01-BootCode
+    - [x] Bootloader_01-BootCode (Need a host program. Protocols and others)
     - [x] Bootloader_01-UserCode
 
 ### Cortex M4 Programming
