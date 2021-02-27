@@ -1092,7 +1092,7 @@ void bootloader_handle_dis_rw_protect(uint8_t *pBuffer)
         printmsg("BL_DEBUG_MSG:checksum success !!\n");
         bootloader_send_ack(pBuffer[0],1);
 
-        status = configure_flash_sector_rw_protection(0,0,1);
+        status = configure_flash_sector_rw_protection(pBuffer[2] , pBuffer[3],0);
 
         printmsg("BL_DEBUG_MSG: flash erase status: %#x\n",status);
 
