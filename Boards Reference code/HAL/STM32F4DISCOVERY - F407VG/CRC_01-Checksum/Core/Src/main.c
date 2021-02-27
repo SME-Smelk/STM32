@@ -3,9 +3,9 @@
   * @Project        : CRC_01-Checksum
   * @Autor          : Ismael Poblete
   * @Company		: -
-  * @Date         	: 02-25-2021
+  * @Date         	: 02-26-2021
   * @Target			: DISCOVERY-DISC1 STM32F407VG
-  * @brief          : Example of bootloader program at 0x8000000.
+  * @brief          : Use CRC with UART like a receiver data.
   * @Lib			: CMSIS, HAL.
   * @System Clock
   * 	SYSSource:		HSI
@@ -22,6 +22,8 @@
   * 		PD14      	------> LD5 Red
   * 		PD15      	------> LD6 Blue
   * 		PA0     	<------ User Button
+  *@note
+  *		-UART2 if the receive data is 05 51 E7 E9 AB 7C then the
   ******************************************************************************
 **/
 
