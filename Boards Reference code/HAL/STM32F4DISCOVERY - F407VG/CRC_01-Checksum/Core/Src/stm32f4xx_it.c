@@ -24,7 +24,6 @@
 /* Private user code ---------------------------------------------------------*/
 
 /* External variables --------------------------------------------------------*/
-extern UART_HandleTypeDef huart2;
 
 /******************************************************************************/
 /*           Cortex-M4 Processor Interruption and Exception Handlers          */ 
@@ -102,17 +101,3 @@ void SysTick_Handler(void)
 /* For the available peripheral interrupt handler names,                      */
 /* please refer to the startup file (startup_stm32f4xx.s).                    */
 /******************************************************************************/
-
-/**
-* @brief This function handles USART2 global interrupt.
-*/
-
-
-void EXTI0_IRQHandler(void)
-{
-
-	HAL_GPIO_TogglePin(LD4_GPIO_Port,LD4_Pin);
-
-	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
-
-}
