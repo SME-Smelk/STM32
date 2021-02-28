@@ -75,8 +75,8 @@ The DISCOVERY-DISC1 F407VG board has the following code repository the following
     - [x] RTC_05-Demo_APIs
 - [x] Cyclic Redundancy Check (CRC)
     - [x] CRC_01-Checksum
-- [ ] Protection Modes
-    - [ ] Protect_01-Level1
+- [x] Protection Modes (Read RDP - Write Protection)
+    - [x] Protect_01-Level1
 - [ ] Communication Protocols
 	- [x] UART
 	- [x] I2C
@@ -118,7 +118,7 @@ The DISCOVERY-DISC1 F407VG board has the following code repository the following
 
 - [x] Bootloader
     - [x] Bootloader_00-BootCode
-    - [x] Bootloader_01-BootCode
+    - [x] Bootloader_01-BootCode (Need a host program. Protocols and others)
     - [x] Bootloader_01-UserCode
 
 ### Cortex M4 Programming
