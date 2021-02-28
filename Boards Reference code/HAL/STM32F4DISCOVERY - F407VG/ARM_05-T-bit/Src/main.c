@@ -5,10 +5,8 @@
   * @Company		: -
   * @Date         	: 02-28-2021
   * @Target			: DISCOVERY-DISC1 STM32F407VG
-  * @brief          : See the access modes: privileged and unprivileged modes.
-  * 				  We cannot call or modified a privileged register in
-  * 				  unprivileged mode it will produced a hardfault. See register
-  * 				  CONTROl bit 0 in debugger.
+  * @brief          : See the effect of T-Bit with a variable pointer function
+  * 				  writing in PC a even and odd T-Bit value.
   * @Lib			: -
   * @System Clock
   * 	SYSSource:		HSI
