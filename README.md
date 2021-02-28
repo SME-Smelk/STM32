@@ -145,8 +145,8 @@ The DISCOVERY-DISC1 F407VG board has the following code repository the following
 
 - [ ] Cortex-M4
     - [x] ARM_00-Ref
-    - [ ] ARM_01-HelloWorld-Semihosting
-    - [ ] ARM_02-OperationMode
+    - [x] ARM_01-HelloWorld-Semihosting
+    - [x] ARM_02-OperationMode
     - [ ] ARM_03-Inline
     - [ ] ARM_04-Access_levels
     - [ ] ARM_05-T-bit
