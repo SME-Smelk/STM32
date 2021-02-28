@@ -77,7 +77,7 @@ The DISCOVERY-DISC1 F407VG board has the following code repository the following
     - [x] CRC_01-Checksum
 - [x] Protection Modes (Read RDP - Write Protection)
     - [x] Protect_01-Level1
-- [ ] Communication Protocols
+- [ ] Communication Protocols - Conectivity
 	- [x] UART
 	- [x] I2C
 		- [x] I2C_01-Master_Slave_TX_RX_AllOne
@@ -92,7 +92,27 @@ The DISCOVERY-DISC1 F407VG board has the following code repository the following
 		- [ ] LoopBack
 		- [ ] LoopBack_IT
 		- [ ] Normal_mode_twonodes
-
+	- [ ] ETH
+	- [ ] FSMC
+	- [ ] USB_OTG
+		- [ ] USB_OTG_FS
+		- [ ] USB_OTG_HS
+	- [ ] USART
+	- [ ] SDIO
+- [ ] Multimedia
+	- [ ] I2S
+	- [ ] DCMI
+- [ ] Security
+	- [ ] RNG	
+- [ ] others Middleware
+	- [ ] FATFS
+	- [ ] LIBJPEG
+	- [ ] MBEDTLS
+	- [ ] USB_HOST
+- [ ] System Core
+	- [ ] IWDG
+	- [ ] WWDG
+	- [ ] SYS
 ### RTOS
 
 - [x] RTOS FreeRTOS
