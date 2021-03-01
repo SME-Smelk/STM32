@@ -102,7 +102,7 @@ The DISCOVERY-DISC1 F407VG board has the following code repository the following
 - [ ] Multimedia
 	- [ ] I2S
 	- [ ] DCMI
-- [ ] Security
+- [ ] Random Numbers
 	- [ ] RNG	
 - [ ] others Middleware
 	- [ ] FATFS
