@@ -147,15 +147,15 @@ The DISCOVERY-DISC1 F407VG board has the following code repository the following
     - [x] ARM_00-Ref
     - [x] ARM_01-HelloWorld-Semihosting
     - [x] ARM_02-OperationMode
-    - [ ] ARM_03-Inline
-    - [ ] ARM_04-Access_levels
-    - [ ] ARM_05-T-bit
-    - [ ] ARM_06-Bit_Banding
-    - [ ] ARM_07-Stack
-    - [ ] ARM_08-Int_Pend_USART3
-    - [ ] ARM_09-Interrupt_PendBit_USART3
-    - [ ] ARM_10-Interrupt_Priority
-    - [ ] ARM_11-Exception_Entry_Exit
+    - [x] ARM_03-Inline
+    - [x] ARM_04-Access_levels
+    - [x] ARM_05-T-bit
+    - [x] ARM_06-Bit_Banding
+    - [x] ARM_07-Stack
+    - [x] ARM_08-Int_Pend_USART3
+    - [x] ARM_09-Interrupt_PendBit_USART3
+    - [x] ARM_10-Interrupt_Priority
+    - [x] ARM_11-Exception_Entry_Exit
     - [ ] ARM_12-Fault_Gen
     - [ ] ARM_13-SVC_Number
     - [ ] ARM_14-SVC_Operation
