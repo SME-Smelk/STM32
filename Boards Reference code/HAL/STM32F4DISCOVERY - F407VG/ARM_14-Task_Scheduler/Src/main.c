@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
   * @Project        : ARM_14-Task_Scheduler
-  * @Autor          : Ismael Poblete
+  * @Autor          : Ismael Poblete V.
   * @Company		: -
   * @Date         	: 03-01-2021
   * @Target			: DISCOVERY-DISC1 STM32F407VG
