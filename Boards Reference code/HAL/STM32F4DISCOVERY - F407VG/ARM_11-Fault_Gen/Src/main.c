@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
   * @Project        : ARM_11-Fault_Gen
-  * @Autor          : Ismael Poblete
+  * @Autor          : Ismael Poblete V.
   * @Company		: -
   * @Date         	: 02-28-2021
   * @Target			: DISCOVERY-DISC1 STM32F407VG

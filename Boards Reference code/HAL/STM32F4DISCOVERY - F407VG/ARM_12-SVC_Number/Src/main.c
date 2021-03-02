@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
   * @Project        : ARM_12-SVC_Number
-  * @Autor          : Ismael Poblete
+  * @Autor          : Ismael Poblete V.
   * @Company		: -
   * @Date         	: 03-01-2021
   * @Target			: DISCOVERY-DISC1 STM32F407VG
