@@ -143,7 +143,7 @@ The DISCOVERY-DISC1 F407VG board has the following code repository the following
 
 ### Cortex M4 Programming
 
-- [ ] Cortex-M4
+- [x] Cortex-M4
     - [x] ARM_00-Ref
     - [x] ARM_01-HelloWorld-Semihosting
     - [x] ARM_02-OperationMode
@@ -156,11 +156,11 @@ The DISCOVERY-DISC1 F407VG board has the following code repository the following
     - [x] ARM_09-Interrupt_PendBit_USART3
     - [x] ARM_10-Interrupt_Priority
     - [x] ARM_11-Exception_Entry_Exit
-    - [ ] ARM_12-Fault_Gen
-    - [ ] ARM_13-SVC_Number
-    - [ ] ARM_14-SVC_Operation
-    - [ ] ARM_15-Task_Scheduler
-    - [ ] ARM_16-CMSIS_Task_Scheduler
+    - [x] ARM_12-Fault_Gen
+    - [x] ARM_13-SVC_Number
+    - [x] ARM_14-SVC_Operation
+    - [x] ARM_15-Task_Scheduler
+    - [x] ARM_16-CMSIS_Task_Scheduler
 
 ### Other pherypherals and sensors
 - [ ] SD 
