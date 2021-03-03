@@ -182,5 +182,7 @@ The DISCOVERY-DISC1 F407VG board has the following code repository the following
 - [ ] Signal Procesing
 	- [ ] ADC-FFT
 	- [ ] DSP
+		- [ ] IIR
+		- [ ] FIR 
 	- [ ] Filters
 	
