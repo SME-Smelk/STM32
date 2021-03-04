@@ -181,6 +181,7 @@ The DISCOVERY-DISC1 F407VG board has the following code repository the following
 	- [ ] IMU/AHRS MPU6050
 - [ ] Signal Procesing
 	- [ ] ADC-FFT
+	- [ ] RMS
 	- [ ] DSP
 		- [ ] IIR
 		- [ ] FIR 
