@@ -3,7 +3,7 @@
 
 In the process of learning and generating a personal repository as well as friendly to the community. This section will host codes on the use of STM32 microcontrollers, but focused on STM32F407VG, for now. 
 
-- In process of code programming
+- Code programming in process
 - Basic code support and exaples of STM32 microcontrollers and AC, DMA, UART, SPI, I2C, CAN, low power, interrupts, etc.
 - Focus in DISCOVERY-DISC1 F407VG Board
 - Support  STM32 and Cortex Mx architecture
