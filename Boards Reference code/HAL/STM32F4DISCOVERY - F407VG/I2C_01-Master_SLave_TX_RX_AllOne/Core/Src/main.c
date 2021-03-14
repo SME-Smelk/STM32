@@ -86,12 +86,21 @@ int main(void)
 	I2C1_Init();
 	USART2_UART_Init();
 
+#ifndef MASTER_DEVICE
+	/* Read from master, slave transmit the information with sequence */
+	HAL_I2C_EnableListen_IT(&hi2c1);
+    HAL_I2C_Slave_Seq_Receive_IT(&hi2c1, slave_tx_buffer, 1, I2C_NEXT_FRAME);
+
+#endif
+
+#ifdef MASTER_DEVICE
 	while(!HAL_GPIO_ReadPin(USER_BUTTON_GPIO_Port, USER_BUTTON_Pin));
 	if((HAL_I2C_IsDeviceReady(&hi2c1, SLAVE_ADDRESS, 10, 10) == HAL_OK)){
 		HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_SET);
 	}else{
 		HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_RESET);
 	}
+#endif
 
 	while (1)
 	{
@@ -304,7 +313,7 @@ static void I2C1_Init(void)
 #ifdef MASTER_DEVICE
   hi2c1.Init.OwnAddress1 = 0;
 #else
-  hi2c1.Init.OwnAddress1 = SLAVE_ADDRESS;
+  hi2c1.Init.OwnAddress1 = OWN_ADDRESS;
 #endif
   hi2c1.Init.OwnAddress2 = 0;
   hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
@@ -317,6 +326,21 @@ static void I2C1_Init(void)
   }
 
 }
+
+void HAL_I2C_AddrCallback(I2C_HandleTypeDef *hi2c, uint8_t TransferDirection, uint16_t AddrMatchCode)
+{
+	/*For sequence*/
+  if( TransferDirection==I2C_DIRECTION_TRANSMIT ) {
+   /* if( first ) {
+      HAL_I2C_Slave_Seq_Receive_IT(hi2c1, &slave_tx_buffer, 1, I2C_NEXT_FRAME);
+    } else {
+      HAL_I2C_Slave_Seq_Receive_IT(hi2c1, &slave_tx_buffer, 1, I2C_NEXT_FRAME);
+    }*/
+  } else {
+    /*HAL_I2C_Slave_Seq_Transmit_IT(hi2c, &slave_tx_buffer, 5, I2C_NEXT_FRAME);*/
+  }
+}
+
 /**
   * @brief  This function is executed in case of error occurrence.
   * @retval None

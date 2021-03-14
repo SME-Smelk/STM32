@@ -23,7 +23,8 @@
 #define MASTER_DEVICE
 #define MASTER_WRITE
 
-#define SLAVE_ADDRESS 0x68
+#define OWN_ADDRESS 			0x50
+#define SLAVE_ADDRESS 			OWN_ADDRESS >> 1
 
 /* Mode Master/Slave - Read/Write */
 #define MASTER_WRITE_CMD       0xC1
