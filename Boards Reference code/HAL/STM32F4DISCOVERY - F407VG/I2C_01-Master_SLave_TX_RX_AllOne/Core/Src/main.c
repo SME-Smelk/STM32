@@ -89,7 +89,6 @@ int main(void)
 #ifndef MASTER_DEVICE
 	/* Read from master, slave transmit the information with sequence */
 	HAL_I2C_EnableListen_IT(&hi2c1);
-    HAL_I2C_Slave_Seq_Receive_IT(&hi2c1, slave_tx_buffer, 1, I2C_NEXT_FRAME);
 
 #endif
 
