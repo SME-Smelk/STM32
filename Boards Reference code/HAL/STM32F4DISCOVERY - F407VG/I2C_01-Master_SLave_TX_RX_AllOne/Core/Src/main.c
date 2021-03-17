@@ -326,17 +326,52 @@ static void I2C1_Init(void)
 
 }
 
+void HAL_I2C_SlaveRxCpltCallback(I2C_HandleTypeDef *hi2c)
+{
+
+    if(slave_rcv_cmd == MASTER_WRITE_CMD){
+		  /* prepare to rcv from the master
+		   * first rcv no bytes to be written by master*/
+  	  //HAL_I2C_Slave_Seq_Receive_IT(hi2c, &slave_rcv_cmd, 1, I2C_NEXT_FRAME);
+
+		  memset(slave_rx_buffer,0, sizeof(slave_rx_buffer));
+		  HAL_I2C_Slave_Seq_Receive_IT(hi2c, slave_rx_buffer, 5, I2C_NEXT_FRAME);
+
+    }
+}
+
+void HAL_I2C_SlaveTxCpltCallback(I2C_HandleTypeDef *hi2c)
+{
+
+	//HAL_I2C_Slave_Seq_Receive_IT(hi2c, &slave_rcv_cmd, 1, I2C_NEXT_FRAME);
+}
+int i = 0;
+uint8_t first = SET;
 void HAL_I2C_AddrCallback(I2C_HandleTypeDef *hi2c, uint8_t TransferDirection, uint16_t AddrMatchCode)
 {
-	/*For sequence*/
+	i++;
+	/*For secuence*/
   if( TransferDirection==I2C_DIRECTION_TRANSMIT ) {
-   /* if( first ) {
-      HAL_I2C_Slave_Seq_Receive_IT(hi2c1, &slave_tx_buffer, 1, I2C_NEXT_FRAME);
-    } else {
-      HAL_I2C_Slave_Seq_Receive_IT(hi2c1, &slave_tx_buffer, 1, I2C_NEXT_FRAME);
-    }*/
+
+	  if(first==SET){
+		  HAL_I2C_Slave_Seq_Receive_IT(hi2c, &slave_rcv_cmd, 1, I2C_NEXT_FRAME);
+		  first=RESET;
+	  }else{
+	      if(slave_rcv_cmd == MASTER_WRITE_CMD){
+			  /* prepare to rcv from the master
+			   * first rcv no bytes to be written by master*/
+	    	  //HAL_I2C_Slave_Seq_Receive_IT(hi2c, &slave_rcv_cmd, 1, I2C_NEXT_FRAME);
+
+			  memset(slave_rx_buffer,0, sizeof(slave_rx_buffer));
+			  HAL_I2C_Slave_Seq_Receive_IT(hi2c, slave_rx_buffer, 5, I2C_NEXT_FRAME);
+
+	      }
+	  }
+
   } else {
-    /*HAL_I2C_Slave_Seq_Transmit_IT(hi2c, &slave_tx_buffer, 5, I2C_NEXT_FRAME);*/
+      if(slave_rcv_cmd == MASTER_READ_CMD){
+    	  HAL_I2C_Slave_Seq_Transmit_IT(hi2c, (uint8_t*)slave_tx_buffer, 5, I2C_NEXT_FRAME);
+      }
   }
 }
 
