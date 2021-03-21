@@ -20,18 +20,19 @@
   * @note
   * -I2C1 functionality is through interrupt and sequential data.
   * -Slave Mode it waiting for master commands.
-  * 	-Slave identification:
-  * 		SLAVE_ADDRESS 0x28
-  * 		ID:			  0xE0
-  * 		Version:	  1.0
-  * 	-Commands from master:
-  * 		Read cmd:
-  *				CHECK_STATUS_CMD       	0xC1, Send a simple command of 1 byte
-  *				READ_ID_VER_CMD        	0XC2, Send the id and version in 4 bytes.
-  *				READ_DATA_CMD        	0XC3, Send 12 bytes of data, three float variables.
-  *				RESET_SLAVE_CMD			0xC5, Send 1 byte command to reset the board by software
-  *			Write cmd:
-  *				WRITE_TO_PARAMETER_CMD  0xC4, Send 1 byte cmd + 4 bytes of data for parameter
+  *
+  * -Slave identification:
+  * 	SLAVE_ADDRESS 0x28
+  * 	ID:			  0xE0
+  * 	Version:	  1.0
+  * -Commands from master:
+  * 	Read cmd:
+  *			CHECK_STATUS_CMD       	0xC1, Send a simple command of 1 byte
+  *			READ_ID_VER_CMD        	0XC2, Send the id and version in 4 bytes.
+  *			READ_DATA_CMD        	0XC3, Send 12 bytes of data, three float variables.
+  *			RESET_SLAVE_CMD			0xC5, Send 1 byte command to reset the board by software
+  *		Write cmd:
+  *			WRITE_TO_PARAMETER_CMD  0xC4, Send 1 byte cmd + 4 bytes of data for parameter
   *
   ******************************************************************************
 **/
