@@ -53,7 +53,7 @@ I2C_HandleTypeDef hi2c1;
 void SystemClock_Config(void);
 static void GPIO_Init(void);
 static void I2C1_Init(void);
-
+float ieee_float(uint32_t f);
 /* Private user code ---------------------------------------------------------*/
 
 //General buffer to receive a command
@@ -61,6 +61,9 @@ uint8_t slave_rcv_cmd;
 
 // General buffer to transmit
 uint8_t transmitBuffer[5];
+uint8_t receiveBuffer[5];
+uint32_t data_receive;
+float variable_to_write = 0.0;
 
 //Data variables
 float data[3] = {0.0,0.0,0.0};
@@ -77,7 +80,6 @@ int main(void)
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
-
 
   /* Configure the system clock */
   SystemClock_Config();
@@ -197,26 +199,20 @@ static void GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 
+uint8_t first = SET;
 void HAL_I2C_SlaveRxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
-/*
-	//Receive Command
-    switch(slave_rcv_cmd){
-    case CHECK_STATUS_CMD:
-    	//write_status_func();
-    	break;
-    case READ_ID_VER_CMD:
-    	//write_id_ver_func();
-    	break;
-    case READ_DATA_CMD:
-    	//write_data_func();
-    	break;
-    default:
-		break;
-    }
-
-*/
-
+	if(slave_rcv_cmd == WRITE_TO_PARAMETER_CMD){
+		if(first == SET){
+			first = RESET;
+		}else{
+			data_receive = receiveBuffer[4] + (receiveBuffer[3]<< 8) + (receiveBuffer[2]<<16) + (receiveBuffer[1]<<24);
+			variable_to_write = ieee_float(data_receive);
+			first = SET;
+		}
+	}else if(slave_rcv_cmd == RESET_SLAVE_CMD){
+		NVIC_SystemReset();
+	}
 }
 
 void HAL_I2C_SlaveTxCpltCallback(I2C_HandleTypeDef *hi2c)
@@ -227,20 +223,27 @@ void HAL_I2C_SlaveTxCpltCallback(I2C_HandleTypeDef *hi2c)
 
 
 int i = 0;
-uint8_t first = SET;
+
 
 void HAL_I2C_AddrCallback(I2C_HandleTypeDef *hi2c, uint8_t TransferDirection, uint16_t AddrMatchCode)
 {
 	i++;
 	if (TransferDirection == I2C_DIRECTION_TRANSMIT) {
 
-			if (HAL_I2C_Slave_Sequential_Receive_IT(hi2c, &slave_rcv_cmd, 1, I2C_FIRST_FRAME) != HAL_OK) {
-				Error_Handler();
+		if (HAL_I2C_Slave_Sequential_Receive_IT(hi2c, &slave_rcv_cmd, 1, I2C_FIRST_FRAME) != HAL_OK) {
+			Error_Handler();
+		}
+
+		if(slave_rcv_cmd == WRITE_TO_PARAMETER_CMD){
+			if(first == RESET){
+				if (HAL_I2C_Slave_Sequential_Receive_IT(hi2c, (uint8_t*)&receiveBuffer, LEN_WRITE_TO_PARAMETER_CMD, I2C_LAST_FRAME) != HAL_OK) {
+					Error_Handler();
+				}
 			}
+		}
 
 	//I2C_DIRECTION_RECEIVE
 	}else{
-
 		switch(slave_rcv_cmd){
 		case CHECK_STATUS_CMD:
 
@@ -282,14 +285,9 @@ void HAL_I2C_AddrCallback(I2C_HandleTypeDef *hi2c, uint8_t TransferDirection, ui
 			}
 
 			break;
-
 		default:
-			Error_Handler();
 			break;
 		}
-
-
-
 	}
 }
 
@@ -303,6 +301,17 @@ void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c)
 	Error_Handler();
 }
 
+
+float ieee_float(uint32_t f)
+{
+    union int_float{
+        uint32_t i;
+        float f;
+    } tofloat;
+
+    tofloat.i = f;
+    return tofloat.f;
+}
 
 /**
   * @brief  This function is executed in case of error occurrence.

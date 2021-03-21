@@ -43,14 +43,17 @@ extern "C" {
 #define NUMBER_VAR_DATA			3
 
 /* Mode Master/Slave - Read/Write */
-#define CHECK_STATUS_CMD       	0xC1
-#define READ_ID_VER_CMD        	0XC2
-#define READ_DATA_CMD        	0XC3
+#define CHECK_STATUS_CMD       		0xC1
+#define READ_ID_VER_CMD        		0XC2
+#define READ_DATA_CMD        		0XC3
+#define WRITE_TO_PARAMETER_CMD 		0XC4
+#define RESET_SLAVE_CMD        		0XC5
 
 /*Data lenght*/
-#define LEN_CHECK_STATUS_CMD    1
-#define LEN_READ_ID_VER_CMD   	4
-#define LEN_READ_DATA_CMD   	4 * NUMBER_VAR_DATA
+#define LEN_CHECK_STATUS_CMD   		1
+#define LEN_READ_ID_VER_CMD   		4
+#define LEN_READ_DATA_CMD   		4 * NUMBER_VAR_DATA
+#define LEN_WRITE_TO_PARAMETER_CMD  5
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/
