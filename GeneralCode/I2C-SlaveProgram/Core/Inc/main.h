@@ -59,10 +59,6 @@ extern "C" {
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
 
-#define USER_BUTTON_GPIO_Port GPIOC
-#define USER_BUTTON_Pin GPIO_PIN_13
-
-
 /* Private defines -----------------------------------------------------------*/
 
 
