@@ -32,7 +32,7 @@ void Error_Handler(void);
 #define USART_TX_Pin 				GPIO_PIN_2
 #define USART_TX_GPIO_Port 			GPIOA
 #define USART_RX_Pin 				GPIO_PIN_3
-#define USART_RX_GPIO_Port 			GPIOAx1
+#define USART_RX_GPIO_Port 			GPIOA
 
 
 #endif /* __MAIN_H */
