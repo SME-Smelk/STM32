@@ -91,35 +91,35 @@ int main(void)
 
 	/* Test malloc with array dynamic allocate */
 
-		//Set a 14 pointers in stack, high address value of RAM.
-		char *pArrayOfGpsDataStr[14];
+	//Set a 14 pointers in stack, high address value of RAM.
+	char *pArrayOfGpsDataStr[14];
 
-		cont++;
-		for (int i = 0; i < 14; i++) {
+	cont++;
+	for (int i = 0; i < 14; i++) {
 
-			//Each pointer [i], pointer to Heap of de low address value of RAM.
-			//Each pointer is separate by 80 * sizeof(char), its means, 80bytes type char + 8 malloc, 88bytes.
-			pArrayOfGpsDataStr[i] = (char*)malloc(80 * sizeof(char));
-			if(pArrayOfGpsDataStr[i]!=NULL){
-				//Clean the string in that location in [i] address
-				memset(pArrayOfGpsDataStr[i],0,strlen(pArrayOfGpsDataStr[i]));
-				//Create a string
-				char *pData = "aaaaaaaaa";
-				//The [i] address, than pointer to heap, write pData.
-				strcpy(pArrayOfGpsDataStr[i], pData);
-				strcat(pArrayOfGpsDataStr[i], "\0");
-			}else{
-				//Error no memory to allocate
-				while(1);
-			}
-		}
-
-		//Clean the heap and strings data values.
-		for (int i = 0; i < 14; i++) {
+		//Each pointer [i], pointer to Heap of de low address value of RAM.
+		//Each pointer is separate by 80 * sizeof(char), its means, 80bytes type char + 8 malloc, 88bytes.
+		pArrayOfGpsDataStr[i] = (char*)malloc(80 * sizeof(char));
+		if(pArrayOfGpsDataStr[i]!=NULL){
+			//Clean the string in that location in [i] address
 			memset(pArrayOfGpsDataStr[i],0,strlen(pArrayOfGpsDataStr[i]));
-			free(pArrayOfGpsDataStr[i]);
+			//Create a string
+			char *pData = "aaaaaaaaa";
+			//The [i] address, than pointer to heap, write pData.
+			strcpy(pArrayOfGpsDataStr[i], pData);
+			strcat(pArrayOfGpsDataStr[i], "\0");
+		}else{
+			//Error no memory to allocate
+			while(1);
 		}
 	}
+
+	//Clean the heap and strings data values.
+	for (int i = 0; i < 14; i++) {
+		memset(pArrayOfGpsDataStr[i],0,strlen(pArrayOfGpsDataStr[i]));
+		free(pArrayOfGpsDataStr[i]);
+	}
+}
 }
 
 /**
