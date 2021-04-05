@@ -123,17 +123,25 @@ int main(void)
 	while (1){
 		if(GPS_DataProcess() == GPS_DATA_RECEIVED){
 
-			sprintf(pData,"GPS:\n");
+			sprintf(pData,"GPS:Data Received\n");
 			HAL_UART_Transmit(&DEBUG_UART1, (uint8_t*)pData, sizeof(pData), HAL_MAX_DELAY);
 
 		}else if(GPS_DataProcess() == GPS_ERROR){
 
+			//while(1);
 			sprintf(pData,"GPS No Fix\n");
 			HAL_UART_Transmit(&DEBUG_UART1, (uint8_t*)pData, sizeof(pData), HAL_MAX_DELAY);
 
-		}else{
+		}else if(GPS_DataProcess() == GPS_BUF_NO_MEMORY){
 
-			sprintf(pData,"GPS No data\n");
+			while(1);
+			sprintf(pData,"GPS Mem buff err\n");
+			HAL_UART_Transmit(&DEBUG_UART1, (uint8_t*)pData, sizeof(pData), HAL_MAX_DELAY);
+
+		}else if(GPS_DataProcess() == GPS_NODATA){
+
+			//while(1);
+			sprintf(pData,"GPS No Fix\n");
 			HAL_UART_Transmit(&DEBUG_UART1, (uint8_t*)pData, sizeof(pData), HAL_MAX_DELAY);
 
 		}
@@ -235,6 +243,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
 		if(GPS_NMEA.recvd_data == '\r'){
 		/*Data Ready*/
+			GPS_NMEA.data_buffer[GPS_NMEA.count_data] = '\n';
 			GPS_NMEA.flag_data_ready = SET;
 		}else{
 		/*Fill buffer*/
@@ -276,11 +285,13 @@ void GPS_Init(void){
 
 uint32_t cont=0;
 int GPS_DataProcess(void){
+
+	//GPS_NMEA.flag_data_ready=SET;
 	if(GPS_NMEA.flag_data_ready){
 /*
 		//Data test
 		//Signal
-		//char buffer[] = "$GPGGA,005314.00,2337.93836,S,07022.79995,W,1,04,6.54,107.4,M,34.1,M,,*59";
+		char buffer[] = "$GPGGA,005314.00,2337.93836,S,07022.79995,W,1,04,6.54,107.4,M,34.1,M,,*59\ndga";
 		//No signal
 		//char buffer[] = "$GPGGA,154053.00,,,,,0,00,99.99,,,,,,*6";
 		memset(GPS_NMEA.data_buffer, 0, strlen(GPS_NMEA.data_buffer));
@@ -288,32 +299,42 @@ int GPS_DataProcess(void){
 */
 
 		/* Parse data */
-		cont++;
-		memset(&GPS_NMEA.GPGGA,0,sizeof(GPS_NMEA.GPGGA));
 		char *pArrayOfGpsDataStr[14];
+		char *str;
+		cont++;
+
+		/*Create a buffer for data*/
+		str = malloc(strlen(GPS_NMEA.data_buffer)+1);
+		if(str==NULL)
+		{
+			GPS_NMEA.GPS_Status=GPS_BUF_NO_MEMORY;
+			return GPS_BUF_NO_MEMORY;
+		}
+		memset(str,0,strlen(str));
+		/*Save data buffer to str*/
+		strlcpy (str,(char*)GPS_NMEA.data_buffer,strlen((char*)GPS_NMEA.data_buffer) + 1);
+
+		/*Clean GPGGA*/
+		memset(&GPS_NMEA.GPGGA,0,sizeof(GPS_NMEA.GPGGA));
+
+		/*Create a buffer to strings vectors of GPGGA parameters*/
 		for (int i = 0; i < 14; i++) {
 
 			pArrayOfGpsDataStr[i] = malloc(sizeof(GPS_NMEA.data_buffer) * sizeof(char));
 			if(pArrayOfGpsDataStr[i]==NULL){
+				GPS_NMEA.GPS_Status=GPS_BUF_NO_MEMORY;
 				return GPS_BUF_NO_MEMORY;
 			}
 			memset(pArrayOfGpsDataStr[i],0,strlen(pArrayOfGpsDataStr[i]));
 
 		}
 
-		char *str;
-		str = malloc(strlen(GPS_NMEA.data_buffer)+1);
-		if(str==NULL)
-		{
-			return GPS_BUF_NO_MEMORY;
-		}
-
-		strlcpy (str,(char*)GPS_NMEA.data_buffer,strlen((char*)GPS_NMEA.data_buffer) + 1);
-		truncateStr(GPS_NMEA.data_buffer, pArrayOfGpsDataStr, ',');
+		/* Separate the string GPGGA Parameters*/
+		truncateStr(str, pArrayOfGpsDataStr, ',');
 
 		/*Checksum CRC NMEA;*/
 		GPS_NMEA.GPGGA.checksum = strtoul(subString(pArrayOfGpsDataStr[13],1,(strlen(pArrayOfGpsDataStr[13])-1)), NULL, 16);
-		uint16_t checksum = nmea_checksum(str,strlen(pArrayOfGpsDataStr[13]));
+		uint16_t checksum = nmea_checksum(GPS_NMEA.data_buffer,strlen(pArrayOfGpsDataStr[13]));
 
 		/*Checksum fix quality*/
 		GPS_NMEA.GPGGA.fix_quality = atoi((char*)subString(pArrayOfGpsDataStr[6],0,strlen(pArrayOfGpsDataStr[6])));
@@ -346,6 +367,11 @@ int GPS_DataProcess(void){
 			GPS_NMEA.GPGGA.longitude=convertDegMinToDecDeg(GPS_NMEA.GPGGA.longitude * -1);
 			}
 
+			//check buff memory of function subString
+			if(GPS_NMEA.GPS_Status==GPS_BUF_NO_MEMORY){
+				return GPS_BUF_NO_MEMORY;
+			}
+
 			/* No error, good data */
 			memset(&GPS_NMEA.data_buffer,0,sizeof(GPS_NMEA.data_buffer));
 			for (int i = 0; i < 14; i++) {
@@ -355,7 +381,7 @@ int GPS_DataProcess(void){
 			free(str);
 			GPS_NMEA.flag_data_ready = RESET;
 			GPS_NMEA.count_data=0;
-
+			GPS_NMEA.GPS_Status=GPS_DATA_RECEIVED;
 			return GPS_DATA_RECEIVED;
 		}else{
 			/* No signal or error in data integrity */
@@ -368,20 +394,21 @@ int GPS_DataProcess(void){
 			free(str);
 			GPS_NMEA.flag_data_ready = RESET;
 			GPS_NMEA.count_data=0;
-
+			GPS_NMEA.GPS_Status=GPS_ERROR;
 			return GPS_ERROR;
 		}
 
 	}
 
 	/*No data*/
+	GPS_NMEA.GPS_Status=GPS_NODATA;
 	return GPS_NODATA;
 }
 
 int32_t truncateStr(char instr[], char *outstr[], const char delimeter) {
     char *tempBuff;
     int32_t numberOfRawsOutArray = 0;
-    tempBuff = strtok(instr, &delimeter);
+    tempBuff = strtok((char*)instr, &delimeter);
     while (tempBuff != NULL) {
         strcpy(outstr[numberOfRawsOutArray], tempBuff);
         strcat(outstr[numberOfRawsOutArray], "\0");
@@ -411,6 +438,9 @@ uint16_t nmea_checksum(char *nmea_data, uint8_t char_length)
 {
     int crc = 0;
     int i;
+    //uint8_t err_off;
+
+    //err_off=strlen(strstr(nmea_data,'\n'));
 
     // Between $ and * sign.
     for (i = 1; i < strlen(nmea_data) - char_length; i ++) {
@@ -435,10 +465,13 @@ const char* subString(const char* in_str, uint8_t offset, uint8_t len) {
     }
 
     char *outstr = malloc(len + 1);
+    if(outstr==NULL){
+    	GPS_NMEA.GPS_Status=GPS_BUF_NO_MEMORY;
+    }
     memset((char*)outstr,0,strlen(outstr));
     strncpy(outstr,&in_str[offset], len);
     outstr[offset + len] = '\0';
-    //strcat(outstr, "\0");
+    free(outstr);
     return outstr;
 }
 
