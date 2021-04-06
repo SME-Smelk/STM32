@@ -97,7 +97,7 @@ int32_t truncateStr(char instr[], char *outstr[], const char delimeter);
 
 /* Private user code ---------------------------------------------------------*/
 GPS_t GPS_NMEA;
-char* pData;
+char pData[50];
 
 /**
   * @brief  The application entry point.
@@ -134,15 +134,15 @@ int main(void)
 
 		}else if(GPS_DataProcess() == GPS_BUF_NO_MEMORY){
 
-			while(1);
+			//while(1);
 			sprintf(pData,"GPS Mem buff err\n");
 			HAL_UART_Transmit(&DEBUG_UART1, (uint8_t*)pData, sizeof(pData), HAL_MAX_DELAY);
 
 		}else if(GPS_DataProcess() == GPS_NODATA){
 
 			//while(1);
-			sprintf(pData,"GPS No Fix\n");
-			HAL_UART_Transmit(&DEBUG_UART1, (uint8_t*)pData, sizeof(pData), HAL_MAX_DELAY);
+			//sprintf(pData,"GPS No Fix\n");
+			//HAL_UART_Transmit(&DEBUG_UART1, (uint8_t*)pData, sizeof(pData), HAL_MAX_DELAY);
 
 		}
 	}
