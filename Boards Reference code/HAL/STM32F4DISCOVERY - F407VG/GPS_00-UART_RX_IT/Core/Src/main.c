@@ -55,6 +55,31 @@ typedef struct {
 
 } GPS_GPGGA_t;
 
+typedef struct {
+
+    uint8_t utc_time[3];
+    char validity;
+    float latitude;
+    char lat_direction;
+    float longitude;
+    char lon_direction;
+    float speed_knots;
+    float true_course;
+    uint8_t utc_date[3];
+    float magnetic_var;
+    char magnetic_var_direction;
+    uint16_t checksum;
+
+} GPS_GPRMC_t;
+
+typedef enum
+{
+
+  SENTENCE_GPGGA       	  = "$GPGGA,",
+  SENTENCE_GPRMC		  = "$GPRMC,",
+
+} GPS_CodeSentenceTypeDef;
+
 typedef enum
 {
   GPS_OK       			  = 0x00U,
@@ -65,11 +90,14 @@ typedef enum
 } GPS_StatusTypeDef;
 
 typedef struct {
+
 	char data_buffer[80];
 	uint8_t count_data;
 	uint8_t flag_data_ready;
 	uint8_t recvd_data;
 	GPS_GPGGA_t	GPGGA;
+	GPS_GPRMC_t	GPRMC;
+
 } GPS_HandleTypeDef;
 
 /* Private define ------------------------------------------------------------*/
@@ -91,7 +119,8 @@ static void DEBUG_USART1_Init(void);
 
 //GPS
 GPS_StatusTypeDef GPS_Init(UART_HandleTypeDef *huart,GPS_HandleTypeDef *gps_nmea);
-GPS_StatusTypeDef GPS_DataProcess(void);
+GPS_StatusTypeDef GPS_DataProcess(GPS_HandleTypeDef *gps_nmea);
+GPS_StatusTypeDef detecCommand(UART_HandleTypeDef *huart,GPS_HandleTypeDef *gps_nmea, const char* sentence_code);
 void detecCommand_GPGGA(void);
 
 double convertDegMinToDecDeg (float degMin);
@@ -125,7 +154,7 @@ int main(void)
 
 	/* Start Code */
 	while (1){
-		switch(GPS_DataProcess()){
+		switch(GPS_DataProcess(&GPS_NMEA)){
 		case GPS_DATA_RECEIVED:
 			memset(pData,0,sizeof(pData));
 			sprintf(pData,"GPS:%d:%d:%d,%f,%f,%d,%d,%f\n",
@@ -251,22 +280,24 @@ static void DEBUG_USART1_Init(void)
   */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-
+/*
 	if(GPS_NMEA.count_data >= 7){
-	/* Data receive*/
+	// Data receive
 
 		if(GPS_NMEA.recvd_data == '\r'){
-		/*Data Ready*/
+		//Data Ready
 			GPS_NMEA.data_buffer[GPS_NMEA.count_data] = '\n';
 			GPS_NMEA.flag_data_ready = SET;
 		}else{
-		/*Fill buffer*/
+		//Fill buffer
 			GPS_NMEA.data_buffer[GPS_NMEA.count_data] = GPS_NMEA.recvd_data;
 			GPS_NMEA.count_data++;
 		}
 
 	}else{
-		detecCommand_GPGGA();
+		*/
+		//detecCommand_GPGGA();
+		detecCommand(huart,&GPS_NMEA,SENTENCE_GPGGA);
 	/* Command option detect: $GPGGA*/
 		/*
 		GPS_NMEA.data_buffer[GPS_NMEA.count_data] = GPS_NMEA.recvd_data;
@@ -287,12 +318,49 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 		}else{
 			GPS_NMEA.count_data = 0;
 		}
-		*/
+
 	}
 
-	HAL_UART_Receive_IT(&GPS_UART2,&GPS_NMEA.recvd_data,1);
+*/
 
 }
+
+
+
+GPS_StatusTypeDef detecCommand(UART_HandleTypeDef *huart,GPS_HandleTypeDef *gps_nmea, const char* sentence_code){
+
+	/* Get 1 byte data*/
+	gps_nmea->data_buffer[gps_nmea->count_data] = gps_nmea->recvd_data;
+
+	if(gps_nmea->count_data >= 7){
+		/*Command has been detected*/
+		if(gps_nmea->recvd_data == '\r'){
+		/*Data Ready*/
+			gps_nmea->data_buffer[gps_nmea->count_data] = '\n';
+			gps_nmea->flag_data_ready = SET;
+		}else{
+		/*Fill buffer*/
+			gps_nmea->data_buffer[gps_nmea->count_data] =gps_nmea->recvd_data;
+			gps_nmea->count_data++;
+		}
+
+	}else{
+		/* Detect command*/
+		if(gps_nmea->recvd_data == sentence_code[gps_nmea->count_data]){
+			gps_nmea->count_data++;
+		}else{
+			gps_nmea->count_data = 0;
+		}
+	}
+
+	if(HAL_UART_Receive_IT(huart,&gps_nmea->recvd_data,1) == HAL_ERROR){
+		return GPS_ERROR;
+	}
+
+	return GPS_OK;
+
+}
+/*
 
 void detecCommand_GPGGA(void){
 	GPS_NMEA.data_buffer[GPS_NMEA.count_data] = GPS_NMEA.recvd_data;
@@ -314,21 +382,20 @@ void detecCommand_GPGGA(void){
 		GPS_NMEA.count_data = 0;
 	}
 }
-
+*/
 GPS_StatusTypeDef GPS_Init(UART_HandleTypeDef *huart,GPS_HandleTypeDef *gps_nmea){
 	gps_nmea->flag_data_ready=RESET;
 	gps_nmea->count_data=0;
-	if(HAL_UART_Receive_IT(&huart,&gps_nmea->recvd_data,1) == HAL_ERROR){
+	if(HAL_UART_Receive_IT(huart,&gps_nmea->recvd_data,1) == HAL_ERROR){
 		return GPS_ERROR;
 	}
 	return GPS_OK;
 }
 
-uint32_t cont=0;
-GPS_StatusTypeDef GPS_DataProcess(void){
+GPS_StatusTypeDef GPS_DataProcess(GPS_HandleTypeDef *gps_nmea){
 
 	//GPS_NMEA.flag_data_ready=SET;
-	if(GPS_NMEA.flag_data_ready){
+	if(gps_nmea->flag_data_ready){
 /*
 		//Data test
 		//Signal
@@ -342,25 +409,24 @@ GPS_StatusTypeDef GPS_DataProcess(void){
 		/* Parse data */
 		char *pArrayOfGpsDataStr[14];
 		char *str;
-		cont++;
 
 		/*Create a buffer for data*/
-		str = malloc(strlen(GPS_NMEA.data_buffer)+1);
+		str = malloc(strlen(gps_nmea->data_buffer)+1);
 		if(str==NULL)
 		{
 			return GPS_BUF_NO_MEMORY;
 		}
 		memset(str,0,strlen(str));
 		/*Save data buffer to str*/
-		strlcpy (str,(char*)GPS_NMEA.data_buffer,strlen((char*)GPS_NMEA.data_buffer) + 1);
+		strlcpy (str,(char*)gps_nmea->data_buffer,strlen((char*)gps_nmea->data_buffer) + 1);
 
 		/*Clean GPGGA*/
-		memset(&GPS_NMEA.GPGGA,0,sizeof(GPS_NMEA.GPGGA));
+		memset(&gps_nmea->GPGGA,0,sizeof(gps_nmea->GPGGA));
 
 		/*Create a buffer to strings vectors of GPGGA parameters*/
 		for (int i = 0; i < 14; i++) {
 
-			pArrayOfGpsDataStr[i] = malloc(sizeof(GPS_NMEA.data_buffer) * sizeof(char));
+			pArrayOfGpsDataStr[i] = malloc(sizeof(gps_nmea->data_buffer) * sizeof(char));
 			if(pArrayOfGpsDataStr[i]==NULL){
 				return GPS_BUF_NO_MEMORY;
 			}
@@ -372,10 +438,119 @@ GPS_StatusTypeDef GPS_DataProcess(void){
 		truncateStr(str, pArrayOfGpsDataStr, ',');
 
 		/*Checksum CRC NMEA;*/
+		gps_nmea->GPGGA.checksum = strtoul(subString(pArrayOfGpsDataStr[13],1,(strlen(pArrayOfGpsDataStr[13])-1)), NULL, 16);
+		uint16_t checksum = nmea_checksum(gps_nmea->data_buffer,strlen(pArrayOfGpsDataStr[13]));
+
+		/*Checksum fix quality*/
+		gps_nmea->GPGGA.fix_quality = atoi((char*)subString(pArrayOfGpsDataStr[6],0,strlen(pArrayOfGpsDataStr[6])));
+
+		if((checksum == gps_nmea->GPGGA.checksum) && (gps_nmea->GPGGA.fix_quality != 0)){
+
+			gps_nmea->GPGGA.utc_time[0] = atoi(subString(pArrayOfGpsDataStr[1],0,2));
+			gps_nmea->GPGGA.utc_time[1] = atoi(subString(pArrayOfGpsDataStr[1],2,2));
+			gps_nmea->GPGGA.utc_time[2] = atoi(subString(pArrayOfGpsDataStr[1],4,2));
+			gps_nmea->GPGGA.latitude = atof(subString(pArrayOfGpsDataStr[2],0,strlen(pArrayOfGpsDataStr[2])));
+			gps_nmea->GPGGA.lat_direction = *subString(pArrayOfGpsDataStr[3],0,strlen(pArrayOfGpsDataStr[3]));
+			gps_nmea->GPGGA.longitude = atof(subString(pArrayOfGpsDataStr[4],0,strlen(pArrayOfGpsDataStr[4])));
+			gps_nmea->GPGGA.lon_direction = *subString(pArrayOfGpsDataStr[5],0,strlen(pArrayOfGpsDataStr[5]));
+			gps_nmea->GPGGA.num_sattelites = atoi(subString(pArrayOfGpsDataStr[7],0,strlen(pArrayOfGpsDataStr[7])));
+			gps_nmea->GPGGA.h_duration = atof(subString(pArrayOfGpsDataStr[8],0,strlen(pArrayOfGpsDataStr[8])));
+			gps_nmea->GPGGA.altitude = atof(subString(pArrayOfGpsDataStr[9],0,strlen(pArrayOfGpsDataStr[9])));
+			gps_nmea->GPGGA.altitude_unit = *subString(pArrayOfGpsDataStr[10],0,strlen(pArrayOfGpsDataStr[10]));
+			gps_nmea->GPGGA.height_of_geoid = atof(subString(pArrayOfGpsDataStr[11],0,strlen(pArrayOfGpsDataStr[11])));
+			gps_nmea->GPGGA.hog_unit = *subString(pArrayOfGpsDataStr[12],0,strlen(pArrayOfGpsDataStr[12]));
+
+			if(gps_nmea->GPGGA.lat_direction == 'N'){
+			gps_nmea->GPGGA.latitude=convertDegMinToDecDeg(gps_nmea->GPGGA.latitude);
+			}else if(gps_nmea->GPGGA.lat_direction == 'S'){
+			gps_nmea->GPGGA.latitude=convertDegMinToDecDeg(gps_nmea->GPGGA.latitude * -1);
+			}
+
+			if(gps_nmea->GPGGA.lon_direction == 'E'){
+				gps_nmea->GPGGA.longitude=convertDegMinToDecDeg(gps_nmea->GPGGA.longitude);
+			}else if(gps_nmea->GPGGA.lon_direction == 'W'){
+				gps_nmea->GPGGA.longitude=convertDegMinToDecDeg(gps_nmea->GPGGA.longitude * -1);
+			}
+
+			/* No error, good data */
+			memset(&gps_nmea->data_buffer,0,sizeof(gps_nmea->data_buffer));
+			for (int i = 0; i < 14; i++) {
+				memset(pArrayOfGpsDataStr[i],0,strlen(pArrayOfGpsDataStr[i]));
+				free(pArrayOfGpsDataStr[i]);
+			}
+			free(str);
+			gps_nmea->flag_data_ready = RESET;
+			gps_nmea->count_data=0;
+			return GPS_DATA_RECEIVED;
+		}else{
+			/* No signal or error in data integrity */
+			memset(&gps_nmea->GPGGA,0,sizeof(gps_nmea->GPGGA));
+			memset(&gps_nmea->data_buffer,0,sizeof(gps_nmea->data_buffer));
+			for (int i = 0; i < 14; i++) {
+				memset(pArrayOfGpsDataStr[i],0,strlen(pArrayOfGpsDataStr[i]));
+				free(pArrayOfGpsDataStr[i]);
+			}
+			free(str);
+			gps_nmea->flag_data_ready = RESET;
+			gps_nmea->count_data=0;
+			return GPS_ERROR;
+		}
+	}
+
+	/*No data*/
+	return GPS_NODATA;
+}
+
+/*
+GPS_StatusTypeDef GPS_DataProcess(void){
+
+	//GPS_NMEA.flag_data_ready=SET;
+	if(GPS_NMEA.flag_data_ready){
+
+		//Data test
+		//Signal
+		char buffer[] = "$GPGGA,005314.00,2337.93836,S,07022.79995,W,1,04,6.54,107.4,M,34.1,M,,*59\ndga";
+		//No signal
+		//char buffer[] = "$GPGGA,154053.00,,,,,0,00,99.99,,,,,,*6";
+		memset(GPS_NMEA.data_buffer, 0, strlen(GPS_NMEA.data_buffer));
+		strncpy(GPS_NMEA.data_buffer, buffer, strlen(buffer));
+
+		// Parse data
+		char *pArrayOfGpsDataStr[14];
+		char *str;
+
+		//Create a buffer for data
+		str = malloc(strlen(GPS_NMEA.data_buffer)+1);
+		if(str==NULL)
+		{
+			return GPS_BUF_NO_MEMORY;
+		}
+		memset(str,0,strlen(str));
+		//Save data buffer to str
+		strlcpy (str,(char*)GPS_NMEA.data_buffer,strlen((char*)GPS_NMEA.data_buffer) + 1);
+
+		//Clean GPGGA
+		memset(&GPS_NMEA.GPGGA,0,sizeof(GPS_NMEA.GPGGA));
+
+		//Create a buffer to strings vectors of GPGGA parameters
+		for (int i = 0; i < 14; i++) {
+
+			pArrayOfGpsDataStr[i] = malloc(sizeof(GPS_NMEA.data_buffer) * sizeof(char));
+			if(pArrayOfGpsDataStr[i]==NULL){
+				return GPS_BUF_NO_MEMORY;
+			}
+			memset(pArrayOfGpsDataStr[i],0,strlen(pArrayOfGpsDataStr[i]));
+
+		}
+
+		// Separate the string GPGGA Parameters
+		truncateStr(str, pArrayOfGpsDataStr, ',');
+
+		//Checksum CRC NMEA;
 		GPS_NMEA.GPGGA.checksum = strtoul(subString(pArrayOfGpsDataStr[13],1,(strlen(pArrayOfGpsDataStr[13])-1)), NULL, 16);
 		uint16_t checksum = nmea_checksum(GPS_NMEA.data_buffer,strlen(pArrayOfGpsDataStr[13]));
 
-		/*Checksum fix quality*/
+		//Checksum fix quality
 		GPS_NMEA.GPGGA.fix_quality = atoi((char*)subString(pArrayOfGpsDataStr[6],0,strlen(pArrayOfGpsDataStr[6])));
 
 		if((checksum == GPS_NMEA.GPGGA.checksum) && (GPS_NMEA.GPGGA.fix_quality != 0)){
@@ -406,7 +581,7 @@ GPS_StatusTypeDef GPS_DataProcess(void){
 			GPS_NMEA.GPGGA.longitude=convertDegMinToDecDeg(GPS_NMEA.GPGGA.longitude * -1);
 			}
 
-			/* No error, good data */
+			// No error, good data
 			memset(&GPS_NMEA.data_buffer,0,sizeof(GPS_NMEA.data_buffer));
 			for (int i = 0; i < 14; i++) {
 				memset(pArrayOfGpsDataStr[i],0,strlen(pArrayOfGpsDataStr[i]));
@@ -417,7 +592,7 @@ GPS_StatusTypeDef GPS_DataProcess(void){
 			GPS_NMEA.count_data=0;
 			return GPS_DATA_RECEIVED;
 		}else{
-			/* No signal or error in data integrity */
+			// No signal or error in data integrity
 			memset(&GPS_NMEA.GPGGA,0,sizeof(GPS_NMEA.GPGGA));
 			memset(&GPS_NMEA.data_buffer,0,sizeof(GPS_NMEA.data_buffer));
 			for (int i = 0; i < 14; i++) {
@@ -431,10 +606,10 @@ GPS_StatusTypeDef GPS_DataProcess(void){
 		}
 	}
 
-	/*No data*/
+	//No data
 	return GPS_NODATA;
 }
-
+*/
 int32_t truncateStr(char instr[], char *outstr[], const char delimeter) {
     char *tempBuff;
     int32_t numberOfRawsOutArray = 0;
