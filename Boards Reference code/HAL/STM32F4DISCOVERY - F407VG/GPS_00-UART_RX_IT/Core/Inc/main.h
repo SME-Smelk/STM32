@@ -22,6 +22,9 @@
 /* Exported macro ------------------------------------------------------------*/
 #define GPS_DEBUG
 
+#define SENTENCE_GPGGA "$GPGGA,"
+
+
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
 
