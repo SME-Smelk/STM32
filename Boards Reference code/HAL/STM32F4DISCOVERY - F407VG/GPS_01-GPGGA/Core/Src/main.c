@@ -58,6 +58,7 @@ typedef struct {
 typedef enum
 {
   GPS_OK       			  = 0x00U,
+  GPS_BUSY				  = 0x06U,
   GPS_DATA_RECEIVED		  = 0x01U,
   GPS_NODATA    		  = 0x02U,
   GPS_ERROR    			  = 0x03U,
@@ -103,7 +104,7 @@ GPS_StatusTypeDef GPS_detecCommand(UART_HandleTypeDef *huart,GPS_HandleTypeDef *
 double convertDegMinToDecDeg (float degMin);
 uint16_t nmea_checksum(char *nmea_data, uint8_t char_length);
 char *subString(const char* in_str, uint8_t offset, uint8_t len);
-int32_t truncateStr(char instr[], char *outstr[], const char delimeter);
+int32_t truncateStr(char instr[], char *outstr[], const char* delimeter) ;
 
 /* Private user code ---------------------------------------------------------*/
 GPS_HandleTypeDef GPS_NMEA;
@@ -266,35 +267,44 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
 GPS_StatusTypeDef GPS_detecCommand(UART_HandleTypeDef *huart,GPS_HandleTypeDef *gps_nmea){
 
-	/* Get 1 byte data*/
-	gps_nmea->data_buffer[gps_nmea->count_data] = gps_nmea->recvd_data;
+	if(!gps_nmea->flag_data_ready){
 
-	if(gps_nmea->count_data >= 7){
+		/* Get 1 byte data*/
+		gps_nmea->data_buffer[gps_nmea->count_data] = gps_nmea->recvd_data;
+
 		/*Command has been detected*/
-		if(gps_nmea->recvd_data == '\r'){
-		/*Data Ready*/
-			gps_nmea->data_buffer[gps_nmea->count_data] = '\n';
-			gps_nmea->flag_data_ready = SET;
+		if((gps_nmea->count_data >= 7)){
+
+			if(gps_nmea->recvd_data == '\r'){
+			/*Data Ready*/
+				gps_nmea->data_buffer[gps_nmea->count_data] = '\0';
+				gps_nmea->flag_data_ready = SET;
+			}else{
+			/*Fill buffer*/
+				gps_nmea->data_buffer[gps_nmea->count_data] =gps_nmea->recvd_data;
+				gps_nmea->count_data++;
+			}
+
 		}else{
-		/*Fill buffer*/
-			gps_nmea->data_buffer[gps_nmea->count_data] =gps_nmea->recvd_data;
-			gps_nmea->count_data++;
+			/* Detecting command*/
+			if(gps_nmea->recvd_data == SENTENCE_GPGGA[gps_nmea->count_data]){
+				gps_nmea->count_data++;
+			}else{
+				gps_nmea->count_data = 0;
+			}
 		}
 
-	}else{
-		/* Detect command*/
-		if(gps_nmea->recvd_data == SENTENCE_GPGGA[gps_nmea->count_data]){
-			gps_nmea->count_data++;
-		}else{
-			gps_nmea->count_data = 0;
+		if(HAL_UART_Receive_IT(huart,&gps_nmea->recvd_data,1) == HAL_ERROR){
+			return GPS_ERROR;
 		}
+
+		return GPS_OK;
 	}
 
 	if(HAL_UART_Receive_IT(huart,&gps_nmea->recvd_data,1) == HAL_ERROR){
 		return GPS_ERROR;
 	}
-
-	return GPS_OK;
+	return GPS_BUSY;
 
 }
 
@@ -311,38 +321,30 @@ GPS_StatusTypeDef GPS_Init(UART_HandleTypeDef *huart,GPS_HandleTypeDef *gps_nmea
 GPS_StatusTypeDef GPS_DataProcess(GPS_HandleTypeDef *gps_nmea){
 
 	if(gps_nmea->flag_data_ready){
-	/*
+/*
 		//Data test
 		//Signal
-		char buffer[] = "$GPGGA,005314.00,2337.93836,S,07022.79995,W,1,04,6.54,107.4,M,34.1,M,,*59\ndga";
+		char buffer[] = "$GPGGA,005314.00,2337.93836,S,07022.79995,W,1,04,6.54,107.4,M,34.1,M,,*59\0";
 		//No signal
 		//char buffer[] = "$GPGGA,154053.00,,,,,0,00,99.99,,,,,,*6";
 		memset(GPS_NMEA.data_buffer, 0, strlen(GPS_NMEA.data_buffer));
 		strncpy(GPS_NMEA.data_buffer, buffer, strlen(buffer));
-	*/
+*/
 
 		/* Parse data */
 		char *pDynamic_ArrayGpsData[14];
 		char *pDynamic_buffer;
-		char *pDynamic_buffer2;
 
 		/*Create a buffer for data*/
 		pDynamic_buffer = malloc(strlen(gps_nmea->data_buffer)+1);
-		pDynamic_buffer2 = malloc(strlen(pDynamic_buffer)+1);
 
 		if(pDynamic_buffer==NULL)
 		{
 			return GPS_BUF_NO_MEMORY;
 		}
 
-		if(pDynamic_buffer2==NULL)
-		{
-			return GPS_BUF_NO_MEMORY;
-		}
-
 		/*Save data buffer to pDynamic_buffer*/
 		strlcpy (pDynamic_buffer,(char*)gps_nmea->data_buffer,strlen((char*)gps_nmea->data_buffer) + 1);
-		strlcpy (pDynamic_buffer2,pDynamic_buffer,strlen(pDynamic_buffer) + 1);;
 
 		/*Create a buffer to strings vectors of sentence parameters*/
 		for (int i = 0; i < 14; i++) {
@@ -361,16 +363,17 @@ GPS_StatusTypeDef GPS_DataProcess(GPS_HandleTypeDef *gps_nmea){
 
 
 		/* Separate the string GPGGA Parameters*/
-		truncateStr(pDynamic_buffer, pDynamic_ArrayGpsData, ',');
+		const char* delimiter = ",";
+		truncateStr(pDynamic_buffer, pDynamic_ArrayGpsData,delimiter);
 
 		/*Checksum CRC NMEA;*/
 		char *pptr;
 
-		pptr = subString(pDynamic_ArrayGpsData[13],1,(strlen(pDynamic_ArrayGpsData[13])-2));
+		pptr = subString(pDynamic_ArrayGpsData[13],1,(strlen(pDynamic_ArrayGpsData[13])-1));
 		gps_nmea->GPGGA.checksum = strtoul((char*)pptr, NULL, 16);
 		free(pptr);
 
-		uint16_t checksum = nmea_checksum(pDynamic_buffer2,strlen(pDynamic_ArrayGpsData[13]));
+		uint16_t checksum = nmea_checksum(gps_nmea->data_buffer,strlen(pDynamic_ArrayGpsData[13]));
 
 		/*Checksum fix quality*/
 		pptr = (char*)subString(pDynamic_ArrayGpsData[6],0,strlen(pDynamic_ArrayGpsData[6]));
@@ -446,26 +449,24 @@ GPS_StatusTypeDef GPS_DataProcess(GPS_HandleTypeDef *gps_nmea){
 
 			/* No error, good data */
 			memset(&gps_nmea->data_buffer,0,sizeof(gps_nmea->data_buffer));
+			free(pDynamic_buffer);
 			for (int i = 0; i < 14; i++) {
 				memset(pDynamic_ArrayGpsData[i],0,strlen(pDynamic_ArrayGpsData[i]));
 				free(pDynamic_ArrayGpsData[i]);
 			}
-			free(pDynamic_buffer2);
-			free(pDynamic_buffer);
 
 			gps_nmea->flag_data_ready = RESET;
 			gps_nmea->count_data=0;
 			return GPS_DATA_RECEIVED;
 		}else{
 			/* No signal or error in data integrity */
+			free(pDynamic_buffer);
 			memset(&gps_nmea->GPGGA,0,sizeof(gps_nmea->GPGGA));
 			memset(&gps_nmea->data_buffer,0,sizeof(gps_nmea->data_buffer));
 			for (int i = 0; i < 14; i++) {
 				memset(pDynamic_ArrayGpsData[i],0,strlen(pDynamic_ArrayGpsData[i]));
 				free(pDynamic_ArrayGpsData[i]);
 			}
-			free(pDynamic_buffer2);
-			free(pDynamic_buffer);
 
 			gps_nmea->flag_data_ready = RESET;
 			gps_nmea->count_data=0;
@@ -476,15 +477,15 @@ GPS_StatusTypeDef GPS_DataProcess(GPS_HandleTypeDef *gps_nmea){
 	return GPS_NODATA;
 }
 
-int32_t truncateStr(char instr[], char *outstr[], const char delimeter) {
+int32_t truncateStr(char instr[], char *outstr[], const char* delimeter) {
     char *tempBuff;
     int32_t numberOfRawsOutArray = 0;
-    tempBuff = strtok((char*)instr, &delimeter);
+    tempBuff = strtok((char*)instr, delimeter);
     while (tempBuff != NULL) {
         strcpy(outstr[numberOfRawsOutArray], tempBuff);
         strcat(outstr[numberOfRawsOutArray], "\0");
         numberOfRawsOutArray++;
-        tempBuff = strtok(NULL, &delimeter);
+        tempBuff = strtok(NULL, delimeter);
     }
     return numberOfRawsOutArray;
 }
