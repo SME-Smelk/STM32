@@ -1,9 +1,9 @@
 /**
   ******************************************************************************
-  * @Project        : GPS_00-UART_RX_IT
+  * @Project        : GPS_01-GPGGA
   * @Autor          : Ismael Poblete V.
   * @Company		: -
-  * @Date         	: 07-04-2021
+  * @Date         	: 10-04-2021
   * @Target			: DISCOVERY-DISC1 STM32F407VG
   * @brief          : GPS NMEA GPGGA RX IT data reception.
   * @Lib			: CMSIS, HAL.
@@ -15,12 +15,24 @@
   * @Perf
   * 	*UART1
   * 		PA9			<-----> USART_TX
-  * 		PA10			<-----> USART_RX
+  * 		PA10		<-----> USART_RX
   * 	*UART2
   * 		PA2			<-----> USART_TX
   * 		PA3			<-----> USART_RX
   * @Note:
-  * 	-GPS used:
+  * 	-GPS NEO 6M
+  * 	-NMEA GPGGA detected by uart rx interrupt.
+  * 	-See GPS_HandleTypeDef GPS_NMEA
+  * 		-Data adquisition:
+  * 			-buffer to receive 1 byte rx uart data (recvd_data)
+  * 			-counter for data fill(count_data)
+  * 			-buffer to fill (data_buffer)
+  * 			-Data process in loop just when have the full data buffer (flag_data_ready = true)
+  * 		-Debugs values:
+  * 			-GPS_StatusTypeDef Content return values of data status and errors
+  * 		-GPGGA Sentence:
+  * 			-GPS_GPGGA_t Content all data information of NMEA GPGGA
+  *
   ******************************************************************************
 **/
 
@@ -58,20 +70,20 @@ typedef struct {
 typedef enum
 {
   GPS_OK       			  = 0x00U,
-  GPS_BUSY				  = 0x06U,
-  GPS_DATA_RECEIVED		  = 0x01U,
-  GPS_NODATA    		  = 0x02U,
-  GPS_ERROR    			  = 0x03U,
-  GPS_HAL_ERROR			  = 0x04U,
-  GPS_BUF_NO_MEMORY       = 0x05U,
+  GPS_BUSY				  = 0x01U,
+  GPS_DATA_RECEIVED		  = 0x02U,
+  GPS_NODATA    		  = 0x03U,
+  GPS_ERROR    			  = 0x04U,
+  GPS_HAL_ERROR			  = 0x05U,
+  GPS_BUF_NO_MEMORY       = 0x06U,
 } GPS_StatusTypeDef;
 
 typedef struct {
 
 	char data_buffer[80];
 	uint8_t count_data;
-	uint8_t flag_data_ready;
 	uint8_t recvd_data;
+	uint8_t flag_data_ready;
 	GPS_GPGGA_t	GPGGA;
 	//GPS_GPRMC_t	GPRMC;
 
