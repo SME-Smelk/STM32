@@ -108,7 +108,7 @@ int32_t truncateStr(char instr[], char *outstr[], const char* delimeter) ;
 
 /* Private user code ---------------------------------------------------------*/
 GPS_HandleTypeDef GPS_NMEA;
-char pData[50];
+char pData[100];
 
 /**
   * @brief  The application entry point.
