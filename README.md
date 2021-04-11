@@ -177,7 +177,7 @@ The DISCOVERY-DISC1 F407VG board has the following code repository the following
 ### Aplications
 
 - [ ] With Interfaces
-    - [ ] GPS Communication
+    - [x] GPS Communication
 	- [ ] IMU/AHRS MPU6050
 - [ ] Signal Procesing
 	- [ ] ADC-FFT
