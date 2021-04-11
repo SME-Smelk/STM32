@@ -189,7 +189,7 @@ The HAL programming DISCOVERY-DISC1 F407VG board has the following code reposito
 
 The SME High layer based with HAL for DISCOVERY-DISC1 F407VG board has the following code repository the following plan, at the moment. This list could change**
 
-- [ ] SME Drivers
+- [ ] SME -> HAL Drivers
 	- [x] GPS
 	- [ ] ...
 	
