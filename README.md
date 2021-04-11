@@ -27,11 +27,9 @@ In the process of learning and generating a personal repository as well as frien
 
 
 
-# Board Reference Code: Basics
+# Board Reference Code: HAL / Basics
 
-## DISCOVERY-DISC1 STM32F407VG
-
-The DISCOVERY-DISC1 F407VG board has the following code repository the following plan, at the moment. This list could change**
+The HAL programming DISCOVERY-DISC1 F407VG board has the following code repository the following plan, at the moment. This list could change**
 
 - [x] UART2
     - [x] UART2_01-HelloWord
@@ -187,3 +185,22 @@ The DISCOVERY-DISC1 F407VG board has the following code repository the following
 		- [ ] FIR 
 	- [ ] Filters
 	
+# Board Reference Code: SME - HAL Drivers
+
+The DISCOVERY-DISC1 F407VG board has the following code repository the following plan, at the moment. This list could change**
+
+- [ ] SME Drivers
+	- [x] GPS
+	- [ ] ...
+	
+# Board Reference Code: SME Drivers
+
+The DISCOVERY-DISC1 F407VG board has the following code repository the following plan, at the moment. This list could change**
+
+- [ ] SME Drivers
+	- [ ] SystemClock
+	- [ ] GPIO
+	- [ ] UART
+	- [ ] ADC
+	- [ ] I2C
+	- [ ] SPI
