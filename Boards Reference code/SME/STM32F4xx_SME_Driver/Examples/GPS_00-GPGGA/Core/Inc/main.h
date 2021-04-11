@@ -11,7 +11,7 @@
 #define __MAIN_H
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f4xx_hal.h"
+#include <stm32f4xx_hal.h>
 #include <stm32f4xx_sme_conf.h>
 
 /* Private includes ----------------------------------------------------------*/

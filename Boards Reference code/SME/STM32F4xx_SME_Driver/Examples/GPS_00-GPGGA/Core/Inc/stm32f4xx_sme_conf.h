@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
   * @file    stm32f4xx_sme_gps.h
-  * @author  MCD Application Team
+  * @author  Ismael Poblete V.
   * @brief   Header file of CORTEX HAL module.
   ******************************************************************************
   * @attention
