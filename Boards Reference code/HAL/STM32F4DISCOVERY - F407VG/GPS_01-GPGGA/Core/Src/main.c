@@ -43,12 +43,12 @@
 #include <stdlib.h>
 #include <math.h>
 
-/* Private includes ----------------------------------------------------------*/
-
 /* Private typedef -----------------------------------------------------------*/
 
-/*Structure and type for storing GGA NMEA parsed message (location info)*/
 
+/**
+  * @brief  NMEA GPGGA handle Structure definition
+  */
 typedef struct {
 
     uint8_t utc_time[3];
@@ -67,6 +67,9 @@ typedef struct {
 
 } GPS_GPGGA_t;
 
+/**
+  * @brief  SME GPS Status structures definition
+  */
 typedef enum
 {
   GPS_OK       			  = 0x00U,
@@ -78,14 +81,17 @@ typedef enum
   GPS_BUF_NO_MEMORY       = 0x06U,
 } GPS_StatusTypeDef;
 
+
+/**
+  * @brief  SME GPS structures definition
+  */
 typedef struct {
 
-	char data_buffer[80];
-	uint8_t count_data;
-	uint8_t recvd_data;
-	uint8_t flag_data_ready;
-	GPS_GPGGA_t	GPGGA;
-	//GPS_GPRMC_t	GPRMC;
+	char data_buffer[80]; 			/*!< Create a buffer to fill with GPS NMEA data.*/
+	uint8_t count_data;				/*!< Counter like a motor to fill data to the buffer array.*/
+	uint8_t recvd_data;				/*!< 1 byte to save the reception data of uart rx.*/
+	uint8_t flag_data_ready;		/*!< Flag to indicate that the data is ready for loop function.*/
+	GPS_GPGGA_t	GPGGA;				/*!< GPS NMEA GPGGA data parameters.*/
 
 } GPS_HandleTypeDef;
 
@@ -106,13 +112,11 @@ void SystemClock_Config(void);
 static void GPS_USART2_Init(void);
 static void DEBUG_USART1_Init(void);
 
-//GPS
-//APIs
+/*GPS APIs*/
 GPS_StatusTypeDef GPS_Init(UART_HandleTypeDef *huart,GPS_HandleTypeDef *gps_nmea);
 GPS_StatusTypeDef GPS_DataProcess(GPS_HandleTypeDef *gps_nmea);
-GPS_StatusTypeDef GPS_detecCommand(UART_HandleTypeDef *huart,GPS_HandleTypeDef *gps_nmea);
+GPS_StatusTypeDef GPS_detecCommand(UART_HandleTypeDef *huart,GPS_HandleTypeDef *gps_nmea,const char* nmea_sentence);
 
-//private
 double convertDegMinToDecDeg (float degMin);
 uint16_t nmea_checksum(char *nmea_data, uint8_t char_length);
 char *subString(const char* in_str, uint8_t offset, uint8_t len);
@@ -171,11 +175,6 @@ int main(void)
 			HAL_UART_Transmit(&DEBUG_UART1, (uint8_t*)pData, sizeof(pData), HAL_MAX_DELAY);
 			break;
 		default:
-			/*
-			memset(pData,0,sizeof(pData));
-			sprintf(pData,"NODATA\n");
-			HAL_UART_Transmit(&DEBUG_UART1, (uint8_t*)pData, sizeof(pData), HAL_MAX_DELAY);
-			*/
 			break;
 		}
 	}
@@ -271,13 +270,21 @@ static void DEBUG_USART1_Init(void)
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
 
-	GPS_detecCommand(&GPS_UART2,&GPS_NMEA);
+	GPS_detecCommand(&GPS_UART2,&GPS_NMEA,SENTENCE_GPGGA);
 
 }
 
 
-
-GPS_StatusTypeDef GPS_detecCommand(UART_HandleTypeDef *huart,GPS_HandleTypeDef *gps_nmea){
+/**
+ * @brief  Function to detect NMEA sentence command
+ * @param  Pointer to a UART_HandleTypeDef structure that contains
+ *         the configuration information for the specified UART module.
+ * @param  Pointer to a GPS_HandleTypeDef structure that contains
+ *         the configuration information for the specified SME GPS driver.
+ * @param  NMEA sentence to find.
+ * @retval GPS SME Status
+ */
+GPS_StatusTypeDef GPS_detecCommand(UART_HandleTypeDef *huart,GPS_HandleTypeDef *gps_nmea,const char* nmea_sentence){
 
 	if(!gps_nmea->flag_data_ready){
 
@@ -299,7 +306,7 @@ GPS_StatusTypeDef GPS_detecCommand(UART_HandleTypeDef *huart,GPS_HandleTypeDef *
 
 		}else{
 			/* Detecting command*/
-			if(gps_nmea->recvd_data == SENTENCE_GPGGA[gps_nmea->count_data]){
+			if(gps_nmea->recvd_data == nmea_sentence[gps_nmea->count_data]){
 				gps_nmea->count_data++;
 			}else{
 				gps_nmea->count_data = 0;
@@ -320,6 +327,14 @@ GPS_StatusTypeDef GPS_detecCommand(UART_HandleTypeDef *huart,GPS_HandleTypeDef *
 
 }
 
+/**
+ * @brief  Function to initialize the GPS parameters.
+ * @param  Pointer to a UART_HandleTypeDef structure that contains
+ *         the configuration information for the specified UART module.
+ * @param  Pointer to a GPS_HandleTypeDef structure that contains
+ *         the configuration information for the specified SME GPS driver.
+ * @retval GPS SME Status
+ */
 GPS_StatusTypeDef GPS_Init(UART_HandleTypeDef *huart,GPS_HandleTypeDef *gps_nmea){
 	gps_nmea->flag_data_ready=RESET;
 	gps_nmea->count_data=0;
@@ -330,6 +345,12 @@ GPS_StatusTypeDef GPS_Init(UART_HandleTypeDef *huart,GPS_HandleTypeDef *gps_nmea
 	return GPS_OK;
 }
 
+/**
+ * @brief  Function to process buffer data of NMEA GPS.
+ * @param  Pointer to a GPS_HandleTypeDef structure that contains
+ *         the configuration information for the specified SME GPS driver.
+ * @retval GPS SME Status
+ */
 GPS_StatusTypeDef GPS_DataProcess(GPS_HandleTypeDef *gps_nmea){
 
 	if(gps_nmea->flag_data_ready){
@@ -372,8 +393,6 @@ GPS_StatusTypeDef GPS_DataProcess(GPS_HandleTypeDef *gps_nmea){
 		/*Clean GPGGA*/
 		memset(&gps_nmea->GPGGA,0,sizeof(gps_nmea->GPGGA));
 
-
-
 		/* Separate the string GPGGA Parameters*/
 		const char* delimiter = ",";
 		truncateStr(pDynamic_buffer, pDynamic_ArrayGpsData,delimiter);
@@ -394,6 +413,7 @@ GPS_StatusTypeDef GPS_DataProcess(GPS_HandleTypeDef *gps_nmea){
 
 		if((checksum == gps_nmea->GPGGA.checksum) && (gps_nmea->GPGGA.fix_quality != 0)){
 
+			/*Good data, save to GPGGA*/
 			pptr = subString(pDynamic_ArrayGpsData[1],0,2);
 			gps_nmea->GPGGA.utc_time[0] = atoi(pptr);
 			free(pptr);
@@ -489,6 +509,13 @@ GPS_StatusTypeDef GPS_DataProcess(GPS_HandleTypeDef *gps_nmea){
 	return GPS_NODATA;
 }
 
+/**
+ * @brief  Separate a data in strings arrays
+ * @param  Input string data to separate
+ * @param  Output to put the string data.
+ * @param  Delimeter for data separation
+ * @retval Number of array elements that have been separated
+ */
 int32_t truncateStr(char instr[], char *outstr[], const char* delimeter) {
     char *tempBuff;
     int32_t numberOfRawsOutArray = 0;
@@ -502,7 +529,11 @@ int32_t truncateStr(char instr[], char *outstr[], const char* delimeter) {
     return numberOfRawsOutArray;
 }
 
-
+/**
+ * @brief  Convert degree, minutes and seconds to decimal degrees
+ * @param  degree, minutes and seconds in float
+ * @retval decimal degrees
+ */
 double convertDegMinToDecDeg (float degMin)
 {
   double min = 0.0;
@@ -518,13 +549,16 @@ double convertDegMinToDecDeg (float degMin)
   return decDeg;
 }
 
+/**
+ * @brief  Get the checksum nmea crc value from the input string data
+ * @param  Pointer to input string
+ * @param  Length of the string
+ * @retval checksum nmea crc value
+ */
 uint16_t nmea_checksum(char *nmea_data, uint8_t char_length)
 {
     int crc = 0;
     int i;
-    //uint8_t err_off;
-
-    //err_off=strlen(strstr(nmea_data,'\n'));
 
     // Between $ and * sign.
     for (i = 1; i < strlen(nmea_data) - char_length; i ++) {
@@ -539,7 +573,7 @@ uint16_t nmea_checksum(char *nmea_data, uint8_t char_length)
  * @param  Pointer to input string
  * @param  Start position of the required part of the string
  * @param  Length of the required part of the string
- * @retval Constant pointer to a resulting string
+ * @retval char pointer to a resulting string
  */
  char *subString(const char* in_str, uint8_t offset, uint8_t len) {
 
@@ -556,7 +590,6 @@ uint16_t nmea_checksum(char *nmea_data, uint8_t char_length)
     memset((char*)outstr,0,strlen(outstr));
     strncpy(outstr,&in_str[offset], len);
     outstr[offset + len] = '\0';
-    //free(outstr);
     return outstr;
 
 }
