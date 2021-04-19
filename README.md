@@ -110,6 +110,10 @@ The HAL programming DISCOVERY-DISC1 F407VG board has the following code reposito
 	- [ ] IWDG
 	- [ ] WWDG
 	- [ ] SYS
+- [ ] Memorys
+	- [ ] NOR
+	- [ ] NAND FLASH
+	
 ### RTOS
 
 - [x] RTOS FreeRTOS
@@ -174,15 +178,17 @@ The HAL programming DISCOVERY-DISC1 F407VG board has the following code reposito
 ### Aplications
 
 - [ ] With Interfaces
-    - [x] GPS Communication
+    	- [x] GPS Communication
 	- [ ] IMU/AHRS MPU6050
 - [ ] Signal Procesing
-	- [ ] ADC-FFT
-	- [ ] RMS
 	- [ ] DSP
-		- [ ] IIR
-		- [ ] FIR 
-	- [ ] Filters
+		- [ ] General Math 
+			- [x] RMS
+			- [x] Average
+			- [ ] FFT
+		- [ ] Filters
+			- [ ] IIR
+			- [ ] FIR
 	
 # Board Reference Code: SME - HAL Drivers
 
@@ -190,7 +196,13 @@ The SME High layer based with HAL for DISCOVERY-DISC1 F407VG board has the follo
 
 - [ ] SME -> HAL Drivers
 	- [x] GPS
-	- [ ] ...
+	- [ ] DSP
+		- [ ] General Math 
+			- [ ] RMS
+			- [ ] Average
+		- [ ] Filters
+			- [ ] IIR
+			- [ ] FIR
 	
 # Board Reference Code: SME Drivers
 
