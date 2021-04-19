@@ -14,7 +14,7 @@
 #include "stm32f4xx_hal.h"
 #include <string.h>
 #include <stdio.h>
-
+#include <stm32f4xx_sme_conf.h>
 
 /* Private includes ----------------------------------------------------------*/
 

@@ -35,8 +35,6 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "math.h"
-#include "stdio.h"
 #include "string.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -59,14 +57,11 @@ static void USART2_UART_Init(void);
 static void ADC1_Init(void);
 static void DMA_Init(void);
 
-/* DMA - RMS AVERAGE */
-void reset_data_request(ADC_HandleTypeDef* hadc, uint32_t* pData, uint32_t Length);
-void calc_average_float32(uint8_t number_adc_channels,uint32_t block_size, float input_block[number_adc_channels][block_size], float output_average[number_adc_channels]);
-void calc_rms_float32(uint8_t number_adc_channels,uint32_t block_size, float input_block[number_adc_channels][block_size], float output_rms[number_adc_channels]);
-void data_acquisition(float k_parameter, uint8_t number_adc_channels,uint32_t size_block,float input_block[number_adc_channels][size_block]);
 /* Private user code ---------------------------------------------------------*/
 
 /* Defines for ADC and RMS */
+GeneralMath_HandleTypeDef GeneralMath;
+
 /* ADC */
 #define NUMBER_ADC_CHANNELS 2
 
@@ -83,8 +78,6 @@ float average_rms[NUMBER_ADC_CHANNELS];
 uint16_t adc_buf[NUMBER_ADC_CHANNELS];
 /* Buf for store data for channels*/
 float input_buff_voltage[NUMBER_ADC_CHANNELS][SIZE_RMS_BLOCK];
-/*Flag to ready data*/
-uint8_t flag_buffdata_ready = RESET;
 
 /* User data*/
 char msg[100];
@@ -128,18 +121,18 @@ int main(void)
 
 
 	/* Start */
-	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_buf, NUMBER_ADC_CHANNELS);
+	SME_GeneralMath_Init(&GeneralMath, &hadc1, (uint32_t*)adc_buf, NUMBER_ADC_CHANNELS);
 
 	while (1)
 	{
 		/* Calculate RMS*/
-		if(flag_buffdata_ready == SET){
+		if(GeneralMath.flag_buffdata_ready == SET){
 			/* The data is reayd and the buffers are full*/
-			calc_rms_float32(NUMBER_ADC_CHANNELS, SIZE_RMS_BLOCK,input_buff_voltage,output_rms);
-			calc_average_float32(NUMBER_ADC_CHANNELS, SIZE_AVERAGE_BLOCK,input_buff_voltage,average_rms);
+			SME_GeneralMath_rms_float32(&GeneralMath, NUMBER_ADC_CHANNELS, SIZE_RMS_BLOCK,input_buff_voltage,output_rms);
+			SME_GeneralMath_average_float32(&GeneralMath, NUMBER_ADC_CHANNELS, SIZE_AVERAGE_BLOCK,input_buff_voltage,average_rms);
 
 			/* Start DMA ofr nex data and reset flag ready*/
-			reset_data_request(&hadc1, (uint32_t*)adc_buf, NUMBER_ADC_CHANNELS);
+			SME_GeneralMath_reset_dma_request(&GeneralMath,&hadc1, (uint32_t*)adc_buf, NUMBER_ADC_CHANNELS);
 
 			/* Print data */
 			memset(msg,0,sizeof(msg));
@@ -306,69 +299,8 @@ static void DMA_Init(void)
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
 
-	data_acquisition(ADC_K_PARAMETER,NUMBER_ADC_CHANNELS,SIZE_RMS_BLOCK,input_buff_voltage);
+	SME_GeneralMath_data_acquisition(&GeneralMath,&hadc1,ADC_K_PARAMETER,NUMBER_ADC_CHANNELS,SIZE_RMS_BLOCK,(float*)adc_buf,input_buff_voltage);
 
-}
-
-uint32_t cont_buff_adc_rms = 0;
-
-void data_acquisition(float k_parameter, uint8_t number_adc_channels,uint32_t size_block,float input_block[number_adc_channels][size_block]){
-	if(flag_buffdata_ready == RESET){
-		for (int i =0; i<number_adc_channels; i++)
-		{
-			input_block[i][cont_buff_adc_rms] = (float)adc_buf[i] * k_parameter;
-		}
-		cont_buff_adc_rms++;
-		if(cont_buff_adc_rms >= size_block){
-			cont_buff_adc_rms=0;
-			flag_buffdata_ready = SET;
-			HAL_ADC_Stop_DMA(&hadc1);
-		}
-
-	}
-}
-
-void reset_data_request(ADC_HandleTypeDef* hadc, uint32_t* pData, uint32_t Length){
-	flag_buffdata_ready = RESET;
-	HAL_ADC_Start_DMA(hadc, pData, Length);
-}
-
-void calc_rms_float32(uint8_t number_adc_channels,uint32_t block_size, float input_block[number_adc_channels][block_size], float output_rms[number_adc_channels]){
-
-	float sum_v2[number_adc_channels];
-
-	for (int i =0; i < number_adc_channels; i++)
-	{
-		for (int j =0; j < block_size; j++)
-		{
-			/* Acquire the sum pot 2 */
-			if(j==0){
-				sum_v2[i] = input_block[i][j] * input_block[i][j];
-			}else{
-				sum_v2[i] = sum_v2[i] + input_block[i][j] * input_block[i][j];
-			}
-		}
-		output_rms[i] = sqrt(sum_v2[i] / (float) block_size);
-	}
-}
-
-void calc_average_float32(uint8_t number_adc_channels,uint32_t block_size, float input_block[number_adc_channels][block_size], float output_average[number_adc_channels]){
-
-	float sum_average[number_adc_channels];
-
-	for (int i =0; i < number_adc_channels; i++)
-	{
-		for (int j =0; j < block_size; j++)
-		{
-			/* Acquire the sum pot 2 */
-			if(j==0){
-				sum_average[i] = input_block[i][j];
-			}else{
-				sum_average[i] = sum_average[i] + input_block[i][j];
-			}
-		}
-		output_average[i] = sum_average[i] / (float) block_size;
-	}
 }
 
 /**
