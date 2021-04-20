@@ -75,7 +75,7 @@ float output_rms[NUMBER_ADC_CHANNELS];
 float average_rms[NUMBER_ADC_CHANNELS];
 
 /*Buf for DMA - ADC channels*/
-uint16_t adc_buf[NUMBER_ADC_CHANNELS];
+//uint16_t adc_buf[NUMBER_ADC_CHANNELS];
 /* Buf for store data for channels*/
 float input_buff_voltage[NUMBER_ADC_CHANNELS][SIZE_RMS_BLOCK];
 
@@ -121,7 +121,7 @@ int main(void)
 
 
 	/* Start */
-	SME_GeneralMath_Init(&GeneralMath, &hadc1, (uint32_t*)adc_buf, NUMBER_ADC_CHANNELS);
+	SME_GeneralMath_Init(&GeneralMath, &hadc1, NUMBER_ADC_CHANNELS);
 
 	while (1)
 	{
@@ -132,7 +132,7 @@ int main(void)
 			SME_GeneralMath_average_float32(&GeneralMath, NUMBER_ADC_CHANNELS, SIZE_AVERAGE_BLOCK,input_buff_voltage,average_rms);
 
 			/* Start DMA ofr nex data and reset flag ready*/
-			SME_GeneralMath_reset_dma_request(&GeneralMath,&hadc1, (uint32_t*)adc_buf, NUMBER_ADC_CHANNELS);
+			SME_GeneralMath_reset_dma_request(&GeneralMath,&hadc1, NUMBER_ADC_CHANNELS);
 
 			/* Print data */
 			memset(msg,0,sizeof(msg));
@@ -299,7 +299,7 @@ static void DMA_Init(void)
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
 
-	SME_GeneralMath_data_acquisition(&GeneralMath,&hadc1,NUMBER_ADC_CHANNELS,SIZE_RMS_BLOCK,ADC_K_PARAMETER,(uint16_t*)adc_buf,input_buff_voltage);
+	SME_GeneralMath_data_acquisition(&GeneralMath,&hadc1,NUMBER_ADC_CHANNELS,SIZE_RMS_BLOCK,ADC_K_PARAMETER,input_buff_voltage);
 
 }
 

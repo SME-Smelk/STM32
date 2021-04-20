@@ -76,24 +76,25 @@
  * @param  NMEA sentence to find.
  * @retval GPS SME Status
  */
-SME_StatusTypeDef SME_GeneralMath_Init(GeneralMath_HandleTypeDef *generalmath,ADC_HandleTypeDef* hadc, uint32_t* pData, uint32_t Length){
-	generalmath->cont_buff_adc_rms=0;
+SME_StatusTypeDef SME_GeneralMath_Init(GeneralMath_HandleTypeDef *generalmath,ADC_HandleTypeDef* hadc, uint32_t number_adc_channels){
+	generalmath->cont_databuff=0;
 	generalmath->flag_buffdata_ready = RESET;
-	if(HAL_ADC_Start_DMA(hadc, pData, Length) == HAL_ERROR){
+	generalmath->adc_buf = malloc(number_adc_channels);
+	if(HAL_ADC_Start_DMA(hadc, (uint32_t*)generalmath->adc_buf, number_adc_channels) == HAL_ERROR){
 		return SME_ERROR;
 	}
 	return SME_OK;
 }
 
-SME_StatusTypeDef SME_GeneralMath_data_acquisition(GeneralMath_HandleTypeDef *generalmath, ADC_HandleTypeDef* hadc,uint8_t number_adc_channels,uint32_t size_block,float k_parameter,uint16_t *data_buf,float input_block[number_adc_channels][size_block]){
+SME_StatusTypeDef SME_GeneralMath_data_acquisition(GeneralMath_HandleTypeDef *generalmath, ADC_HandleTypeDef* hadc,uint8_t number_adc_channels,uint32_t size_block,float k_parameter,float input_block[number_adc_channels][size_block]){
 	if(generalmath->flag_buffdata_ready == RESET){
 		for (int i =0; i<number_adc_channels; i++)
 		{
-			input_block[i][generalmath->cont_buff_adc_rms] = (float)data_buf[i] * k_parameter;
+			input_block[i][generalmath->cont_databuff] = (float)generalmath->adc_buf[i] * k_parameter;
 		}
-		generalmath->cont_buff_adc_rms++;
-		if(generalmath->cont_buff_adc_rms >= size_block){
-			generalmath->cont_buff_adc_rms=0;
+		generalmath->cont_databuff++;
+		if(generalmath->cont_databuff >= size_block){
+			generalmath->cont_databuff=0;
 			generalmath->flag_buffdata_ready = SET;
 			HAL_ADC_Stop_DMA(hadc);
 			return SME_NEWDATA;
@@ -102,9 +103,11 @@ SME_StatusTypeDef SME_GeneralMath_data_acquisition(GeneralMath_HandleTypeDef *ge
 	return SME_BUSY;
 }
 
-SME_StatusTypeDef SME_GeneralMath_reset_dma_request(GeneralMath_HandleTypeDef *generalmath,ADC_HandleTypeDef* hadc, uint32_t* pData, uint32_t Length){
+SME_StatusTypeDef SME_GeneralMath_reset_dma_request(GeneralMath_HandleTypeDef *generalmath,ADC_HandleTypeDef* hadc, uint32_t number_adc_channels){
 	generalmath->flag_buffdata_ready = RESET;
-	if(HAL_ADC_Start_DMA(hadc, pData, Length) == HAL_ERROR){
+	free(generalmath->adc_buf);
+	generalmath->adc_buf = malloc(number_adc_channels);
+	if(HAL_ADC_Start_DMA(hadc, (uint32_t*)generalmath->adc_buf, number_adc_channels) == HAL_ERROR){
 		return SME_ERROR;
 	}
 	return SME_OK;
