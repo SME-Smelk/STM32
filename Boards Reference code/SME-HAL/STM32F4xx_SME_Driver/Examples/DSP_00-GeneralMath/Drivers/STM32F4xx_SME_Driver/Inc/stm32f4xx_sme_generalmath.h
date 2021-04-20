@@ -37,7 +37,7 @@ typedef struct {
 /* Global function prototypes -----------------------------------------------*/
 
 SME_StatusTypeDef SME_GeneralMath_Init(GeneralMath_HandleTypeDef *generalmath,ADC_HandleTypeDef* hadc, uint32_t* pData, uint32_t Length);
-SME_StatusTypeDef SME_GeneralMath_data_acquisition(GeneralMath_HandleTypeDef *generalmath, ADC_HandleTypeDef* hadc,uint8_t number_adc_channels,uint32_t size_block,float k_parameter,float adc_buf[number_adc_channels],float input_block[number_adc_channels][size_block]);
+SME_StatusTypeDef SME_GeneralMath_data_acquisition(GeneralMath_HandleTypeDef *generalmath, ADC_HandleTypeDef* hadc,uint8_t number_adc_channels,uint32_t size_block,float k_parameter,uint16_t *data_buf,float input_block[number_adc_channels][size_block]);
 SME_StatusTypeDef SME_GeneralMath_reset_dma_request(GeneralMath_HandleTypeDef *generalmath,ADC_HandleTypeDef* hadc, uint32_t* pData, uint32_t Length);
 SME_StatusTypeDef SME_GeneralMath_rms_float32(GeneralMath_HandleTypeDef *generalmath,uint8_t number_adc_channels,uint32_t block_size, float input_block[number_adc_channels][block_size], float output_rms[number_adc_channels]);
 SME_StatusTypeDef SME_GeneralMath_average_float32(GeneralMath_HandleTypeDef *generalmath,uint8_t number_adc_channels,uint32_t block_size, float input_block[number_adc_channels][block_size], float output_average[number_adc_channels]);

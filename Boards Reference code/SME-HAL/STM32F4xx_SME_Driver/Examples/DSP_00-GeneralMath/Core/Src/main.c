@@ -299,7 +299,7 @@ static void DMA_Init(void)
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
 
-	SME_GeneralMath_data_acquisition(&GeneralMath,&hadc1,ADC_K_PARAMETER,NUMBER_ADC_CHANNELS,SIZE_RMS_BLOCK,(float*)adc_buf,input_buff_voltage);
+	SME_GeneralMath_data_acquisition(&GeneralMath,&hadc1,NUMBER_ADC_CHANNELS,SIZE_RMS_BLOCK,ADC_K_PARAMETER,(uint16_t*)adc_buf,input_buff_voltage);
 
 }
 

@@ -85,11 +85,11 @@ SME_StatusTypeDef SME_GeneralMath_Init(GeneralMath_HandleTypeDef *generalmath,AD
 	return SME_OK;
 }
 
-SME_StatusTypeDef SME_GeneralMath_data_acquisition(GeneralMath_HandleTypeDef *generalmath, ADC_HandleTypeDef* hadc,uint8_t number_adc_channels,uint32_t size_block,float k_parameter,float adc_buf[number_adc_channels],float input_block[number_adc_channels][size_block]){
+SME_StatusTypeDef SME_GeneralMath_data_acquisition(GeneralMath_HandleTypeDef *generalmath, ADC_HandleTypeDef* hadc,uint8_t number_adc_channels,uint32_t size_block,float k_parameter,uint16_t *data_buf,float input_block[number_adc_channels][size_block]){
 	if(generalmath->flag_buffdata_ready == RESET){
 		for (int i =0; i<number_adc_channels; i++)
 		{
-			input_block[i][generalmath->cont_buff_adc_rms] = (float)adc_buf[i] * k_parameter;
+			input_block[i][generalmath->cont_buff_adc_rms] = (float)data_buf[i] * k_parameter;
 		}
 		generalmath->cont_buff_adc_rms++;
 		if(generalmath->cont_buff_adc_rms >= size_block){
