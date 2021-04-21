@@ -133,7 +133,7 @@ int main(void)
 			SME_GeneralMath_average_float32(NUMBER_ADC_CHANNELS,SIZE_RMS_BLOCK,GeneralMath_DMA_DAQ.input_buff_voltage,output_average);
 
 			/* Start DMA ofr nex data and reset flag ready*/
-			SME_GeneralMath_reset_dma_request(&GeneralMath_DMA_DAQ);
+			SME_GeneralMath_DMA_reset_request(&GeneralMath_DMA_DAQ);
 
 			/* Print data */
 			memset(msg,0,sizeof(msg));

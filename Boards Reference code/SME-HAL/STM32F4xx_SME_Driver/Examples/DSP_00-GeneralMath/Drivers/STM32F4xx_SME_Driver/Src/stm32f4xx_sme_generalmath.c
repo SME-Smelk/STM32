@@ -66,15 +66,25 @@
 	(#) Use a SME_GeneralMath_DMA_Start function to start the DMA data acquisition
 		of a ADC. Use before the infinite loop transition.
 
+			SME_GeneralMath_DMA_Start(&GeneralMath_DMA_DAQ, &hadc1, SIZE_RMS_BLOCK, NUMBER_ADC_CHANNELS,ADC_K_PARAMETER);
+
+
 	(#) Use SME_GeneralMath_DMA_data_acquisition function in HAL_ADC_ConvCpltCallback
 		It acquire and store the next new data to fill the buffer. When the buffer is
 		full, then it set a flag_buffdata_ready and stop the DMA.
 
+			SME_GeneralMath_DMA_data_acquisition(&GeneralMath_DMA_DAQ);
+
 	(#) When flag_buffdata_ready is set it can used in the infinite loop for personal
 		process, for use math functions or @GeneralMath_functions.
 
+			SME_GeneralMath_rms_float32(NUMBER_ADC_CHANNELS,SIZE_RMS_BLOCK,GeneralMath_DMA_DAQ.input_buff_voltage,output_rms);
+			SME_GeneralMath_average_float32(NUMBER_ADC_CHANNELS,SIZE_RMS_BLOCK,GeneralMath_DMA_DAQ.input_buff_voltage,output_average);
+
 	(#) Use SME_GeneralMath_DMA_reset_request for reset and prepared the next data acquisition
 		and start the DMA for fill the buffer. Reset flag_buffdata_ready.
+
+			SME_GeneralMath_reset_dma_request(&GeneralMath_DMA_DAQ);
 
   @endverbatim
   ******************************************************************************
@@ -133,8 +143,7 @@ SME_StatusTypeDef SME_GeneralMath_DMA_Start(GeneralMath_DMA_DAQ_HandleTypeDef *g
  */
 SME_StatusTypeDef SME_GeneralMath_DMA_data_acquisition(GeneralMath_DMA_DAQ_HandleTypeDef *generalmath){
 	if(generalmath->flag_buffdata_ready == RESET){
-		uint8_t number_channels = generalmath->number_channels;
-		for (int i = 0; i < 2; i++)
+		for (int i = 0; i < generalmath->number_channels; i++)
 		{
 			generalmath->input_buff_voltage[i][generalmath->cont_databuff] = (float)generalmath->adc_buf[i] * generalmath->adc_k_parameter;
 		}

@@ -27,12 +27,12 @@
 typedef struct {
 	ADC_HandleTypeDef* adc_handler;
 	float adc_k_parameter;
-	uint8_t number_adc_channels;
+	uint8_t number_channels;
 	uint32_t size_block;
 	uint16_t *adc_buf;
 
 	uint32_t cont_databuff;
-	uint8_t flag_buffdata_ready;				/*!< Counter like a motor to fill data to the buffer array.*/
+	uint8_t flag_buffdata_ready;
 
 	float **input_buff_voltage;
 
