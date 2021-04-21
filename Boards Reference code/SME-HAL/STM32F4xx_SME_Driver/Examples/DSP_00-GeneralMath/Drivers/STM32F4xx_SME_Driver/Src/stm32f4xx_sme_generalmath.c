@@ -105,7 +105,8 @@ SME_StatusTypeDef SME_GeneralMath_DMA_Start(GeneralMath_DMA_DAQ_HandleTypeDef *g
  */
 SME_StatusTypeDef SME_GeneralMath_DMA_data_acquisition(GeneralMath_DMA_DAQ_HandleTypeDef *generalmath){
 	if(generalmath->flag_buffdata_ready == RESET){
-		for (int i =0; i<generalmath->number_adc_channels; i++)
+		uint8_t number_adc_channels = generalmath->number_adc_channels;
+		for (int i = 0; i < 2; i++)
 		{
 			generalmath->input_buff_voltage[i][generalmath->cont_databuff] = (float)generalmath->adc_buf[i] * generalmath->adc_k_parameter;
 		}
@@ -155,7 +156,7 @@ SME_StatusTypeDef SME_GeneralMath_reset_dma_request(GeneralMath_DMA_DAQ_HandleTy
  * @param  NMEA sentence to find.
  * @retval GPS SME Status
  */
-SME_StatusTypeDef SME_GeneralMath_rms_float32(uint32_t number_adc_channels, uint32_t size_block, float input_buff_voltage[number_adc_channels][size_block],float output_rms[number_adc_channels]){
+SME_StatusTypeDef SME_GeneralMath_rms_float32(uint32_t number_adc_channels, uint32_t size_block, float **input_buff_voltage,float output_rms[number_adc_channels]){
 		float sum_v2[number_adc_channels];
 
 		for (int i =0; i < number_adc_channels; i++)
@@ -183,7 +184,7 @@ SME_StatusTypeDef SME_GeneralMath_rms_float32(uint32_t number_adc_channels, uint
  * @param  NMEA sentence to find.
  * @retval GPS SME Status
  */
-SME_StatusTypeDef SME_GeneralMath_average_float32(uint32_t number_adc_channels, uint32_t size_block, float input_buff_voltage[number_adc_channels][size_block],float output_average[number_adc_channels]){
+SME_StatusTypeDef SME_GeneralMath_average_float32(uint32_t number_adc_channels, uint32_t size_block, float **input_buff_voltage,float output_average[number_adc_channels]){
 
 		float sum_average[number_adc_channels];
 
