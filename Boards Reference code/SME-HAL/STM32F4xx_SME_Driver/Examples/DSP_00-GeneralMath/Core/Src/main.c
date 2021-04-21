@@ -60,8 +60,7 @@ static void DMA_Init(void);
 /* Private user code ---------------------------------------------------------*/
 
 /* Defines for ADC and RMS */
-GeneralMath_HandleTypeDef GeneralMath_rms;
-GeneralMath_HandleTypeDef GeneralMath_average;
+GeneralMath_DMA_DAQ_HandleTypeDef GeneralMath_DMA_DAQ;
 
 /* ADC */
 #define NUMBER_ADC_CHANNELS 2
@@ -72,13 +71,13 @@ GeneralMath_HandleTypeDef GeneralMath_average;
 #define ADC_K_PARAMETER (3.0 / 4096.0)
 
 /* Data to store rms and average */
-//float output_rms[NUMBER_ADC_CHANNELS];
-//float average_rms[NUMBER_ADC_CHANNELS];
+float output_rms[NUMBER_ADC_CHANNELS];
+float output_average[NUMBER_ADC_CHANNELS];
 
 /*Buf for DMA - ADC channels*/
 //uint16_t adc_buf[NUMBER_ADC_CHANNELS];
 /* Buf for store data for channels*/
-//float input_buff_voltage[NUMBER_ADC_CHANNELS][SIZE_RMS_BLOCK];
+float input_buff_voltage[NUMBER_ADC_CHANNELS][SIZE_RMS_BLOCK];
 
 /* User data*/
 char msg[100];
@@ -122,25 +121,23 @@ int main(void)
 
 
 	/* Start */
-	SME_GeneralMath_Init(&GeneralMath_rms, &hadc1, NUMBER_ADC_CHANNELS,ADC_K_PARAMETER);
-	SME_GeneralMath_Init(&GeneralMath_average, &hadc1, NUMBER_ADC_CHANNELS,ADC_K_PARAMETER);
+	SME_GeneralMath_DMA_Start(&GeneralMath_DMA_DAQ, &hadc1, SIZE_RMS_BLOCK, NUMBER_ADC_CHANNELS,ADC_K_PARAMETER);
 
 	while (1)
 	{
 		/* Calculate RMS*/
-		if(GeneralMath_rms.DAQ.flag_buffdata_ready == SET){
+		if(GeneralMath_DMA_DAQ.flag_buffdata_ready == SET){
 
 			/* The data is reayd and the buffers are full*/
-			SME_GeneralMath_rms_float32(&GeneralMath_rms);
-			SME_GeneralMath_average_float32(&GeneralMath_average);
+			SME_GeneralMath_rms_float32(NUMBER_ADC_CHANNELS,SIZE_RMS_BLOCK,GeneralMath_DMA_DAQ.input_buff_voltage,output_rms);
+			SME_GeneralMath_average_float32(NUMBER_ADC_CHANNELS,SIZE_RMS_BLOCK,GeneralMath_DMA_DAQ.input_buff_voltage,output_average);
 
 			/* Start DMA ofr nex data and reset flag ready*/
-			SME_GeneralMath_reset_dma_request(&GeneralMath_rms,&hadc1);
-			SME_GeneralMath_reset_dma_request(&GeneralMath_average,&hadc1);
+			SME_GeneralMath_reset_dma_request(&GeneralMath_DMA_DAQ);
 
 			/* Print data */
 			memset(msg,0,sizeof(msg));
-			sprintf(msg,"Va:%.3f,%.3f,Vb:%.3f,%.3f\r\n",GeneralMath_rms.data_output[0],GeneralMath_average.data_output[0],GeneralMath_rms.data_output[1],GeneralMath_rms.data_output[1]);
+			sprintf(msg,"Va:%.3f,%.3f,Vb:%.3f,%.3f\r\n",output_rms[0],output_average[0],output_rms[1],output_average[1]);
 			HAL_UART_Transmit(&huart2,(uint8_t*)msg,strlen(msg),HAL_MAX_DELAY);
 
 		}
@@ -303,8 +300,7 @@ static void DMA_Init(void)
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
 
-	SME_GeneralMath_data_acquisition(&GeneralMath_rms,&hadc1);
-	SME_GeneralMath_data_acquisition(&GeneralMath_average,&hadc1);
+	SME_GeneralMath_DMA_data_acquisition(&GeneralMath_DMA_DAQ);
 
 }
 

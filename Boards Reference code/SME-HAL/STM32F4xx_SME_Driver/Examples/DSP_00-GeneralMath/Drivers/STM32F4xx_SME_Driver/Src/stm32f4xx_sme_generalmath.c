@@ -76,18 +76,19 @@
  * @param  NMEA sentence to find.
  * @retval GPS SME Status
  */
-SME_StatusTypeDef SME_GeneralMath_Init(GeneralMath_HandleTypeDef *generalmath,ADC_HandleTypeDef* hadc, uint32_t number_adc_channels, float adc_k_parameter){
-	generalmath->DAQ.cont_databuff=0;
-	generalmath->DAQ.flag_buffdata_ready = RESET;
-	generalmath->DAQ.adc_k_parameter = adc_k_parameter;
-	generalmath->DAQ.number_adc_channels = number_adc_channels;
-	generalmath->DAQ.adc_buf = malloc(generalmath->DAQ.number_adc_channels);
+SME_StatusTypeDef SME_GeneralMath_DMA_Start(GeneralMath_DMA_DAQ_HandleTypeDef *generalmath,ADC_HandleTypeDef* hadc,  uint32_t size_block,uint32_t number_adc_channels, float adc_k_parameter){
+	generalmath->cont_databuff=0;
+	generalmath->size_block=size_block;
+	generalmath->flag_buffdata_ready = RESET;
+	generalmath->adc_k_parameter = adc_k_parameter;
+	generalmath->number_adc_channels = number_adc_channels;
+	generalmath->adc_buf = malloc(generalmath->number_adc_channels);
 
 	for(int i = 0; i < number_adc_channels;i++){
-		generalmath->DAQ.input_buff_voltage[i] = malloc(generalmath->DAQ.number_adc_channels);
+		generalmath->input_buff_voltage[i] = malloc(generalmath->number_adc_channels);
 	}
 
-	if(HAL_ADC_Start_DMA(hadc, (uint32_t*)generalmath->DAQ.adc_buf, generalmath->DAQ.number_adc_channels) == HAL_ERROR){
+	if(HAL_ADC_Start_DMA(hadc, (uint32_t*)generalmath->adc_buf, generalmath->number_adc_channels) == HAL_ERROR){
 		return SME_ERROR;
 	}
 	return SME_OK;
@@ -102,17 +103,17 @@ SME_StatusTypeDef SME_GeneralMath_Init(GeneralMath_HandleTypeDef *generalmath,AD
  * @param  NMEA sentence to find.
  * @retval GPS SME Status
  */
-SME_StatusTypeDef SME_GeneralMath_data_acquisition(GeneralMath_HandleTypeDef *generalmath, ADC_HandleTypeDef* hadc){
-	if(generalmath->DAQ.flag_buffdata_ready == RESET){
-		for (int i =0; i<generalmath->DAQ.number_adc_channels; i++)
+SME_StatusTypeDef SME_GeneralMath_DMA_data_acquisition(GeneralMath_DMA_DAQ_HandleTypeDef *generalmath){
+	if(generalmath->flag_buffdata_ready == RESET){
+		for (int i =0; i<generalmath->number_adc_channels; i++)
 		{
-			generalmath->DAQ.input_buff_voltage[i][generalmath->DAQ.cont_databuff] = (float)generalmath->DAQ.adc_buf[i] * generalmath->DAQ.adc_k_parameter;
+			generalmath->input_buff_voltage[i][generalmath->cont_databuff] = (float)generalmath->adc_buf[i] * generalmath->adc_k_parameter;
 		}
-		generalmath->DAQ.cont_databuff++;
-		if(generalmath->DAQ.cont_databuff >= generalmath->size_block){
-			generalmath->DAQ.cont_databuff=0;
-			generalmath->DAQ.flag_buffdata_ready = SET;
-			HAL_ADC_Stop_DMA(hadc);
+		generalmath->cont_databuff++;
+		if(generalmath->cont_databuff >= generalmath->size_block){
+			generalmath->cont_databuff=0;
+			generalmath->flag_buffdata_ready = SET;
+			HAL_ADC_Stop_DMA(generalmath->adc_handler);
 			return SME_NEWDATA;
 		}
 	}
@@ -128,18 +129,18 @@ SME_StatusTypeDef SME_GeneralMath_data_acquisition(GeneralMath_HandleTypeDef *ge
  * @param  NMEA sentence to find.
  * @retval GPS SME Status
  */
-SME_StatusTypeDef SME_GeneralMath_reset_dma_request(GeneralMath_HandleTypeDef *generalmath,ADC_HandleTypeDef* hadc){
-	generalmath->DAQ.flag_buffdata_ready = RESET;
-	free(generalmath->DAQ.adc_buf);
-	for(int i = 0; i < generalmath->DAQ.number_adc_channels;i++){
-		free(generalmath->DAQ.input_buff_voltage[i]);
+SME_StatusTypeDef SME_GeneralMath_reset_dma_request(GeneralMath_DMA_DAQ_HandleTypeDef *generalmath){
+	generalmath->flag_buffdata_ready = RESET;
+	free(generalmath->adc_buf);
+	for(int i = 0; i < generalmath->number_adc_channels;i++){
+		free(generalmath->input_buff_voltage[i]);
 	}
 
-	generalmath->DAQ.adc_buf = malloc(generalmath->DAQ.number_adc_channels);
-	for(int i = 0; i < generalmath->DAQ.number_adc_channels;i++){
-		generalmath->DAQ.input_buff_voltage[i] = malloc(generalmath->DAQ.number_adc_channels);
+	generalmath->adc_buf = malloc(generalmath->number_adc_channels);
+	for(int i = 0; i < generalmath->number_adc_channels;i++){
+		generalmath->input_buff_voltage[i] = malloc(generalmath->number_adc_channels);
 	}
-	if(HAL_ADC_Start_DMA(hadc, (uint32_t*)generalmath->DAQ.adc_buf, generalmath->DAQ.number_adc_channels) == HAL_ERROR){
+	if(HAL_ADC_Start_DMA(generalmath->adc_handler, (uint32_t*)generalmath->adc_buf, generalmath->number_adc_channels) == HAL_ERROR){
 		return SME_ERROR;
 	}
 	return SME_OK;
@@ -154,26 +155,23 @@ SME_StatusTypeDef SME_GeneralMath_reset_dma_request(GeneralMath_HandleTypeDef *g
  * @param  NMEA sentence to find.
  * @retval GPS SME Status
  */
-SME_StatusTypeDef SME_GeneralMath_rms_float32(GeneralMath_HandleTypeDef *generalmath, float output_rms[generalmath->DAQ.number_adc_channels]){
-	if(generalmath->DAQ.flag_buffdata_ready == SET){
-		float sum_v2[generalmath->DAQ.number_adc_channels];
+SME_StatusTypeDef SME_GeneralMath_rms_float32(uint32_t number_adc_channels, uint32_t size_block, float input_buff_voltage[number_adc_channels][size_block],float output_rms[number_adc_channels]){
+		float sum_v2[number_adc_channels];
 
-		for (int i =0; i < generalmath->DAQ.number_adc_channels; i++)
+		for (int i =0; i < number_adc_channels; i++)
 		{
-			for (int j =0; j < generalmath->size_block; j++)
+			for (int j =0; j < size_block; j++)
 			{
 				/* Acquire the sum pot 2 */
 				if(j==0){
-					sum_v2[i] = generalmath->DAQ.input_buff_voltage[i][j] * generalmath->DAQ.input_buff_voltage[i][j];
+					sum_v2[i] = input_buff_voltage[i][j] * input_buff_voltage[i][j];
 				}else{
-					sum_v2[i] = sum_v2[i] + generalmath->DAQ.input_buff_voltage[i][j] * generalmath->DAQ.input_buff_voltage[i][j];
+					sum_v2[i] = sum_v2[i] + input_buff_voltage[i][j] * input_buff_voltage[i][j];
 				}
 			}
-			output_rms[i] = sqrt(sum_v2[i] / (float) generalmath->size_block);
+			output_rms[i] = sqrt(sum_v2[i] / (float) size_block);
 		}
 		return SME_OK;
-	}
-	return SME_BUSY;
 }
 
 /**
@@ -185,26 +183,24 @@ SME_StatusTypeDef SME_GeneralMath_rms_float32(GeneralMath_HandleTypeDef *general
  * @param  NMEA sentence to find.
  * @retval GPS SME Status
  */
-SME_StatusTypeDef SME_GeneralMath_average_float32(GeneralMath_HandleTypeDef *generalmath, float output_average[generalmath->DAQ.number_adc_channels]){
-	if(generalmath->DAQ.flag_buffdata_ready == SET){
-		float sum_average[generalmath->DAQ.number_adc_channels];
+SME_StatusTypeDef SME_GeneralMath_average_float32(uint32_t number_adc_channels, uint32_t size_block, float input_buff_voltage[number_adc_channels][size_block],float output_average[number_adc_channels]){
 
-		for (int i =0; i < generalmath->DAQ.number_adc_channels; i++)
+		float sum_average[number_adc_channels];
+
+		for (int i =0; i < number_adc_channels; i++)
 		{
-			for (int j =0; j < generalmath->size_block; j++)
+			for (int j =0; j < size_block; j++)
 			{
 				/* Acquire the sum pot 2 */
 				if(j==0){
-					sum_average[i] = generalmath->DAQ.input_buff_voltage[i][j];
+					sum_average[i] = input_buff_voltage[i][j];
 				}else{
-					sum_average[i] = sum_average[i] + generalmath->DAQ.input_buff_voltage[i][j];
+					sum_average[i] = sum_average[i] + input_buff_voltage[i][j];
 				}
 			}
-			output_average[i] = sum_average[i] / (float) generalmath->size_block;
+			output_average[i] = sum_average[i] / (float) size_block;
 		}
 		return SME_OK;
-	}
-	return SME_BUSY;
 }
 
 
