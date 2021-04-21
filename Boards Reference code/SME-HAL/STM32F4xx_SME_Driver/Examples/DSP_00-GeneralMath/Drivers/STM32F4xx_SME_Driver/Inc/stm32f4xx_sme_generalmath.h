@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * @file    stm32f4xx_sme_gps.h
+  * @file    stm32f4xx_sme_generalmath.h
   * @author  Ismael Poblete V.
-  * @brief   Header file of SME GPS module.
+  * @brief   Header file of SME GeneralMath module.
   ******************************************************************************
 
   ******************************************************************************
@@ -44,7 +44,7 @@ typedef struct {
 
 SME_StatusTypeDef SME_GeneralMath_DMA_Start(GeneralMath_DMA_DAQ_HandleTypeDef *generalmath,ADC_HandleTypeDef* hadc,  uint32_t size_block,uint32_t number_adc_channels, float adc_k_parameter);
 SME_StatusTypeDef SME_GeneralMath_DMA_data_acquisition(GeneralMath_DMA_DAQ_HandleTypeDef *generalmath);
-SME_StatusTypeDef SME_GeneralMath_reset_dma_request(GeneralMath_DMA_DAQ_HandleTypeDef *generalmath);
+SME_StatusTypeDef SME_GeneralMath_DMA_reset_request(GeneralMath_DMA_DAQ_HandleTypeDef *generalmath);
 SME_StatusTypeDef SME_GeneralMath_rms_float32(uint32_t number_adc_channels, uint32_t size_block, float **input_buff_voltage,float output_rms[number_adc_channels]);
 SME_StatusTypeDef SME_GeneralMath_average_float32(uint32_t number_adc_channels, uint32_t size_block, float **input_buff_voltage,float output_average[number_adc_channels]);
 
