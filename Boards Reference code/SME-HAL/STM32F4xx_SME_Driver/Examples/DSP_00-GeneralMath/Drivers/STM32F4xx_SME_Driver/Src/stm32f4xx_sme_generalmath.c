@@ -119,14 +119,17 @@
  */
 SME_StatusTypeDef SME_GeneralMath_DMA_Start(GeneralMath_DMA_DAQ_HandleTypeDef *generalmath,ADC_HandleTypeDef* hadc, uint32_t size_block, uint32_t number_channels, float adc_k_parameter){
 	generalmath->cont_databuff=0;
+	generalmath->adc_handler=hadc;
 	generalmath->size_block=size_block;
 	generalmath->flag_buffdata_ready = RESET;
 	generalmath->adc_k_parameter = adc_k_parameter;
 	generalmath->number_channels = number_channels;
+
 	generalmath->adc_buf = malloc(generalmath->number_channels);
 
-	for(int i = 0; i < number_channels;i++){
-		generalmath->input_buff_voltage[i] = malloc(generalmath->number_channels);
+	generalmath->input_buff_voltage = malloc(generalmath->number_channels);
+	for(int i = 0; i < generalmath->number_channels;i++){
+		generalmath->input_buff_voltage[i] = malloc(generalmath->size_block);
 	}
 
 	if(HAL_ADC_Start_DMA(hadc, (uint32_t*)generalmath->adc_buf, generalmath->number_channels) == HAL_ERROR){
@@ -143,6 +146,7 @@ SME_StatusTypeDef SME_GeneralMath_DMA_Start(GeneralMath_DMA_DAQ_HandleTypeDef *g
  */
 SME_StatusTypeDef SME_GeneralMath_DMA_data_acquisition(GeneralMath_DMA_DAQ_HandleTypeDef *generalmath){
 	if(generalmath->flag_buffdata_ready == RESET){
+
 		for (int i = 0; i < generalmath->number_channels; i++)
 		{
 			generalmath->input_buff_voltage[i][generalmath->cont_databuff] = (float)generalmath->adc_buf[i] * generalmath->adc_k_parameter;
@@ -166,15 +170,16 @@ SME_StatusTypeDef SME_GeneralMath_DMA_data_acquisition(GeneralMath_DMA_DAQ_Handl
  */
 SME_StatusTypeDef SME_GeneralMath_DMA_reset_request(GeneralMath_DMA_DAQ_HandleTypeDef *generalmath){
 	generalmath->flag_buffdata_ready = RESET;
-	free(generalmath->adc_buf);
+/*	free(generalmath->adc_buf);
 	for(int i = 0; i < generalmath->number_channels;i++){
 		free(generalmath->input_buff_voltage[i]);
 	}
 
-	generalmath->adc_buf = malloc(generalmath->number_channels);
+	generalmath->input_buff_voltage = malloc(generalmath->number_channels);
 	for(int i = 0; i < generalmath->number_channels;i++){
-		generalmath->input_buff_voltage[i] = malloc(generalmath->number_channels);
+		generalmath->input_buff_voltage[i] = malloc(generalmath->size_block);
 	}
+*/
 	if(HAL_ADC_Start_DMA(generalmath->adc_handler, (uint32_t*)generalmath->adc_buf, generalmath->number_channels) == HAL_ERROR){
 		return SME_ERROR;
 	}
