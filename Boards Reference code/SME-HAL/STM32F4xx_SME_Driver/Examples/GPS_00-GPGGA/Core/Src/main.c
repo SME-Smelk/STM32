@@ -87,7 +87,7 @@ int main(void)
 	/* Start Code */
 	while (1){
 		switch(SME_GPS_DataProcess(&GPS_NMEA)){
-		case GPS_DATA_RECEIVED:
+		case SME_NEWDATA:
 			memset(pData,0,sizeof(pData));
 			sprintf(pData,"GPS:%d:%d:%d,%f,%f,%d,%d,%f\n",
 				GPS_NMEA.GPGGA.utc_time[0],
@@ -102,12 +102,12 @@ int main(void)
 			HAL_UART_Transmit(&DEBUG_UART1, (uint8_t*)pData, sizeof(pData), HAL_MAX_DELAY);
 
 			break;
-		case GPS_ERROR:
+		case SME_ERROR:
 			memset(pData,0,sizeof(pData));
 			sprintf(pData,"GPS No Fix\n");
 			HAL_UART_Transmit(&DEBUG_UART1, (uint8_t*)pData, sizeof(pData), HAL_MAX_DELAY);
 			break;
-		case GPS_BUF_NO_MEMORY:
+		case SME_STACKOVERFLOW:
 			memset(pData,0,sizeof(pData));
 			sprintf(pData,"GPS Mem buff err\n");
 			HAL_UART_Transmit(&DEBUG_UART1, (uint8_t*)pData, sizeof(pData), HAL_MAX_DELAY);

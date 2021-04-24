@@ -44,6 +44,7 @@ typedef struct {
 /**
   * @brief  SME GPS Status structures definition
   */
+/*
 typedef enum
 {
   GPS_OK       			  = 0x00U,
@@ -54,7 +55,7 @@ typedef enum
   GPS_HAL_ERROR			  = 0x05U,
   GPS_BUF_NO_MEMORY       = 0x06U,
 } GPS_StatusTypeDef;
-
+*/
 
 /**
   * @brief  SME GPS structures definition
@@ -75,8 +76,8 @@ typedef struct {
 
 /* Global function prototypes -----------------------------------------------*/
 
-GPS_StatusTypeDef SME_GPS_Init(UART_HandleTypeDef *huart,GPS_HandleTypeDef *gps_nmea);
-GPS_StatusTypeDef SME_GPS_DataProcess(GPS_HandleTypeDef *gps_nmea);
-GPS_StatusTypeDef SME_GPS_detecCommand(UART_HandleTypeDef *huart,GPS_HandleTypeDef *gps_nmea,const char* nmea_sentence);
+SME_StatusTypeDef SME_GPS_Init(UART_HandleTypeDef *huart,GPS_HandleTypeDef *gps_nmea);
+SME_StatusTypeDef SME_GPS_DataProcess(GPS_HandleTypeDef *gps_nmea);
+SME_StatusTypeDef SME_GPS_detecCommand(UART_HandleTypeDef *huart,GPS_HandleTypeDef *gps_nmea,const char* nmea_sentence);
 
 #endif /* __STM32F4xx_SME_GPS_H */

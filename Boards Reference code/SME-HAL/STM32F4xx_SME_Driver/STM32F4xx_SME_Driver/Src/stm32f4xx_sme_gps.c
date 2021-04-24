@@ -79,7 +79,7 @@ static int32_t truncateStr(char instr[], char *outstr[], const char* delimeter) 
  * @param  NMEA sentence to find.
  * @retval GPS SME Status
  */
-GPS_StatusTypeDef SME_GPS_detecCommand(UART_HandleTypeDef *huart,GPS_HandleTypeDef *gps_nmea,const char* nmea_sentence){
+SME_StatusTypeDef SME_GPS_detecCommand(UART_HandleTypeDef *huart,GPS_HandleTypeDef *gps_nmea,const char* nmea_sentence){
 
 	if(!gps_nmea->flag_data_ready){
 
@@ -109,16 +109,16 @@ GPS_StatusTypeDef SME_GPS_detecCommand(UART_HandleTypeDef *huart,GPS_HandleTypeD
 		}
 
 		if(HAL_UART_Receive_IT(huart,&gps_nmea->recvd_data,1) == HAL_ERROR){
-			return GPS_ERROR;
+			return SME_ERROR;
 		}
 
-		return GPS_OK;
+		return SME_OK;
 	}
 
 	if(HAL_UART_Receive_IT(huart,&gps_nmea->recvd_data,1) == HAL_ERROR){
-		return GPS_ERROR;
+		return SME_ERROR;
 	}
-	return GPS_BUSY;
+	return SME_BUSY;
 
 }
 
@@ -130,14 +130,14 @@ GPS_StatusTypeDef SME_GPS_detecCommand(UART_HandleTypeDef *huart,GPS_HandleTypeD
  *         the configuration information for the specified SME GPS driver.
  * @retval GPS SME Status
  */
-GPS_StatusTypeDef SME_GPS_Init(UART_HandleTypeDef *huart,GPS_HandleTypeDef *gps_nmea){
+SME_StatusTypeDef SME_GPS_Init(UART_HandleTypeDef *huart,GPS_HandleTypeDef *gps_nmea){
 	gps_nmea->flag_data_ready=RESET;
 	gps_nmea->count_data=0;
 	memset(&gps_nmea,0,sizeof(gps_nmea));
 	if(HAL_UART_Receive_IT(huart,&gps_nmea->recvd_data,1) == HAL_ERROR){
-		return GPS_HAL_ERROR;
+		return SME_ERROR;
 	}
-	return GPS_OK;
+	return SME_OK;
 }
 
 /**
@@ -146,7 +146,7 @@ GPS_StatusTypeDef SME_GPS_Init(UART_HandleTypeDef *huart,GPS_HandleTypeDef *gps_
  *         the configuration information for the specified SME GPS driver.
  * @retval GPS SME Status
  */
-GPS_StatusTypeDef SME_GPS_DataProcess(GPS_HandleTypeDef *gps_nmea){
+SME_StatusTypeDef SME_GPS_DataProcess(GPS_HandleTypeDef *gps_nmea){
 
 	if(gps_nmea->flag_data_ready){
 /*
@@ -168,7 +168,7 @@ GPS_StatusTypeDef SME_GPS_DataProcess(GPS_HandleTypeDef *gps_nmea){
 
 		if(pDynamic_buffer==NULL)
 		{
-			return GPS_BUF_NO_MEMORY;
+			return SME_STACKOVERFLOW;
 		}
 
 		/*Save data buffer to pDynamic_buffer*/
@@ -179,7 +179,7 @@ GPS_StatusTypeDef SME_GPS_DataProcess(GPS_HandleTypeDef *gps_nmea){
 
 			pDynamic_ArrayGpsData[i] = malloc(sizeof(gps_nmea->data_buffer) * sizeof(char));
 			if(pDynamic_ArrayGpsData[i]==NULL){
-				return GPS_BUF_NO_MEMORY;
+				return SME_STACKOVERFLOW;
 			}
 			memset(pDynamic_ArrayGpsData[i],0,strlen(pDynamic_ArrayGpsData[i]));
 
@@ -284,7 +284,7 @@ GPS_StatusTypeDef SME_GPS_DataProcess(GPS_HandleTypeDef *gps_nmea){
 
 			gps_nmea->flag_data_ready = RESET;
 			gps_nmea->count_data=0;
-			return GPS_DATA_RECEIVED;
+			return SME_NEWDATA;
 		}else{
 			/* No signal or error in data integrity */
 			free(pDynamic_buffer);
@@ -297,11 +297,11 @@ GPS_StatusTypeDef SME_GPS_DataProcess(GPS_HandleTypeDef *gps_nmea){
 
 			gps_nmea->flag_data_ready = RESET;
 			gps_nmea->count_data=0;
-			return GPS_ERROR;
+			return SME_ERROR;
 		}
 	}
 	/*No data*/
-	return GPS_NODATA;
+	return SME_BUSY;
 }
 
 /**
