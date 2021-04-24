@@ -4,8 +4,8 @@
   * @author  Ismael Poblete V.
   * @brief   SME utility functions of general math.
   *          This file provides software functions:
-  *          	-To manage the DMA data acquisition of amount of data of ADC.
-  *          	-Math functions from block amount of data
+  *          	-To manage the DMA data acquisition of amount of data from ADC.
+  *          	-Math functions to process a data block.
   *          		-RMS
   *          		-Average
   @verbatim
@@ -40,13 +40,11 @@
 	@GeneralMath_functions:
 
 	(+)SME_GeneralMath_rms_float32			: Compute the RMS from data input matrix,
-											  considering number of channels and size
-											  of block of data for each one.
-											  The output is a array of float value.
+											  considering the size of block of data for
+											  each one. The output is a float value.
 	(+)SME_GeneralMath_average_float32		: Compute the average from data input matrix,
-											  considering number of channels and size
-											  of block of data for each one.
-											  The output is a array of float value.
+											  considering the size of block of data for
+											  each one. The output is a float value.
 
 	********* Private functions *********
 	(*) Without private functions
@@ -64,27 +62,40 @@
 	(#) Set a structure type ADC_HandleTypeDef and DMA_HandleTypeDef. In DMA circular mode.
 
 	(#) Use a SME_GeneralMath_DMA_Start function to start the DMA data acquisition
-		of a ADC. Use before the infinite loop transition.
+		of a ADC and configure the matrix buffer as a output of data.
+		Use before the infinite loop transition.
+		Matrix buffer: data_acq_buffer[NUMBER_ADC_CHANNELS][SIZE_BLOCK]
 
-			SME_GeneralMath_DMA_Start(&GeneralMath_DMA_DAQ, &hadc1, SIZE_RMS_BLOCK, NUMBER_ADC_CHANNELS,ADC_K_PARAMETER);
-
+			SME_GeneralMath_DMA_Start(&GeneralMath_data,&hadc1,NUMBER_ADC_CHANNELS,SIZE_BLOCK,ADC_K_PARAMETER);
 
 	(#) Use SME_GeneralMath_DMA_data_acquisition function in HAL_ADC_ConvCpltCallback
 		It acquire and store the next new data to fill the buffer. When the buffer is
 		full, then it set a flag_buffdata_ready and stop the DMA.
 
-			SME_GeneralMath_DMA_data_acquisition(&GeneralMath_DMA_DAQ);
+			SME_GeneralMath_DMA_data_acquisition(&GeneralMath_data);
 
 	(#) When flag_buffdata_ready is set it can used in the infinite loop for personal
 		process, for use math functions or @GeneralMath_functions.
 
-			SME_GeneralMath_rms_float32(NUMBER_ADC_CHANNELS,SIZE_RMS_BLOCK,GeneralMath_DMA_DAQ.input_buff_voltage,output_rms);
-			SME_GeneralMath_average_float32(NUMBER_ADC_CHANNELS,SIZE_RMS_BLOCK,GeneralMath_DMA_DAQ.input_buff_voltage,output_average);
+			if(GeneralMath_data.flag_buffdata_ready == SET) {
+
+				output_rms[0]=SME_GeneralMath_rms_float32(SIZE_BLOCK,GeneralMath_data.data_acq_buffer[0]);
+				output_rms[1]=SME_GeneralMath_rms_float32(SIZE_BLOCK,GeneralMath_data.data_acq_buffer[1]);
+
+				output_average[0]=SME_GeneralMath_average_float32(SIZE_BLOCK,GeneralMath_data.data_acq_buffer[0]);
+				output_average[1]=SME_GeneralMath_average_float32(SIZE_BLOCK,GeneralMath_data.data_acq_buffer[1]);
+				...
+				...
 
 	(#) Use SME_GeneralMath_DMA_reset_request for reset and prepared the next data acquisition
 		and start the DMA for fill the buffer. Reset flag_buffdata_ready.
 
-			SME_GeneralMath_reset_dma_request(&GeneralMath_DMA_DAQ);
+			if(GeneralMath_data.flag_buffdata_ready == SET) {
+				...
+				...
+				...
+				SME_GeneralMath_reset_dma_request(&GeneralMath_DMA_DAQ);
+			}
 
   @endverbatim
   ******************************************************************************
@@ -107,51 +118,67 @@
  */
 
 /**
- * @brief  Function to detect NMEA sentence command
+ * @brief  Initialize parameters of GeneralMath_DMA_DAQ_HandleTypeDef parameters.
  * @param  Pointer to a GeneralMath_DMA_DAQ_HandleTypeDef structure that contains
  *         the information for GeneralMath of acquisition data
  * @param  Pointer to a ADC_HandleTypeDef structure that contains
  *         the information for the specified adc.
- * @param  Size of block of amount data for matrix dimension [x][size_block]
  * @param  Number of channels for matrix dimension [n_channel][x]
- * @param  float array to send the output data for each channel.
+ * @param  Size of block of amount data for matrix dimension [x][size_block]
+ * @param  Constant value that is multiplied to every element of the matrix data buffer.
  * @retval SME Status
  */
-SME_StatusTypeDef SME_GeneralMath_DMA_Start(GeneralMath_DMA_DAQ_HandleTypeDef *generalmath,ADC_HandleTypeDef* hadc, uint32_t size_block, uint32_t number_channels, float adc_k_parameter){
-	generalmath->cont_databuff=0;
-	generalmath->adc_handler=hadc;
-	generalmath->size_block=size_block;
+SME_StatusTypeDef SME_GeneralMath_DMA_Start(GeneralMath_DMA_DAQ_HandleTypeDef *generalmath,ADC_HandleTypeDef* hadc,uint8_t number_adc_channels,uint32_t size_block, float adc_k_parameter){
+
+	/* Initialize Parameters */
+	generalmath->cont_databuff = 0;
 	generalmath->flag_buffdata_ready = RESET;
+	generalmath->size_block = size_block;
 	generalmath->adc_k_parameter = adc_k_parameter;
-	generalmath->number_channels = number_channels;
+	generalmath->number_adc_channels = number_adc_channels;
+	generalmath->adc_handler = hadc;
 
-	generalmath->adc_buf = malloc(generalmath->number_channels);
-
-	generalmath->input_buff_voltage = malloc(generalmath->number_channels);
-	for(int i = 0; i < generalmath->number_channels;i++){
-		generalmath->input_buff_voltage[i] = malloc(generalmath->size_block);
+	/* Dynamic allocation for DMA ADC BUFF*/
+	generalmath->adc_dma_buf = calloc(generalmath->number_adc_channels,sizeof(float*));
+	if(generalmath->adc_dma_buf == NULL){
+		return SME_STACKOVERFLOW;
 	}
 
-	if(HAL_ADC_Start_DMA(hadc, (uint32_t*)generalmath->adc_buf, generalmath->number_channels) == HAL_ERROR){
+	/* Dynamic allocation for store data values
+	 * Generate a dynamic matrix input_buff_voltage[number_adc_channels][size_block]
+	 * */
+	generalmath->data_acq_buffer = (float**)malloc(sizeof(float*) * generalmath->number_adc_channels);
+	if(generalmath->data_acq_buffer == NULL){
+		return SME_STACKOVERFLOW;
+	}
+	for(int i=0; i<generalmath->number_adc_channels;i++){
+		generalmath->data_acq_buffer[i] = (float*) calloc(generalmath->size_block,sizeof(float*));
+		if(generalmath->data_acq_buffer == NULL){
+			return SME_STACKOVERFLOW;
+		}
+	}
+
+	/* Start DMA */
+	if(HAL_ADC_Start_DMA(generalmath->adc_handler, (uint32_t*)generalmath->adc_dma_buf, generalmath->number_adc_channels) == HAL_ERROR){
 		return SME_ERROR;
 	}
+
 	return SME_OK;
 }
 
 /**
- * @brief  Function to acquisition DMA data for n_channels of data in matrix with length of size_block
+ * @brief  Acquisition ADC-DMA data multiplied for adc_k_parameter and store in matrix data buffer.
  * @param  Pointer to a GeneralMath_DMA_DAQ_HandleTypeDef structure that contains
  *         the configuration information for GeneralMath of acquisition data
  * @retval SME Status
  */
 SME_StatusTypeDef SME_GeneralMath_DMA_data_acquisition(GeneralMath_DMA_DAQ_HandleTypeDef *generalmath){
 	if(generalmath->flag_buffdata_ready == RESET){
-
-		for (int i = 0; i < generalmath->number_channels; i++)
-		{
-			generalmath->input_buff_voltage[i][generalmath->cont_databuff] = (float)generalmath->adc_buf[i] * generalmath->adc_k_parameter;
+		for (int i =0; i<generalmath->number_adc_channels; i++){
+			generalmath->data_acq_buffer[i][generalmath->cont_databuff] = (float) generalmath->adc_dma_buf[i] * generalmath->adc_k_parameter;
 		}
 		generalmath->cont_databuff++;
+
 		if(generalmath->cont_databuff >= generalmath->size_block){
 			generalmath->cont_databuff=0;
 			generalmath->flag_buffdata_ready = SET;
@@ -163,82 +190,62 @@ SME_StatusTypeDef SME_GeneralMath_DMA_data_acquisition(GeneralMath_DMA_DAQ_Handl
 }
 
 /**
- * @brief  Reset the ready data flag, reassign memory to data matrix and start DMA data acquisition.
+ * @brief  Reset ready data flag and re-start DMA data acquisition.
  * @param  Pointer to a GeneralMath_DMA_DAQ_HandleTypeDef structure that contains
  *         the configuration information for GeneralMath of acquisition data
  * @retval SME Status
  */
 SME_StatusTypeDef SME_GeneralMath_DMA_reset_request(GeneralMath_DMA_DAQ_HandleTypeDef *generalmath){
 	generalmath->flag_buffdata_ready = RESET;
-/*	free(generalmath->adc_buf);
-	for(int i = 0; i < generalmath->number_channels;i++){
-		free(generalmath->input_buff_voltage[i]);
-	}
+	generalmath->cont_databuff=0;
 
-	generalmath->input_buff_voltage = malloc(generalmath->number_channels);
-	for(int i = 0; i < generalmath->number_channels;i++){
-		generalmath->input_buff_voltage[i] = malloc(generalmath->size_block);
-	}
-*/
-	if(HAL_ADC_Start_DMA(generalmath->adc_handler, (uint32_t*)generalmath->adc_buf, generalmath->number_channels) == HAL_ERROR){
+	if(HAL_ADC_Start_DMA(generalmath->adc_handler, (uint32_t*)generalmath->adc_dma_buf, generalmath->number_adc_channels) == HAL_ERROR){
 		return SME_ERROR;
 	}
+
 	return SME_OK;
 }
 
 /**
- * @brief  Function to calculate the rms value of a block of data to a variable.
- * @param  Number of channels for matrix dimension [n_channel][x]
- * @param  Size of block of amount data for matrix dimension [x][size_block]
- * @param  Pointer to matrix of input data
- * @param  Float output variable array of number of channels
- * @retval SME Status
+ * @brief  Function to calculate the RMS value from a block of data.
+ * @param  Size of block of amount data to process
+ * @param  Pointer to the matrix of input data
+ * @retval Result of RMS value as a float value
 */
-SME_StatusTypeDef SME_GeneralMath_rms_float32(uint32_t number_channels, uint32_t size_block, float **input_buff_voltage,float output_rms[number_channels]){
-		float sum_v2[number_channels];
-
-		for (int i =0; i < number_channels; i++)
-		{
-			for (int j =0; j < size_block; j++)
-			{
-				/* Acquire the sum pot 2 */
-				if(j==0){
-					sum_v2[i] = input_buff_voltage[i][j] * input_buff_voltage[i][j];
-				}else{
-					sum_v2[i] = sum_v2[i] + input_buff_voltage[i][j] * input_buff_voltage[i][j];
-				}
-			}
-			output_rms[i] = sqrt(sum_v2[i] / (float) size_block);
+float SME_GeneralMath_rms_float32(uint32_t size_block, float *input_buff_voltage){
+	float sum_v2;
+	for (int i =0; i < size_block; i++)
+	{
+		/* Acquire the sum pot 2 */
+		if(i==0){
+			sum_v2 = input_buff_voltage[i] * input_buff_voltage[i];
+		}else{
+			sum_v2 = sum_v2 + input_buff_voltage[i] * input_buff_voltage[i];
 		}
-		return SME_OK;
+	}
+	return sqrt(sum_v2 / (float) size_block);
 }
 
 /**
- * @brief  Function to calculate the average value of a block of data to a variable.
- * @param  Number of channels for matrix dimension [n_channel][x]
- * @param  Size of block of amount data for matrix dimension [x][size_block]
- * @param  Pointer to matrix of input data
- * @param  Float output variable array of number of channels
- * @retval SME Status
+ * @brief  Function to calculate the Average value from a block of data.
+ * @param  Size of block of amount data to process
+ * @param  Pointer to the matrix of input data
+ * @retval Result of RMS value as a float value
 */
-SME_StatusTypeDef SME_GeneralMath_average_float32(uint32_t number_channels, uint32_t size_block, float **input_buff_voltage,float output_average[number_channels]){
+float SME_GeneralMath_average_float32(uint32_t size_block, float *input_buff_voltage){
 
-		float sum_average[number_channels];
+		float sum_average;
 
-		for (int i =0; i < number_channels; i++)
+		for (int i =0; i < size_block; i++)
 		{
-			for (int j =0; j < size_block; j++)
-			{
-				/* Acquire the sum pot 2 */
-				if(j==0){
-					sum_average[i] = input_buff_voltage[i][j];
-				}else{
-					sum_average[i] = sum_average[i] + input_buff_voltage[i][j];
-				}
+			/* Acquire the sum pot 2 */
+			if(i==0){
+				sum_average = input_buff_voltage[i];
+			}else{
+				sum_average = sum_average + input_buff_voltage[i];
 			}
-			output_average[i] = sum_average[i] / (float) size_block;
 		}
-		return SME_OK;
+		return (sum_average / (float) size_block);
 }
 
 

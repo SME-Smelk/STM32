@@ -37,9 +37,10 @@ typedef enum
 {
   SME_OK       			  = 0x00U,
   SME_ERROR				  = 0x01U,
+  SME_STACKOVERFLOW  	  = 0x02U,
 
-  SME_BUSY    			  = 0x02U,
-  SME_NEWDATA    		  = 0x03U,
+  SME_BUSY    			  = 0x03U,
+  SME_NEWDATA    		  = 0x04U,
 } SME_StatusTypeDef;
 
 /* Includes ------------------------------------------------------------------*/

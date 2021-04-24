@@ -1,12 +1,12 @@
 /**
   ******************************************************************************
-  * @Project        : DSP_00-GeneralMath
+  * @Project        : DSP_00-GeneralMath_RMS_AVERAGE
   * @Autor          : Ismael Poblete V.
   * @Company		: -
-  * @Date         	: 04-18-2021
+  * @Date         	: 04-24-2021
   * @Target			: DISCOVERY-DISC1 STM32F407VG
   * @brief          : RMS and Average processing data with DMA.
-  * 				  ADC Continuos Conversion mode and DMA circular mode
+  * 				  ADC Continuous Conversion mode and DMA circular mode
   * @Lib			: CMSIS, HAL.
   * @System Clock
   * 	SYSSource:		PLL(HSE)
@@ -23,12 +23,23 @@
   * 		PA4    	 	------> ADC1,IN4
   * 		PA5    	 	------> ADC1,IN5
   * @note
-  * 	-RMS and average processing data. It need a buffer with fully data to before
-  * 	 call the functions.
-  * 	    -data_acquisition: Function for DMA data acquisition.
-  * 		-calc_rms_float32: Calculate rms float data values from buffer full
-  * 		-calc_average_float32: Calculate averages float data values from buffer full
-  * 		-reset_data_request: Reset flag of ready data and start DMA ADC data acquisition
+  *
+  * 	 ***Utility flag:
+  *
+  * 	 	flag_buffdata_ready: If set then the data buffer is full and ready to process.
+  *
+  *		****Functions:
+  *
+  * 	 	-SME_GeneralMath_DMA_Start: Initialize the data acquisition.
+  * 	    -SME_GeneralMath_DMA_data_acquisition: Process the data acquisition in
+  * 	    	ADC CallBack HAL_ADC_ConvCpltCallback.
+  *
+  * 		-SME_GeneralMath_rms_float32: Calculate RMS float data values from a block of data.
+  * 		-SME_GeneralMath_average_float32: Calculate averages float data values from a block of data.
+  *
+  * 		-SME_GeneralMath_DMA_reset_request:
+  * 			After to process data, reset the buffer and reinitialize ADC-DMA acquisition.
+  * 			Reset flag of ready data and start DMA ADC data acquisition
   *
   ******************************************************************************
 **/
@@ -59,25 +70,17 @@ static void DMA_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 
-/* Defines for ADC and RMS */
-GeneralMath_DMA_DAQ_HandleTypeDef GeneralMath_DMA_DAQ;
+/* Defines for Store Data from ADC-DMA  */
+GeneralMath_DMA_DAQ_HandleTypeDef GeneralMath_data;
 
-/* ADC */
+/* ADC DMA */
 #define NUMBER_ADC_CHANNELS 2
-
-/* Mount of data to process*/
-#define SIZE_RMS_BLOCK 1000
-#define SIZE_AVERAGE_BLOCK 1000
+#define SIZE_BLOCK 1000
 #define ADC_K_PARAMETER (3.0 / 4096.0)
 
-/* Data to store rms and average */
+/* Data to store RMS and average */
 float output_rms[NUMBER_ADC_CHANNELS];
 float output_average[NUMBER_ADC_CHANNELS];
-
-/*Buf for DMA - ADC channels*/
-//uint16_t adc_buf[NUMBER_ADC_CHANNELS];
-/* Buf for store data for channels*/
-float input_buff_voltage[NUMBER_ADC_CHANNELS][SIZE_RMS_BLOCK];
 
 /* User data*/
 char msg[100];
@@ -119,21 +122,33 @@ int main(void)
 	sprintf(msg,"PCLK2  : %ldHz\r\n",HAL_RCC_GetPCLK2Freq());
 	HAL_UART_Transmit(&huart2,(uint8_t*)msg,strlen(msg),HAL_MAX_DELAY);
 
-
 	/* Start */
-	SME_GeneralMath_DMA_Start(&GeneralMath_DMA_DAQ, &hadc1, SIZE_RMS_BLOCK, NUMBER_ADC_CHANNELS,ADC_K_PARAMETER);
+	SME_GeneralMath_DMA_Start(&GeneralMath_data,&hadc1,NUMBER_ADC_CHANNELS,SIZE_BLOCK,ADC_K_PARAMETER);
 
 	while (1)
 	{
-		/* Calculate RMS*/
-		if(GeneralMath_DMA_DAQ.flag_buffdata_ready == SET){
 
-			/* The data is reayd and the buffers are full*/
-			SME_GeneralMath_rms_float32(NUMBER_ADC_CHANNELS,SIZE_RMS_BLOCK,GeneralMath_DMA_DAQ.input_buff_voltage,output_rms);
-			SME_GeneralMath_average_float32(NUMBER_ADC_CHANNELS,SIZE_RMS_BLOCK,GeneralMath_DMA_DAQ.input_buff_voltage,output_average);
+		if(GeneralMath_data.flag_buffdata_ready == SET) {
 
-			/* Start DMA ofr nex data and reset flag ready*/
-			SME_GeneralMath_DMA_reset_request(&GeneralMath_DMA_DAQ);
+			/* The data is ready and the buffers are full.
+			 * Process data...
+			 * With GeneralMath_DMA_DAQ_HandleTypeDef it create a matrix for stores values
+			 * 		number_adc_channels = 2
+			 * 		size_block = 1000
+			 * 		input_buff_voltage[2][1000]
+			 *
+			 * Data of CH4 -> input_buff_voltage[0] with 1000 buffer data
+			 * Data of CH5 -> input_buff_voltage[1] with 1000 buffer data
+			*/
+
+			output_rms[0]=SME_GeneralMath_rms_float32(SIZE_BLOCK,GeneralMath_data.data_acq_buffer[0]);
+			output_rms[1]=SME_GeneralMath_rms_float32(SIZE_BLOCK,GeneralMath_data.data_acq_buffer[1]);
+
+			output_average[0]=SME_GeneralMath_average_float32(SIZE_BLOCK,GeneralMath_data.data_acq_buffer[0]);
+			output_average[1]=SME_GeneralMath_average_float32(SIZE_BLOCK,GeneralMath_data.data_acq_buffer[1]);
+
+			/* Start DMA for next data and reset flag ready */
+			SME_GeneralMath_DMA_reset_request(&GeneralMath_data);
 
 			/* Print data */
 			memset(msg,0,sizeof(msg));
@@ -141,7 +156,9 @@ int main(void)
 			HAL_UART_Transmit(&huart2,(uint8_t*)msg,strlen(msg),HAL_MAX_DELAY);
 
 		}
+
 	}
+
 }
 
 /**
@@ -295,12 +312,11 @@ static void DMA_Init(void)
 
 }
 
-
 /* Called when buffer is completely filled */
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
 
-	SME_GeneralMath_DMA_data_acquisition(&GeneralMath_DMA_DAQ);
+	SME_GeneralMath_DMA_data_acquisition(&GeneralMath_data);
 
 }
 
