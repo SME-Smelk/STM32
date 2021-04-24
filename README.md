@@ -196,11 +196,10 @@ The SME High layer based with HAL for DISCOVERY-DISC1 F407VG board has the follo
 
 - [ ] SME -> HAL Drivers
 	- [x] GPS
-	- [ ] DSP
-		- [ ] General Math 
-			- [x] RMS
-			- [x] Average
-			- [ ] FFT
+	- [ ] General Math / DSP
+		- [x] RMS
+		- [x] Average
+		- [ ] FFT
 		- [ ] Filters
 			- [ ] IIR
 			- [ ] FIR
