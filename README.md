@@ -186,6 +186,9 @@ The HAL programming DISCOVERY-DISC1 F407VG board has the following code reposito
 			- [x] RMS
 			- [x] Average
 			- [ ] FFT
+				- [x] FFT (Example Const data) 
+				- [ ] ADC-FFT
+				- [ ] DMA-ADC-FFT
 		- [ ] Filters
 			- [ ] IIR
 			- [ ] FIR
@@ -196,10 +199,11 @@ The SME High layer based with HAL for DISCOVERY-DISC1 F407VG board has the follo
 
 - [ ] SME -> HAL Drivers
 	- [x] GPS
+		- [ ] GPS_00 GPGGA Example
 	- [ ] General Math / DSP
-		- [x] RMS
-		- [x] Average
-		- [ ] FFT
+		- [x] RMS (Ex. GeneralMath_00)
+		- [x] Average (Ex. GeneralMath_00)
+		- [ ] FFT (Ex. GeneralMath_01)
 		- [ ] Filters
 			- [ ] IIR
 			- [ ] FIR
