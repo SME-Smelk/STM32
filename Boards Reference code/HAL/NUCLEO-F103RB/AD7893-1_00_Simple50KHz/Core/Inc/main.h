@@ -40,20 +40,22 @@ extern "C" {
 void Error_Handler(void);
 
 /* Private defines -----------------------------------------------------------*/
+
+/* Timer for ADC*/
 #define TIMER2_PRESCALER 0
 #define TIMER2_PERIOD 1279
 
+/* ADC - AD7892 */
+/* Output */
 #define CONVST_Pin GPIO_PIN_1
 #define CONVST_GPIO_Port GPIOB
-
 #define RFS_Pin GPIO_PIN_2
 #define RFS_GPIO_Port GPIOB
-
+/* Input */
 #define EOC_Pin GPIO_PIN_11
 #define EOC_GPIO_Port GPIOB
 
-#define B1_Pin GPIO_PIN_13
-#define B1_GPIO_Port GPIOC
+/* Others pins*/
 #define USART_TX_Pin GPIO_PIN_2
 #define USART_TX_GPIO_Port GPIOA
 #define USART_RX_Pin GPIO_PIN_3

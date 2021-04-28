@@ -93,6 +93,10 @@ static void GPIO_Init(void);
 static void USART2_UART_Init(void);
 static void SPI2_Init(void);
 static void TIM2_Init(void);
+
+void AD7892_Init(void);
+void AD7892_Getdata(void);
+
 /* Private user code ---------------------------------------------------------*/
 
 char msg[100];
@@ -100,7 +104,8 @@ uint8_t spidata = 0xFA;
 uint16_t spi_receive_data;
 uint16_t data =0;
 float data_adc = 0.0;
-#define K_PARAMETER 20.0 / 4096
+#define FSR_PARAMETER_10 	20.0
+#define LSB_PARAMETER 		FSR_PARAMETER_10 / 4096
 
 /**
   * @brief  The application entry point.
@@ -119,12 +124,11 @@ int main(void)
 
   /* Initialize all configured peripherals */
   GPIO_Init();
+  AD7892_Init();
   USART2_UART_Init();
   SPI2_Init();
   TIM2_Init();
   HAL_TIM_Base_Start_IT(&htim2);
-
-  AD7892_Init();
 
   /* Infinite loop */
   while (1)
@@ -270,16 +274,45 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 }
 
 void AD7892_Init(void){
+	/* Initialize GPIOs*/
+	GPIO_InitTypeDef GPIO_InitStruct = {0};
 
-	  HAL_GPIO_WritePin(CONVST_GPIO_Port,CONVST_Pin,GPIO_PIN_SET);
-	  HAL_GPIO_WritePin(RFS_GPIO_Port,RFS_Pin,GPIO_PIN_SET);
+	/* GPIO Ports Clock Enable */
+	__HAL_RCC_GPIOB_CLK_ENABLE();
 
+	/*Configure GPIO pin Output Level */
+	HAL_GPIO_WritePin(RFS_GPIO_Port, RFS_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(CONVST_GPIO_Port, CONVST_Pin, GPIO_PIN_RESET);
+
+	/*Configure GPIO pin : EOC_Pin */
+	GPIO_InitStruct.Pin = EOC_Pin;
+	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+	HAL_GPIO_Init(EOC_GPIO_Port, &GPIO_InitStruct);
+
+	/*Configure GPIO pin : RFS_Pin */
+	GPIO_InitStruct.Pin = RFS_Pin;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+	HAL_GPIO_Init(RFS_GPIO_Port, &GPIO_InitStruct);
+
+	/*Configure GPIO pin : CONVST_Pin */
+	GPIO_InitStruct.Pin = CONVST_Pin;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+	HAL_GPIO_Init(CONVST_GPIO_Port, &GPIO_InitStruct);
+
+	/* Set GPIOs */
+	HAL_GPIO_WritePin(CONVST_GPIO_Port,CONVST_Pin,GPIO_PIN_SET);
+	HAL_GPIO_WritePin(RFS_GPIO_Port,RFS_Pin,GPIO_PIN_SET);
 }
 
 void AD7892_Getdata(void){
 
 	  /* Init
-
 			HCKL 64MHz - APB1 64MHz
 			CLOCK,CONVST,EOC,RFS must be HIGH
 			(*): Must be done by the MCU
@@ -287,7 +320,6 @@ void AD7892_Getdata(void){
 			*CONVST: Send pulse for data
 			EOC: After 1.6us, it response with a 85ns pulse (data ready)
 			*RFS: Must be LOW for SPI receive transmission and HIGH when it finished.
-
 	  */
 
 	  /* CONVST LOW TOGGLE 140ns (30ns minimum) */
@@ -307,6 +339,13 @@ void AD7892_Getdata(void){
 	  /* Finish of transmission Set RFS HIGH - SET PIN*/
 	  RFS_GPIO_Port->BSRR = RFS_Pin;
 
+	  /* Data processing */
+	  if(spi_receive_data < 2048){
+		  data_adc = (float)spi_receive_data * LSB_PARAMETER;
+	  }else if(spi_receive_data > 2047){
+		  data_adc = ((4095 - (float)spi_receive_data) * LSB_PARAMETER * -1);
+	  }
+
 }
 /**
   * @brief GPIO Initialization Function
@@ -318,34 +357,10 @@ static void GPIO_Init(void)
   GPIO_InitTypeDef GPIO_InitStruct = {0};
 
   /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
-  __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
-  HAL_GPIO_WritePin(RFS_GPIO_Port, RFS_Pin, GPIO_PIN_RESET);
-  HAL_GPIO_WritePin(CONVST_GPIO_Port, CONVST_Pin, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin : ASD_Pin */
-  GPIO_InitStruct.Pin = EOC_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-  HAL_GPIO_Init(EOC_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : B1_Pin */
-  GPIO_InitStruct.Pin = B1_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : ASD_Pin */
-  GPIO_InitStruct.Pin = CONVST_Pin | RFS_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-  HAL_GPIO_Init(CONVST_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : LD2_Pin */
   GPIO_InitStruct.Pin = LD2_Pin;
