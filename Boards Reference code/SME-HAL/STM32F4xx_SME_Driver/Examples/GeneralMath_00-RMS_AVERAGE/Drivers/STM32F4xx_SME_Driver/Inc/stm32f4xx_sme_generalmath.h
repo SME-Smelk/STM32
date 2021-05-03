@@ -21,7 +21,7 @@
 #include <stm32f4xx_sme_conf.h>
 
 /**
-  * @brief  NMEA GPGGA handle Structure definition
+  * @brief  ADC-DMA handle Structure definition
   */
 
 typedef struct {
