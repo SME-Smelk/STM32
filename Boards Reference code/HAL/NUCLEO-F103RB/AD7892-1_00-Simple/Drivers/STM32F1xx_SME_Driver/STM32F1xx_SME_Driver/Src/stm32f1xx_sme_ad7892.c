@@ -326,27 +326,6 @@ float SME_AD7892_Getdata(SME_AD7892_ADC_t *ad7892){
 	  ad7892->rfs_port->BSRR = ad7892->rfs_pin;
 
 	  /* Data processing */
-	  /*
-	  if((ad7892->spi_receive_data >= 0) && (ad7892->spi_receive_data < 2048)){
-		  ad7892->data_adc = (float)ad7892->spi_receive_data * ad7892->lsb_parameter;
-	  }else if((ad7892->spi_receive_data >= 2047) && (ad7892->spi_receive_data < 4096)){
-		  ad7892->data_adc = ((4095 - (float)ad7892->spi_receive_data) * ad7892->lsb_parameter * -1);
-	  }else{
-		 return SME_ERROR;
-	  }
-	  return SME_OK;
-	  */
-	  /*
-	  if((ad7892->spi_receive_data >= 0) && (ad7892->spi_receive_data < 2048)){
-		  ad7892->data_adc = ((float)ad7892->spi_receive_data + ad7892->offset_err)* ad7892->lsb_parameter * ad7892->gain_err ;
-	  }else if((ad7892->spi_receive_data >= 2047) && (ad7892->spi_receive_data < 4096)){
-		  ad7892->data_adc = ((4095 - ((float)ad7892->spi_receive_data + ad7892->offset_err))* ad7892->gain_err * ad7892->lsb_parameter * -1);
-	  }else{
-		 return SME_ERROR;
-	  }
-	  return SME_OK;
-	  */
-
 	  if((ad7892->spi_receive_data >= 0) && (ad7892->spi_receive_data < 2048)){
 		  ad7892->data_adc = ((float)ad7892->spi_receive_data - ad7892->offset_p_err) / (ad7892->gain_p_err);
 	  }else if((ad7892->spi_receive_data >= 2047) && (ad7892->spi_receive_data < 4096)){
