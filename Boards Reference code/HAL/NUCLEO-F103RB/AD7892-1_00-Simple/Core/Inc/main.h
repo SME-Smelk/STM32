@@ -55,10 +55,19 @@ void Error_Handler(void);
 #define NUMBER_OF_DATA 100
 
 /*Manual Calibrate values*/
-#define OFFSET_P_ERR 		-110.78
-#define GAIN_P_ERR 			205.95
-#define OFFSET_N_ERR 		125.25
-#define GAIN_N_ERR 			205.59
+#define ADC1_OFFSET				4043
+#define ADC1_GAIN_ERR_P 		1
+#define ADC1_GAIN_ERR_N 		1
+
+#define ADC2_OFFSET		 		3879
+#define ADC2_GAIN_ERR_P 		1
+#define ADC2_GAIN_ERR_N 		1
+
+#define ADC1_OFFSET_ERR_P 		-1*(4095-ADC1_OFFSET)
+#define ADC1_OFFSET_ERR_N 		(4095-ADC1_OFFSET)
+#define ADC2_OFFSET_ERR_P 		-1*(4095-ADC2_OFFSET)
+#define ADC2_OFFSET_ERR_N 		(4095-ADC2_OFFSET)
+
 
 /* ADC AD7892_1 */
 #define AD7892_1_CONVST_Pin 		GPIO_PIN_1
