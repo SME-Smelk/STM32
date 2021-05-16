@@ -15,9 +15,9 @@ In the process of learning and generating a personal repository as well as frien
 
 
 
-
-![](https://i.postimg.cc/SsDPs73D/Sin-t-tulo-2.png)
-
+<p align="center">
+  <img src="https://i.postimg.cc/SsDPs73D/Sin-t-tulo-2.png" />
+</p>
 
 
 
