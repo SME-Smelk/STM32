@@ -26,7 +26,7 @@ In the process of learning and generating a personal repository as well as frien
 
 
 
-# Board Reference Code: HAL / Basics
+# Board Reference Code / HAL
 
 The HAL programming DISCOVERY-DISC1 F407VG board has the following code repository the following plan, at the moment. This list could change**
 
